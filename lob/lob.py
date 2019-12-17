@@ -35,6 +35,81 @@ class LimitOrderBook:
         """Delete this limit order book."""
         _LIB.Delete(self._book)
 
+    def limit_sell(self, size, price, arrival):
+        """
+        """
+
+    def limit_buy(self, size, price, arrival):
+        """
+        """
+
+    def limit(self, side, size, price, arrival):
+        """
+        """
+
+    def has(self, order_id):
+        """
+        """
+
+    def get(self, order_id):
+        """
+        """
+
+    def cancel(self, order_id):
+        """
+        """
+
+    def market_sell(self, size, arrival):
+        """
+        """
+
+    def market_buy(self, size, arrival):
+        """
+        """
+
+    def market(self, side, size, arrival):
+        """
+        """
+
+    def best_sell(self):
+        """
+        """
+
+    def best_buy(self):
+        """
+        """
+
+    def best(self):
+        """
+        """
+
+    def volume_sell(self, price=None):
+        """
+        """
+
+    def volume_buy(self, price=None):
+        """
+        """
+
+    def volume(self, price=None):
+        """
+        """
+
+    def size_at(self):
+        """
+        """
+
+    def size_sell(self):
+        """
+        """
+    def size_buy(self):
+        """
+        """
+
+    def size(self, price=None):
+        """
+        """
+
 
 # explicitly define the outward facing API of this module
 __all__ = [LimitOrderBook.__name__]
