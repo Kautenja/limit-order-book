@@ -6,6 +6,7 @@
 //
 
 #include <string>
+#include "limit_order_book.hpp"
 
 // Windows-base systems
 #if defined(_WIN32) || defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(__BORLANDC__)
@@ -19,65 +20,53 @@
     #define EXP
 #endif
 
+using namespace LOB;
+
 // definitions of functions for the Python interface to access
 extern "C" {
-    EXP int foo() {return 0;}
-    // /// Return the width of the NES.
-    // EXP int Width() {
-    //     return NES::Emulator::WIDTH;
-    // }
+    /// Initialize a new limit order book and return a pointer to it
+    EXP LimitOrderBook* Initialize() { return new LimitOrderBook(); }
 
-    // /// Return the height of the NES.
-    // EXP int Height() {
-    //     return NES::Emulator::HEIGHT;
-    // }
-
-    // /// Initialize a new emulator and return a pointer to it
-    // EXP NES::Emulator* Initialize(wchar_t* path) {
-    //     // convert the c string to a c++ std string data structure
-    //     std::wstring ws_rom_path(path);
-    //     std::string rom_path(ws_rom_path.begin(), ws_rom_path.end());
-    //     // create a new emulator with the given ROM path
-    //     return new NES::Emulator(rom_path);
-    // }
+    /// Delete the limit order book, i.e., purge it from memory
+    EXP void Delete(LimitOrderBook* book) { delete book; }
 
     // /// Return a pointer to a controller on the machine
-    // EXP NES::NES_Byte* Controller(NES::Emulator* emu, int port) {
+    // EXP NES::NES_Byte* Controller(LimitOrderBook* book, int port) {
     //     return emu->get_controller(port);
     // }
 
     // /// Return the pointer to the screen buffer
-    // EXP NES::NES_Pixel* Screen(NES::Emulator* emu) {
+    // EXP NES::NES_Pixel* Screen(LimitOrderBook* book) {
     //     return emu->get_screen_buffer();
     // }
 
     // /// Return the pointer to the memory buffer
-    // EXP NES::NES_Byte* Memory(NES::Emulator* emu) {
+    // EXP NES::NES_Byte* Memory(LimitOrderBook* book) {
     //     return emu->get_memory_buffer();
     // }
 
     // /// Reset the emulator
-    // EXP void Reset(NES::Emulator* emu) {
+    // EXP void Reset(LimitOrderBook* book) {
     //     emu->reset();
     // }
 
     // /// Perform a discrete step in the emulator (i.e., 1 frame)
-    // EXP void Step(NES::Emulator* emu) {
+    // EXP void Step(LimitOrderBook* book) {
     //     emu->step();
     // }
 
     // /// Create a deep copy (i.e., a clone) of the given emulator
-    // EXP void Backup(NES::Emulator* emu) {
+    // EXP void Backup(LimitOrderBook* book) {
     //     emu->backup();
     // }
 
     // /// Create a deep copy (i.e., a clone) of the given emulator
-    // EXP void Restore(NES::Emulator* emu) {
+    // EXP void Restore(LimitOrderBook* book) {
     //     emu->restore();
     // }
 
     // /// Close the emulator, i.e., purge it from memory
-    // EXP void Close(NES::Emulator* emu) {
+    // EXP void Close(LimitOrderBook* book) {
     //     delete emu;
     // }
 }
