@@ -34,32 +34,50 @@ extern "C" {
         delete book;
     }
 
-    // limit_sell
-    ///
+    /// Add a new sell limit order to the book.
+    EXP void limit_sell(LimitOrderBook* book) {
 
-    // limit_buy
-    ///
+    }
 
-    // limit
-    ///
+    /// Add a new buy limit order to the book.
+    EXP void limit_buy(LimitOrderBook* book) {
 
-    // has
-    ///
+    }
 
-    // get
-    ///
+    /// Add a new limit order to the book.
+    EXP void limit(LimitOrderBook* book) {
 
-    // cancel
-    ///
+    }
 
-    // market_sell
-    ///
+    /// Return true if the book has an order with given ID, false otherwise.
+    EXP bool has(LimitOrderBook* book, UID order_id) {
+        return book->has(order_id);
+    }
 
-    // market_buy
-    ///
+    /// Get the order with given ID.
+    EXP const Order* get(LimitOrderBook* book, UID order_id) {
+        return &book->get(order_id);
+    }
 
-    // market
-    ///
+    /// Cancel an existing order in the book.
+    EXP void cancel(LimitOrderBook* book, UID order_id) {
+        book->cancel(order_id);
+    }
+
+    /// Execute a sell market order.
+    EXP void market_sell(LimitOrderBook* book) {
+
+    }
+
+    /// Execute a buy market order.
+    EXP void market_buy(LimitOrderBook* book) {
+
+    }
+
+    /// Execute a market order.
+    EXP void market(LimitOrderBook* book) {
+
+    }
 
     /// Return the best sell price.
     EXP Price best_sell(LimitOrderBook* book) {
