@@ -25,12 +25,12 @@ using namespace LOB;
 // definitions of functions for the Python interface to access
 extern "C" {
     /// Initialize a new limit order book and return a pointer to it
-    EXP LimitOrderBook* Initialize() {
+    EXP LimitOrderBook* new_() {
         return new LimitOrderBook();
     }
 
     /// Delete the limit order book, i.e., purge it from memory
-    EXP void Delete(LimitOrderBook* book) {
+    EXP void delete_(LimitOrderBook* book) {
         delete book;
     }
 
