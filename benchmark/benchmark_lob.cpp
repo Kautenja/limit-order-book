@@ -21,9 +21,7 @@ using Catch::Benchmark::Chronometer;
 //
 
 inline void spam_limits(LimitOrderBook book, int count) {
-    Account account;
-    for (int i = 0; i < count; i++)
-        book.limit(&account, Side::Buy, 50, i, i);
+    for (int i = 0; i < count; i++) book.limit(Side::Buy, 50, i, i);
 }
 
 TEST_CASE("Spam new Limits") {
@@ -58,9 +56,8 @@ TEST_CASE("Spam new Limits") {
 //
 
 inline void spam_orders(LimitOrderBook book, int count, int variance = 5) {
-    Account account;
     for (int i = 0; i < count; i++)
-        book.limit(&account, Side::Buy, 50, i % variance, i);
+        book.limit(Side::Buy, 50, i % variance, i);
 }
 
 TEST_CASE("Spam new Orders") {
@@ -101,12 +98,11 @@ inline void spam_orders_random_cancels(
     int variance = 30,
     int cancel_every = 5
 ) {
-    Account account;
     auto generator = std::default_random_engine();
     auto price_distribution = std::normal_distribution<double>(mean, variance);
-    book.limit(&account, Side::Buy, 50, price_distribution(generator), 0);
+    book.limit(Side::Buy, 50, price_distribution(generator), 0);
     for (int i = 1; i < count; i++) {
-        book.limit(&account, Side::Buy, 50, price_distribution(generator), i);
+        book.limit(Side::Buy, 50, price_distribution(generator), i);
         if (i % cancel_every == 0)
             book.cancel(i - cancel_every);
     }
@@ -152,16 +148,15 @@ inline void spam_limit_random_orders(
     int size_variance = 10,
     int order_every = 100
 ) {
-    Account account;
     auto generator = std::default_random_engine();
     auto price = std::normal_distribution<double>(price_mean, price_variance);
     auto size = std::normal_distribution<double>(size_mean, size_variance);
     for (int i = 1; i < count; i++) {
         auto price_ = static_cast<uint64_t>(price(generator));
         auto size_ = static_cast<uint32_t>(size(generator));
-        book.limit(&account, Side::Buy, 100, price_, i);
+        book.limit(Side::Buy, 100, price_, i);
         if (i % order_every == 0)  // random submit a market order
-            book.market(&account, Side::Sell, size_, i);
+            book.market(Side::Sell, size_, i);
     }
 }
 
@@ -188,15 +183,14 @@ inline void spam_limit_many_market_orders(
     int size_mean = 50,
     int size_variance = 10
 ) {
-    Account account;
     auto generator = std::default_random_engine();
     auto price = std::normal_distribution<double>(price_mean, price_variance);
     auto size = std::normal_distribution<double>(size_mean, size_variance);
     for (int i = 1; i < count; i++) {
         auto price_ = static_cast<uint64_t>(price(generator));
         auto size_ = static_cast<uint32_t>(size(generator));
-        book.limit(&account, Side::Buy, 100, price_, i);
-        book.market(&account, Side::Sell, size_, i);
+        book.limit(Side::Buy, 100, price_, i);
+        book.market(Side::Sell, size_, i);
     }
 }
 

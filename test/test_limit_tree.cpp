@@ -41,8 +41,7 @@ SCENARIO("add a single order to LimitTree") {
     GIVEN("a LimitTree and a single buy order") {
         auto tree = LimitTree<Side::Buy>();
         WHEN("the order is added") {
-            Account account;
-            Order node = {&account, 1, Side::Buy, size, price, arrival};
+            Order node = {1, Side::Buy, size, price, arrival};
             tree.limit(&node);
             THEN("the order is recorded in the tree data structures") {
                 REQUIRE(1 == tree.limits.size());
@@ -64,8 +63,7 @@ SCENARIO("add a single order to LimitTree") {
     GIVEN("a LimitTree and a single sell order") {
         auto tree = LimitTree<Side::Sell>();
         WHEN("the order is added") {
-            Account account;
-            Order node = {&account, 1, Side::Sell, size, price, arrival};
+            Order node = {1, Side::Sell, size, price, arrival};
             tree.limit(&node);
             THEN("the order is recorded in the tree data structures") {
                 REQUIRE(1 == tree.limits.size());
@@ -94,10 +92,9 @@ SCENARIO("add two orders to LimitTree (best first)") {
     GIVEN("a LimitTree and 2 buy orders") {
         auto tree = LimitTree<Side::Buy>();
         WHEN("the orders are added") {
-            Account account;
-            Order node1 = {&account, 1, Side::Buy, size, priceHigher, arrival};
+            Order node1 = {1, Side::Buy, size, priceHigher, arrival};
             tree.limit(&node1);
-            Order node2 = {&account, 2, Side::Buy, size, price, arrival};
+            Order node2 = {2, Side::Buy, size, price, arrival};
             tree.limit(&node2);
             THEN("the orders are recorded in the tree data structures") {
                 REQUIRE(2 == tree.limits.size());
@@ -117,10 +114,9 @@ SCENARIO("add two orders to LimitTree (best first)") {
     GIVEN("a LimitTree and 2 sell orders") {
         auto tree = LimitTree<Side::Sell>();
         WHEN("the orders are added") {
-            Account account;
-            Order node1 = {&account, 1, Side::Sell, size, price, arrival};
+            Order node1 = {1, Side::Sell, size, price, arrival};
             tree.limit(&node1);
-            Order node2 = {&account, 2, Side::Buy, size, priceHigher, arrival};
+            Order node2 = {2, Side::Buy, size, priceHigher, arrival};
             tree.limit(&node2);
             THEN("the orders are recorded in the tree data structures") {
                 REQUIRE(2 == tree.limits.size());
@@ -147,10 +143,9 @@ SCENARIO("add two orders to LimitTree (best last)") {
     GIVEN("a LimitTree and 2 buy orders") {
         auto tree = LimitTree<Side::Buy>();
         WHEN("the orders are added") {
-            Account account;
-            Order node1 = {&account, 1, Side::Buy, size, price, arrival};
+            Order node1 = {1, Side::Buy, size, price, arrival};
             tree.limit(&node1);
-            Order node2 = {&account, 2, Side::Buy, size, priceHigher, arrival};
+            Order node2 = {2, Side::Buy, size, priceHigher, arrival};
             tree.limit(&node2);
             THEN("the orders are recorded in the tree data structures") {
                 REQUIRE(2 == tree.limits.size());
@@ -170,10 +165,9 @@ SCENARIO("add two orders to LimitTree (best last)") {
     GIVEN("a LimitTree and 2 sell orders") {
         auto tree = LimitTree<Side::Sell>();
         WHEN("the orders are added") {
-            Account account;
-            Order node1 = {&account, 1, Side::Sell, size, priceHigher, arrival};
+            Order node1 = {1, Side::Sell, size, priceHigher, arrival};
             tree.limit(&node1);
-            Order node2 = {&account, 2, Side::Buy, size, price, arrival};
+            Order node2 = {2, Side::Buy, size, price, arrival};
             tree.limit(&node2);
             THEN("the orders are recorded in the tree data structures") {
                 REQUIRE(2 == tree.limits.size());
@@ -200,10 +194,9 @@ SCENARIO("add two orders to LimitTree (same price)") {
         // only need to test buy because this logic is side independent
         auto tree = LimitTree<Side::Buy>();
         WHEN("the orders are added") {
-            Account account;
-            Order node1 = {&account, 1, Side::Buy, size, price, arrival};
+            Order node1 = {1, Side::Buy, size, price, arrival};
             tree.limit(&node1);
-            Order node2 = {&account, 2, Side::Buy, size, price, arrival};
+            Order node2 = {2, Side::Buy, size, price, arrival};
             tree.limit(&node2);
             THEN("the orders are recorded in the tree data structures") {
                 REQUIRE(1 == tree.limits.size());
@@ -221,20 +214,19 @@ SCENARIO("add two orders to LimitTree (same price)") {
 }
 
 // ---------------------------------------------------------------------------
-// MARK: remove
+// MARK: cancel
 // ---------------------------------------------------------------------------
 
-SCENARIO("remove a single order from LimitTree") {
+SCENARIO("cancel a single order from LimitTree") {
     Size size = 0x4545;
     Price price = 0xAABBCCDD00112233;
     Timestamp arrival = 0xABABCDCDDEDEF0F0;
     GIVEN("a LimitTree with a single buy order") {
         auto tree = LimitTree<Side::Buy>();
-        Account account;
-        Order node = {&account, 1, Side::Buy, size, price, arrival};
+        Order node = {1, Side::Buy, size, price, arrival};
         tree.limit(&node);
-        WHEN("the order is removed") {
-            tree.remove(&node);
+        WHEN("the order is canceld") {
+            tree.cancel(&node);
             THEN("the data structures are updated") {
                 REQUIRE(0 == tree.limits.size());
                 REQUIRE(0 == tree.volume_at(price));
@@ -246,11 +238,10 @@ SCENARIO("remove a single order from LimitTree") {
     }
     GIVEN("a LimitTree and with a single sell order") {
         auto tree = LimitTree<Side::Sell>();
-        Account account;
-        Order node = {&account, 1, Side::Sell, size, price, arrival};
+        Order node = {1, Side::Sell, size, price, arrival};
         tree.limit(&node);
-        WHEN("the order is removed") {
-            tree.remove(&node);
+        WHEN("the order is canceld") {
+            tree.cancel(&node);
             THEN("the data structures are updated") {
                 REQUIRE(0 == tree.limits.size());
                 REQUIRE(0 == tree.volume_at(price));
@@ -263,13 +254,12 @@ SCENARIO("remove a single order from LimitTree") {
     GIVEN("a LimitTree and with 2 single sell orders of the same price") {
         // just need to test sell because logic is side independent
         auto tree = LimitTree<Side::Sell>();
-        Account account;
-        Order node1 = {&account, 1, Side::Sell, size, price, arrival};
+        Order node1 = {1, Side::Sell, size, price, arrival};
         tree.limit(&node1);
-        Order node2 = {&account, 2, Side::Sell, size, price, arrival};
+        Order node2 = {2, Side::Sell, size, price, arrival};
         tree.limit(&node2);
-        WHEN("the first order is removed") {
-            tree.remove(&node1);
+        WHEN("the first order is canceld") {
+            tree.cancel(&node1);
             THEN("the data structures are updated") {
                 REQUIRE(1 == tree.limits.size());
                 REQUIRE(size == tree.volume_at(price));
@@ -279,8 +269,8 @@ SCENARIO("remove a single order from LimitTree") {
                 REQUIRE(&node2 == tree.root->order_tail);
             }
         }
-        WHEN("the second order is removed") {
-            tree.remove(&node2);
+        WHEN("the second order is canceld") {
+            tree.cancel(&node2);
             THEN("the data structures are updated") {
                 REQUIRE(1 == tree.limits.size());
                 REQUIRE(size == tree.volume_at(price));
@@ -293,20 +283,19 @@ SCENARIO("remove a single order from LimitTree") {
     }
 }
 
-SCENARIO("remove an order from LimitTree (best first)") {
+SCENARIO("cancel an order from LimitTree (best first)") {
     Size size = 0x4545;
     Price price = 0xAABBCCDD00112233;
     auto priceHigher = price + 1;
     Timestamp arrival = 0xABABCDCDDEDEF0F0;
     GIVEN("a LimitTree with 2 buy orders") {
         auto tree = LimitTree<Side::Buy>();
-        Account account;
-        Order node1 = {&account, 1, Side::Buy, size, priceHigher, arrival};
+        Order node1 = {1, Side::Buy, size, priceHigher, arrival};
         tree.limit(&node1);
-        Order node2 = {&account, 2, Side::Buy, size, price, arrival};
+        Order node2 = {2, Side::Buy, size, price, arrival};
         tree.limit(&node2);
-        WHEN("the best order is removed") {
-            tree.remove(&node1);
+        WHEN("the best order is canceld") {
+            tree.cancel(&node1);
             THEN("the data structures are updated") {
                 REQUIRE(1 == tree.limits.size());
                 REQUIRE(0 == tree.volume_at(priceHigher));
@@ -321,8 +310,8 @@ SCENARIO("remove an order from LimitTree (best first)") {
                 REQUIRE(&node2 == tree.best->order_tail);
             }
         }
-        WHEN("the arbitrary order is removed") {
-            tree.remove(&node2);
+        WHEN("the arbitrary order is canceld") {
+            tree.cancel(&node2);
             THEN("the data structures are updated") {
                 REQUIRE(1 == tree.limits.size());
                 REQUIRE(size == tree.volume_at(priceHigher));
@@ -340,13 +329,12 @@ SCENARIO("remove an order from LimitTree (best first)") {
     }
     GIVEN("a LimitTree with 2 sell orders") {
         auto tree = LimitTree<Side::Sell>();
-        Account account;
-        Order node1 = {&account, 1, Side::Sell, size, price, arrival};
+        Order node1 = {1, Side::Sell, size, price, arrival};
         tree.limit(&node1);
-        Order node2 = {&account, 2, Side::Buy, size, priceHigher, arrival};
+        Order node2 = {2, Side::Buy, size, priceHigher, arrival};
         tree.limit(&node2);
-        WHEN("the best order is removed") {
-            tree.remove(&node1);
+        WHEN("the best order is canceld") {
+            tree.cancel(&node1);
             THEN("the data structures are updated") {
                 REQUIRE(1 == tree.limits.size());
                 REQUIRE(size == tree.volume_at(priceHigher));
@@ -361,8 +349,8 @@ SCENARIO("remove an order from LimitTree (best first)") {
                 REQUIRE(&node2 == tree.best->order_tail);
             }
         }
-        WHEN("the arbitrary order is removed") {
-            tree.remove(&node2);
+        WHEN("the arbitrary order is canceld") {
+            tree.cancel(&node2);
             THEN("the data structures are updated") {
                 REQUIRE(1 == tree.limits.size());
                 REQUIRE(0 == tree.volume_at(priceHigher));
@@ -380,20 +368,19 @@ SCENARIO("remove an order from LimitTree (best first)") {
     }
 }
 
-SCENARIO("remove an order from LimitTree (best last)") {
+SCENARIO("cancel an order from LimitTree (best last)") {
     Size size = 0x4545;
     Price price = 0xAABBCCDD00112233;
     auto priceHigher = price + 1;
     Timestamp arrival = 0xABABCDCDDEDEF0F0;
     GIVEN("a LimitTree with 2 buy orders") {
         auto tree = LimitTree<Side::Buy>();
-        Account account;
-        Order node1 = {&account, 1, Side::Buy, size, price, arrival};
+        Order node1 = {1, Side::Buy, size, price, arrival};
         tree.limit(&node1);
-        Order node2 = {&account, 2, Side::Buy, size, priceHigher, arrival};
+        Order node2 = {2, Side::Buy, size, priceHigher, arrival};
         tree.limit(&node2);
-        WHEN("the best order is removed") {
-            tree.remove(&node2);
+        WHEN("the best order is canceld") {
+            tree.cancel(&node2);
             THEN("the data structures are updated") {
                 REQUIRE(1 == tree.limits.size());
                 REQUIRE(0 == tree.volume_at(priceHigher));
@@ -408,8 +395,8 @@ SCENARIO("remove an order from LimitTree (best last)") {
                 REQUIRE(&node1 == tree.best->order_tail);
             }
         }
-        WHEN("the arbitrary order is removed") {
-            tree.remove(&node1);
+        WHEN("the arbitrary order is canceld") {
+            tree.cancel(&node1);
             THEN("the data structures are updated") {
                 REQUIRE(1 == tree.limits.size());
                 REQUIRE(size == tree.volume_at(priceHigher));
@@ -427,13 +414,12 @@ SCENARIO("remove an order from LimitTree (best last)") {
     }
     GIVEN("a LimitTree with 2 sell orders") {
         auto tree = LimitTree<Side::Sell>();
-        Account account;
-        Order node1 = {&account, 1, Side::Sell, size, priceHigher, arrival};
+        Order node1 = {1, Side::Sell, size, priceHigher, arrival};
         tree.limit(&node1);
-        Order node2 = {&account, 2, Side::Buy, size, price, arrival};
+        Order node2 = {2, Side::Buy, size, price, arrival};
         tree.limit(&node2);
-        WHEN("the best order is removed") {
-            tree.remove(&node2);
+        WHEN("the best order is canceld") {
+            tree.cancel(&node2);
             THEN("the data structures are updated") {
                 REQUIRE(1 == tree.limits.size());
                 REQUIRE(size == tree.volume_at(priceHigher));
@@ -448,8 +434,8 @@ SCENARIO("remove an order from LimitTree (best last)") {
                 REQUIRE(&node1 == tree.best->order_tail);
             }
         }
-        WHEN("the arbitrary order is removed") {
-            tree.remove(&node1);
+        WHEN("the arbitrary order is canceld") {
+            tree.cancel(&node1);
             THEN("the data structures are updated") {
                 REQUIRE(1 == tree.limits.size());
                 REQUIRE(0 == tree.volume_at(priceHigher));
@@ -473,18 +459,18 @@ SCENARIO("remove an order from LimitTree (best last)") {
 
 SCENARIO("a market order is submitted with no order in the tree") {
     GIVEN("An empty limit tree") {
-        Account account;
         LimitTree<Side::Buy> tree;
         Size size = 100;
         Timestamp arrival = 1;
         WHEN("a buy market order is submitted") {
-            Order market = {&account, 1, Side::Sell, size, 0, arrival};
+            Order market = {1, Side::Sell, size, 0, arrival};
             tree.market(&market, [](UID) { });
-            THEN("the account should not be updated") {
-                REQUIRE(account.order_count == 0);
-                REQUIRE(account.volume == 0);
-                REQUIRE(account.shares == 0);
-                REQUIRE(account.capital == 0);
+            THEN("the tree is empty") {
+                REQUIRE(tree.root == nullptr);
+                REQUIRE(tree.limits.size() == 0);
+                REQUIRE(tree.best == nullptr);
+                REQUIRE(tree.size == 0);
+                REQUIRE(tree.volume == 0);
             }
         }
     }
@@ -496,30 +482,16 @@ SCENARIO("a market order is submitted to tree with a perfect match") {
         Price price = 50;
         Timestamp arrival1 = 1;
         Timestamp arrival2 = 2;
-        Account maker;
-        Account taker;
         LimitTree<Side::Buy> tree;
 
         WHEN("a sell market order is matched to a buy limit order") {
-            Order limit = {&maker, 1, Side::Buy, size, price, arrival1};
+            Order limit = {1, Side::Buy, size, price, arrival1};
             tree.limit(&limit);
-            Order market = {&taker, 2, Side::Sell, size, 0, arrival2};
+            Order market = {2, Side::Sell, size, 0, arrival2};
             tree.market(&market, [](UID) { });
             THEN("the limit_fill and market_fill functions should fire") {
                 REQUIRE(nullptr == tree.best);
                 REQUIRE(0 == tree.volume_at(price));
-            }
-            THEN("the maker account should be updated") {
-                REQUIRE(maker.order_count == 0);
-                REQUIRE(maker.volume == 0);
-                REQUIRE(maker.shares == size);
-                REQUIRE(maker.capital == -price * size);
-            }
-            THEN("the taker account should be updated") {
-                REQUIRE(taker.order_count == 0);
-                REQUIRE(taker.volume == 0);
-                REQUIRE(taker.shares == -static_cast<Shares>(size));
-                REQUIRE(taker.capital == price * size);
             }
         }
     }
@@ -532,31 +504,17 @@ SCENARIO("a market order is submitted that is partially filled") {
         Price price = 50;
         Timestamp arrival1 = 1;
         Timestamp arrival2 = 2;
-        Account maker;
-        Account taker;
         LimitTree<Side::Buy> tree;
-        Order limit = {&maker, 1, Side::Buy, size_limit, price, arrival1};
+        Order limit = {1, Side::Buy, size_limit, price, arrival1};
         tree.limit(&limit);
 
         WHEN("a buy market order is submitted") {
-            Order market = {&taker, 2, Side::Sell, size_market, 0, arrival2};
+            Order market = {2, Side::Sell, size_market, 0, arrival2};
             tree.market(&market, [](UID) { });
             THEN("the limit_fill and market_fill functions should fire") {
                 REQUIRE(nullptr != tree.best);
                 REQUIRE(price == tree.best->key);
                 REQUIRE(size_limit - size_market == tree.volume_at(price));
-            }
-            THEN("the maker account should be updated") {
-                REQUIRE(maker.order_count == 1);
-                REQUIRE(maker.volume == size_limit - size_market);
-                REQUIRE(maker.shares == size_market);
-                REQUIRE(maker.capital == -price * size_market);
-            }
-            THEN("the taker account should be updated") {
-                REQUIRE(taker.order_count == 0);
-                REQUIRE(taker.volume == 0);
-                REQUIRE(taker.shares == -static_cast<Shares>(size_market));
-                REQUIRE(taker.capital == price * size_market);
             }
         }
     }
@@ -571,40 +529,19 @@ SCENARIO("a market order is submitted that spans several limit orders") {
         Timestamp arrival1 = 1;
         Timestamp arrival2 = 2;
         Timestamp arrival3 = 3;
-        Account maker1;
-        Account maker2;
-        Account taker;
         LimitTree<Side::Buy> tree;
-        Order limit1 = {&maker1, 1, Side::Buy, size_limit1, price, arrival1};
+        Order limit1 = {1, Side::Buy, size_limit1, price, arrival1};
         tree.limit(&limit1);
-        Order limit2 = {&maker2, 2, Side::Buy, size_limit2, price, arrival2};
+        Order limit2 = {2, Side::Buy, size_limit2, price, arrival2};
         tree.limit(&limit2);
 
         WHEN("a buy market order is submitted") {
-            Order market = {&taker, 3, Side::Sell, size_market, 0, arrival3};
+            Order market = {3, Side::Sell, size_market, 0, arrival3};
             tree.market(&market, [](UID) { });
             THEN("the limit_fill and market_fill functions should fire") {
                 REQUIRE(nullptr != tree.best);
                 REQUIRE(100 == tree.best->key);
                 REQUIRE(size_limit1 + size_limit2 - size_market == tree.volume_at(price));
-            }
-            THEN("the maker1 account should be updated") {
-                REQUIRE(maker1.order_count == 0);
-                REQUIRE(maker1.volume == 0);
-                REQUIRE(maker1.shares == size_limit1);
-                REQUIRE(maker1.capital == -price * size_limit1);
-            }
-            THEN("the maker2 account should be updated") {
-                REQUIRE(maker2.order_count == 1);
-                REQUIRE(maker2.volume == size_limit1 + size_limit2 - size_market);
-                REQUIRE(maker2.shares == size_market - size_limit1);
-                REQUIRE(maker2.capital == -price * (size_market - size_limit1));
-            }
-            THEN("the taker account should be updated") {
-                REQUIRE(taker.order_count == 0);
-                REQUIRE(taker.volume == 0);
-                REQUIRE(taker.shares == -static_cast<Shares>(size_market));
-                REQUIRE(taker.capital == price * size_market);
             }
         }
     }
@@ -619,40 +556,18 @@ SCENARIO("a market order is submitted that spans several limit orders and clears
         Timestamp arrival1 = 1;
         Timestamp arrival2 = 2;
         Timestamp arrival3 = 3;
-
-        Account maker1;
-        Account maker2;
-        Account taker;
         LimitTree<Side::Buy> tree;
-        Order limit1 = {&maker1, 1, Side::Buy, size_limit1, price, arrival1};
+        Order limit1 = {1, Side::Buy, size_limit1, price, arrival1};
         tree.limit(&limit1);
-        Order limit2 = {&maker2, 2, Side::Buy, size_limit2, price, arrival2};
+        Order limit2 = {2, Side::Buy, size_limit2, price, arrival2};
         tree.limit(&limit2);
 
         WHEN("a buy market order is submitted") {
-            Order market = {&taker, 3, Side::Sell, size_market, 0, arrival3};
+            Order market = {3, Side::Sell, size_market, 0, arrival3};
             tree.market(&market, [](UID) { });
             THEN("the limit_fill and market_fill functions should fire") {
                 REQUIRE(nullptr == tree.best);
                 REQUIRE(0 == tree.volume_at(price));
-            }
-            THEN("the maker1 account should be updated") {
-                REQUIRE(maker1.order_count == 0);
-                REQUIRE(maker1.volume == 0);
-                REQUIRE(maker1.shares == size_limit1);
-                REQUIRE(maker1.capital == -price * size_limit1);
-            }
-            THEN("the maker2 account should be updated") {
-                REQUIRE(maker2.order_count == 0);
-                REQUIRE(maker2.volume == 0);
-                REQUIRE(maker2.shares == size_limit2);
-                REQUIRE(maker2.capital == -price * size_limit2);
-            }
-            THEN("the taker account should be updated") {
-                REQUIRE(taker.order_count == 0);
-                REQUIRE(taker.volume == 0);
-                REQUIRE(taker.shares == -static_cast<Shares>(size_limit1 + size_limit2));
-                REQUIRE(taker.capital == price * (size_limit1 + size_limit2));
             }
         }
     }
@@ -666,41 +581,19 @@ SCENARIO("a market order is submitted that spans several limit prices and clears
         Timestamp arrival1 = 1;
         Timestamp arrival2 = 2;
         Timestamp arrival3 = 3;
-
-        Account maker1;
-        Account maker2;
-        Account taker;
         LimitTree<Side::Buy> tree;
-        Order limit1 = {&maker1, 1, Side::Buy, size, price1, arrival1};
+        Order limit1 = {1, Side::Buy, size, price1, arrival1};
         tree.limit(&limit1);
-        Order limit2 = {&maker2, 2, Side::Buy, size, price2, arrival2};
+        Order limit2 = {2, Side::Buy, size, price2, arrival2};
         tree.limit(&limit2);
 
         WHEN("a buy market order is submitted") {
-            Order market = {&taker, 3, Side::Sell, 2 * size, 0, arrival3};
+            Order market = {3, Side::Sell, 2 * size, 0, arrival3};
             tree.market(&market, [](UID) { });
             THEN("the limit_fill and market_fill functions should fire") {
                 REQUIRE(nullptr == tree.best);
                 REQUIRE(0 == tree.volume_at(price1));
                 REQUIRE(0 == tree.volume_at(price2));
-            }
-            THEN("the maker1 account should be updated") {
-                REQUIRE(maker1.order_count == 0);
-                REQUIRE(maker1.volume == 0);
-                REQUIRE(maker1.shares == size);
-                REQUIRE(maker1.capital == -price1 * size);
-            }
-            THEN("the maker2 account should be updated") {
-                REQUIRE(maker2.order_count == 0);
-                REQUIRE(maker2.volume == 0);
-                REQUIRE(maker2.shares == size);
-                REQUIRE(maker2.capital == -price2 * size);
-            }
-            THEN("the taker account should be updated") {
-                REQUIRE(taker.order_count == 0);
-                REQUIRE(taker.volume == 0);
-                REQUIRE(taker.shares == -static_cast<Shares>(2 * size));
-                REQUIRE(taker.capital == size * (price1 + price2));
             }
         }
     }
@@ -716,41 +609,20 @@ SCENARIO("a market order is submitted with a limit price") {
         Timestamp arrival1 = 1;
         Timestamp arrival2 = 2;
         Timestamp arrival3 = 3;
-        Account maker1;
-        Account maker2;
-        Account taker;
         LimitTree<Side::Buy> tree;
-        Order limit1 = {&maker1, 1, Side::Buy, size_limit1, price1, arrival1};
+        Order limit1 = {1, Side::Buy, size_limit1, price1, arrival1};
         tree.limit(&limit1);
-        Order limit2 = {&maker2, 2, Side::Buy, size_limit2, price2, arrival2};
+        Order limit2 = {2, Side::Buy, size_limit2, price2, arrival2};
         tree.limit(&limit2);
 
         WHEN("a buy market order is submitted") {
-            Order market = {&taker, 3, Side::Sell, size_market, price2, arrival3};
+            Order market = {3, Side::Sell, size_market, price2, arrival3};
             tree.market(&market, [](UID) { });
             THEN("the limit_fill and market_fill functions should fire") {
                 REQUIRE(nullptr != tree.best);
                 REQUIRE(100 == tree.best->key);
                 REQUIRE(20 == tree.volume_at(price1));
                 REQUIRE(0 == tree.volume_at(price2));
-            }
-            THEN("the maker1 account should be updated") {
-                REQUIRE(maker1.order_count == 1);
-                REQUIRE(maker1.volume == size_limit1);
-                REQUIRE(maker1.shares == 0);
-                REQUIRE(maker1.capital == 0);
-            }
-            THEN("the maker2 account should be updated") {
-                REQUIRE(maker2.order_count == 0);
-                REQUIRE(maker2.volume == 0);
-                REQUIRE(maker2.shares == size_limit2);
-                REQUIRE(maker2.capital == -price2 * size_limit2);
-            }
-            THEN("the taker account should be updated") {
-                REQUIRE(taker.order_count == 0);
-                REQUIRE(taker.volume == 0);
-                REQUIRE(taker.shares == -static_cast<Shares>(size_limit2));
-                REQUIRE(taker.capital == price2 * size_limit2);
             }
             THEN("the order should have shares leftover") {
                 REQUIRE(size_market - size_limit2 == market.size);
@@ -773,20 +645,16 @@ SCENARIO("a market order is submitted with a limit price that spans") {
         Timestamp arrival2 = 2;
         Timestamp arrival3 = 3;
         Timestamp arrival4 = 4;
-        Account maker1;
-        Account maker2;
-        Account maker3;
-        Account taker;
         LimitTree<Side::Buy> tree;
-        Order limit1 = {&maker1, 1, Side::Buy, size_limit1, price1, arrival1};
+        Order limit1 = {1, Side::Buy, size_limit1, price1, arrival1};
         tree.limit(&limit1);
-        Order limit2 = {&maker2, 2, Side::Buy, size_limit2, price2, arrival2};
+        Order limit2 = {2, Side::Buy, size_limit2, price2, arrival2};
         tree.limit(&limit2);
-        Order limit3 = {&maker3, 3, Side::Buy, size_limit3, price3, arrival3};
+        Order limit3 = {3, Side::Buy, size_limit3, price3, arrival3};
         tree.limit(&limit3);
 
         WHEN("a buy market order is submitted") {
-            Order market = {&taker, 4, Side::Sell, size_market, price2, arrival4};
+            Order market = {4, Side::Sell, size_market, price2, arrival4};
             tree.market(&market, [](UID) { });
             THEN("the limit_fill and market_fill functions should fire") {
                 REQUIRE(nullptr != tree.best);
@@ -794,30 +662,6 @@ SCENARIO("a market order is submitted with a limit price that spans") {
                 REQUIRE(20 == tree.volume_at(price1));
                 REQUIRE(0 == tree.volume_at(price2));
                 REQUIRE(0 == tree.volume_at(price3));
-            }
-            THEN("the maker1 account should be updated") {
-                REQUIRE(maker1.order_count == 1);
-                REQUIRE(maker1.volume == size_limit1);
-                REQUIRE(maker1.shares == 0);
-                REQUIRE(maker1.capital == 0);
-            }
-            THEN("the maker2 account should be updated") {
-                REQUIRE(maker2.order_count == 0);
-                REQUIRE(maker2.volume == 0);
-                REQUIRE(maker2.shares == size_limit2);
-                REQUIRE(maker2.capital == -price2 * size_limit2);
-            }
-            THEN("the maker3 account should be updated") {
-                REQUIRE(maker3.order_count == 0);
-                REQUIRE(maker3.volume == 0);
-                REQUIRE(maker3.shares == size_limit3);
-                REQUIRE(maker3.capital == -price3 * size_limit3);
-            }
-            THEN("the taker account should be updated") {
-                REQUIRE(taker.order_count == 0);
-                REQUIRE(taker.volume == 0);
-                REQUIRE(taker.shares == -static_cast<Shares>(size_limit3 + size_limit2));
-                REQUIRE(taker.capital == (price2 * size_limit2) + (price3 *size_limit3));
             }
             THEN("the order should have shares leftover") {
                 REQUIRE(size_market - (size_limit2 + size_limit3) == market.size);

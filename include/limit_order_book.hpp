@@ -31,15 +31,14 @@ class LimitOrderBook {
 
     /// Add a new sell limit order to the book.
     ///
-    /// @param account the account for the order
     /// @param size the number of shares to sell
     /// @param price the limit price for the order
     /// @param arrival the time the order arrived at
     /// @return the order ID for the order added to the book
     ///
-    UID limit_sell(Account* account, Size size, Price price, Timestamp arrival) {
+    UID limit_sell(Size size, Price price, Timestamp arrival) {
         // put the order into the sequence map
-        orders.insert({sequence, {account, sequence, Side::Sell, size, price, arrival}});
+        orders.insert({sequence, {sequence, Side::Sell, size, price, arrival}});
         if (buys.best != nullptr && price <= buys.best->key) {  // crosses
             // place a market order with the limit price
             buys.market(&orders.at(sequence), [&](UID uid) { orders.erase(uid); });
@@ -54,15 +53,14 @@ class LimitOrderBook {
 
     /// Add a new buy limit order to the book.
     ///
-    /// @param account the account for the order
     /// @param size the number of shares to buy
     /// @param price the limit price for the order
     /// @param arrival the time the order arrived at
     /// @return the order ID for the order added to the book
     ///
-    UID limit_buy(Account* account, Size size, Price price, Timestamp arrival) {
+    UID limit_buy(Size size, Price price, Timestamp arrival) {
         // put the order into the sequence map
-        orders.insert({sequence, {account, sequence, Side::Buy, size, price, arrival}});
+        orders.insert({sequence, {sequence, Side::Buy, size, price, arrival}});
         if (sells.best != nullptr && price >= sells.best->key) {  // crosses
             // place a market order with the limit price
             sells.market(&orders.at(sequence), [&](UID uid) { orders.erase(uid); });
@@ -83,10 +81,10 @@ class LimitOrderBook {
     /// @param arrival the time the order arrived at
     /// @return the order ID for the order added to the book
     ///
-    inline UID limit(Account* account, Side side, Size size, Price price, Timestamp arrival) {
+    inline UID limit(Side side, Size size, Price price, Timestamp arrival) {
         switch (side) {  // send the order to the appropriate side
-            case Side::Sell: return limit_sell(account, size, price, arrival);
-            case Side::Buy:  return limit_buy(account, size, price, arrival);
+            case Side::Sell: return limit_sell(size, price, arrival);
+            case Side::Buy:  return limit_buy(size, price, arrival);
         }
     }
 
@@ -119,24 +117,22 @@ class LimitOrderBook {
 
     /// Execute a sell market order.
     ///
-    /// @param account the account for the order
     /// @param size the size of the market order
     /// @arrival the arrival of the market order
     ///
-    void market_sell(Account* account, Size size, Timestamp arrival) {
-        auto order = Order(account, sequence, Side::Sell, size, 0, arrival);
+    void market_sell(Size size, Timestamp arrival) {
+        auto order = Order(sequence, Side::Sell, size, 0, arrival);
         order.execution = arrival;
         buys.market(&order, [&](UID uid) { orders.erase(uid); });
     }
 
     /// Execute a buy market order.
     ///
-    /// @param account the account for the order
     /// @param size the size of the market order
     /// @arrival the arrival of the market order
     ///
-    void market_buy(Account* account, Size size, Timestamp arrival) {
-        auto order = Order(account, sequence, Side::Buy, size, 0, arrival);
+    void market_buy(Size size, Timestamp arrival) {
+        auto order = Order(sequence, Side::Buy, size, 0, arrival);
         order.execution = arrival;
         sells.market(&order, [&](UID uid) { orders.erase(uid); });
     }
@@ -147,10 +143,10 @@ class LimitOrderBook {
     /// @param size the size of the market order
     /// @arrival the arrival of the market order
     ///
-    inline void market(Account* account, Side side, Size size, Timestamp arrival) {
+    inline void market(Side side, Size size, Timestamp arrival) {
         switch (side) {  // send the market order to the appropriate side
-            case Side::Sell: { market_sell(account, size, arrival); break; }
-            case Side::Buy:  { market_buy(account, size, arrival); break; }
+            case Side::Sell: { market_sell(size, arrival); break; }
+            case Side::Buy:  { market_buy(size, arrival); break; }
         }
     }
 
