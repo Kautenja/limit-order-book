@@ -141,8 +141,6 @@ struct LimitTree {
         // update the size and volume for the entire tree
         ++size;
         volume += order->size;
-        // update the account
-        order->account->limit(order);
     }
 
     // TODO: use object pool for limit reuse?
@@ -150,7 +148,7 @@ struct LimitTree {
     ///
     /// @param order an order that exists in the limit tree
     ///
-    void remove(Order* order) {
+    void cancel(Order* order) {
         // unwrap the limit for the order
         auto limit_ = order->limit;
         if (order->prev == nullptr && order->next == nullptr) {  // last Order
@@ -180,15 +178,6 @@ struct LimitTree {
         volume -= order->size;
     }
 
-    /// Cancel an order in the limit tree.
-    ///
-    /// @param order an order that exists in the limit tree
-    ///
-    inline void cancel(Order* order) {
-        remove(order);
-        order->account->cancel(order);
-    }
-
     /// Perform a market order of given size on the given limit tree.
     ///
     /// @param order the order to find a market order for
@@ -200,17 +189,13 @@ struct LimitTree {
         while (best != nullptr && is_in_limit<side>(best->key, order->price)) {
             // get the next match as the front of the best price
             auto match = best->order_head;
+            // TODO: Update timestamping?
             // set the execution time for the current match
-            // TODO: update with different timestamping pattern?
             match->execution = order->arrival;
             if (match->size >= order->size) {  // current match can fill
-                // update the account for the market order
-                order->account->market_fill(match, order);
                 if (match->size == order->size) {  // limit order filled
-                    // update the account for the limit order
-                    match->account->limit_fill(match, order);
                     // remove the current match from the book
-                    remove(match);
+                    cancel(match);
                     did_fill(match->uid);
                 } else {  // limit order partially filled
                     // remove the market order quantity from the limit quantity
@@ -219,18 +204,13 @@ struct LimitTree {
                     match->limit->volume -= order->size;
                     // update the volume for the entire tree
                     volume -= order->size;
-                    // update the account for the limit order
-                    match->account->limit_partial(match, order);
                 }
                 return;
             }  // else: current match can NOT fill
             // decrement the remaining size of the market order
             order->size -= match->size;
-            // update the accounts for the orders
-            order->account->market_partial(match, order);
-            match->account->limit_fill(match, order);
             // remove the current match from the book
-            remove(match);
+            cancel(match);
             did_fill(match->uid);
         }
     }
