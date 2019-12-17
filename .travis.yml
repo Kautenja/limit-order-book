@@ -1,0 +1,30 @@
+---
+language: python # this works for Linux but is an error on macOS or Windows
+matrix:
+  include:
+    - name: "Ubuntu 14.04"
+      python: 3.5
+      before_install: pip3 install scons
+    - name: "Ubuntu 16.04"
+      python: 3.5
+      dist: xenial
+      before_install: pip3 install scons
+    - name: "macOS 10.14 (Xcode 10.2)"
+      os: osx
+      osx_image: xcode10.2
+      language: shell
+      before_install: brew install scons
+    # - name: "Windows 10"
+    #   os: windows
+    #   language: shell
+    #   before_install: choco install python
+    #   env: PATH=/c/Python37:/c/Python37/Scripts:$PATH
+    #   script:
+    #     - echo "TODO"
+# install:
+  # - pip3 install -r requirements.txt
+script:
+  - scons test
+  - scons
+notifications:
+  email: false

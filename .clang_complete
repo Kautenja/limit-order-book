@@ -1,0 +1,8 @@
+-Iinclude
+-Ivendor/binary-search-tree/include
+-Ivendor/Catch2/single_include/catch2
+-Ivendor/cpptqdm/include
+-Ivendor/doubly-linked-list/include
+-Ivendor/hopscotch_map/include
+-Ivendor/robin-map/include
+-Ivendor/sparse-map/include

@@ -1,0 +1,21 @@
+[submodule "vendor/Catch2"]
+	path = vendor/Catch2
+	url = https://github.com/catchorg/Catch2
+[submodule "vendor/hopscotch_map"]
+	path = vendor/hopscotch_map
+	url = https://github.com/Tessil/hopscotch-map
+[submodule "vendor/robin-map"]
+	path = vendor/robin-map
+	url = https://github.com/Tessil/robin-map
+[submodule "vendor/sparse-map"]
+	path = vendor/sparse-map
+	url = https://github.com/Tessil/sparse-map
+[submodule "vendor/binary-search-tree"]
+	path = vendor/binary-search-tree
+	url = https://github.com/Kautenja/binary-search-tree
+[submodule "vendor/doubly-linked-list"]
+	path = vendor/doubly-linked-list
+	url = https://github.com/Kautenja/doubly-linked-list
+[submodule "vendor/cpptqdm"]
+	path = vendor/cpptqdm
+	url = https://github.com/Kautenja/cpptqdm
