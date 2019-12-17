@@ -45,6 +45,12 @@ package provides these tools for free.
 
 ## Testing
 
+To run all the unit-test suites, run:
+
+```shell
+make test
+```
+
 ### C++
 
 To run the C++ unit-test suite, run:
