@@ -167,3 +167,10 @@ for main in find_source_files('main', 'build_main'):
     shell_name = main.replace('build_', '')
     benchmark_alias = Alias(shell_name, [program], program[0].path)
     AlwaysBuild(benchmark_alias)
+
+
+# Create a shared library (it will add "lib" to the front automatically)
+lib = PRODUCTION_ENV.SharedLibrary('_lob.so', SRC)
+Command(target = "lob",
+        source = lib,
+        action = Copy("$TARGET", "$SOURCE"))
