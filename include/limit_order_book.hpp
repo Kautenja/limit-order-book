@@ -187,20 +187,20 @@ class LimitOrderBook {
     /// @param price the limit price to get the volume for
     /// @return the volume for the given limit price
     ///
-    inline Size volume_sell(Price price) { return sells.volume_at(price); }
+    inline Volume volume_sell(Price price) { return sells.volume_at(price); }
 
     /// Return the total volume for the sell side of the book.
-    inline Size volume_sell() { return sells.volume; }
+    inline Volume volume_sell() { return sells.volume; }
 
     /// Return the total volume for the buy side of the book.
     ///
     /// @param price the limit price to get the volume for
     /// @return the volume for the given limit price
     ///
-    inline Size volume_buy(Price price) { return buys.volume_at(price); }
+    inline Volume volume_buy(Price price) { return buys.volume_at(price); }
 
     /// Return the total volume for the buy side of the book.
-    inline Size volume_buy() { return buys.volume; }
+    inline Volume volume_buy() { return buys.volume; }
 
     /// Return the volume at the given limit price.
     ///
