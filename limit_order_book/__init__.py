@@ -1,5 +1,5 @@
 """A Limit Order Book (LOB)."""
-from .lob import LimitOrderBook
+from .limit_order_book import LimitOrderBook
 
 
 # explicitly define the outward facing API of this package

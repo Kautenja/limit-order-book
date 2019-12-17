@@ -7,14 +7,14 @@
 [![Format][pypi-format]][pypi-home]
 [![License][pypi-license]](LICENSE)
 
-[build-status]: https://travis-ci.com/Kautenja/lob.svg
-[build-server]: https://travis-ci.com/Kautenja/lob
-[pypi-version]: https://badge.fury.io/py/lob.svg
-[pypi-license]: https://img.shields.io/pypi/l/lob.svg
-[pypi-status]: https://img.shields.io/pypi/status/lob.svg
-[pypi-format]: https://img.shields.io/pypi/format/lob.svg
-[pypi-home]: https://badge.fury.io/py/lob
-[python-version]: https://img.shields.io/pypi/pyversions/lob.svg
+[build-status]: https://travis-ci.com/Kautenja/limit-order-book.svg
+[build-server]: https://travis-ci.com/Kautenja/limit-order-book
+[pypi-version]: https://badge.fury.io/py/limit-order-book.svg
+[pypi-license]: https://img.shields.io/pypi/l/limit-order-book.svg
+[pypi-status]: https://img.shields.io/pypi/status/limit-order-book.svg
+[pypi-format]: https://img.shields.io/pypi/format/limit-order-book.svg
+[pypi-home]: https://badge.fury.io/py/limit-order-book
+[python-version]: https://img.shields.io/pypi/pyversions/limit-order-book.svg
 [python-home]: https://python.org
 
 This is an implementation of the limit order book structure and matching
@@ -31,10 +31,10 @@ directly or using git submodules.
 
 ### Python
 
-The preferred Python installation of `lob` is from `pip`:
+The preferred Python installation of `limit-order-book` is from `pip`:
 
 ```shell
-pip install lob
+pip install limit-order-book
 ```
 
 ### Windows

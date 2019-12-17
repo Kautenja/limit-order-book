@@ -44,7 +44,7 @@ LIBRARY = Extension(LIB_NAME,
 
 
 setup(
-    name='lob',
+    name='limit_order_book',
     version='1.0.0',
     description='A Limit Order Book (LOB) implementation',
     long_description=README,
@@ -66,7 +66,7 @@ setup(
         'Topic :: Office/Business :: Financial',
         'Topic :: Office/Business :: Financial :: Investment'
     ],
-    url='https://github.com/Kautenja/lob',
+    url='https://github.com/Kautenja/limit-order-book',
     author='Christian Kauten',
     author_email='kautencreations@gmail.com',
     license='MIT',

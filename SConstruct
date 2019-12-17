@@ -173,4 +173,4 @@ for main in find_source_files('main', 'build_main'):
 lib = PRODUCTION_ENV.SharedLibrary('_lob.so', SRC)
 AlwaysBuild(lib)
 # copy the so file to the lob package
-Command(target="lob", source=lib, action=Copy("$TARGET", "$SOURCE"))
+Command(target="limit_order_book", source=lib, action=Copy("$TARGET", "$SOURCE"))

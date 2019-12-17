@@ -1,12 +1,12 @@
 """Test cases for the lob module."""
 from unittest import TestCase
-from .. import lob
+from .. import limit_order_book
 
 
 class ShouldInitializeLimitOrderBook(TestCase):
     def test(self):
-        book = lob.LimitOrderBook()
-        self.assertIsInstance(book, lob.LimitOrderBook)
+        book = limit_order_book.LimitOrderBook()
+        self.assertIsInstance(book, limit_order_book.LimitOrderBook)
         self.assertEqual(0, book.best_sell())
         self.assertEqual(0, book.best_buy())
         self.assertEqual(0, book.best(False))
@@ -25,7 +25,7 @@ class ShouldInitializeLimitOrderBook(TestCase):
 
 class ShouldPlaceSellLimitOrder(TestCase):
     def test(self):
-        book = lob.LimitOrderBook()
+        book = limit_order_book.LimitOrderBook()
         book.limit_sell(1, 100, 50)
         self.assertEqual(50, book.best_sell())
         self.assertEqual(0, book.best_buy())
@@ -44,7 +44,7 @@ class ShouldPlaceSellLimitOrder(TestCase):
 
 class ShouldCancelSellLimitOrder(TestCase):
     def test(self):
-        book = lob.LimitOrderBook()
+        book = limit_order_book.LimitOrderBook()
         book.limit_sell(1, 100, 50)
         self.assertTrue(book.has(1))
         book.cancel(1)
@@ -67,7 +67,7 @@ class ShouldCancelSellLimitOrder(TestCase):
 
 class ShouldPlaceBuyLimitOrder(TestCase):
     def test(self):
-        book = lob.LimitOrderBook()
+        book = limit_order_book.LimitOrderBook()
         book.limit_buy(1, 100, 50)
         self.assertEqual(0, book.best_sell())
         self.assertEqual(50, book.best_buy())
@@ -87,7 +87,7 @@ class ShouldPlaceBuyLimitOrder(TestCase):
 
 class ShouldCancelBuyLimitOrder(TestCase):
     def test(self):
-        book = lob.LimitOrderBook()
+        book = limit_order_book.LimitOrderBook()
         book.limit_buy(1, 100, 50)
         self.assertTrue(book.has(1))
         book.cancel(1)
@@ -110,7 +110,7 @@ class ShouldCancelBuyLimitOrder(TestCase):
 
 class ShouldPlaceSellMarketOrderEmptyBook(TestCase):
     def test(self):
-        book = lob.LimitOrderBook()
+        book = limit_order_book.LimitOrderBook()
         book.market_sell(1, 100)
         self.assertEqual(0, book.best_sell())
         self.assertEqual(0, book.best_buy())
@@ -130,7 +130,7 @@ class ShouldPlaceSellMarketOrderEmptyBook(TestCase):
 
 class ShouldPlaceBuyMarketOrderEmptyBook(TestCase):
     def test(self):
-        book = lob.LimitOrderBook()
+        book = limit_order_book.LimitOrderBook()
         book.market_buy(1, 100)
         self.assertEqual(0, book.best_sell())
         self.assertEqual(0, book.best_buy())
@@ -150,7 +150,7 @@ class ShouldPlaceBuyMarketOrderEmptyBook(TestCase):
 
 class ShouldPlaceSellMarketOrderAndMatch(TestCase):
     def test(self):
-        book = lob.LimitOrderBook()
+        book = limit_order_book.LimitOrderBook()
         book.limit_buy(1, 100, 50)
         book.market_sell(1, 10)
         self.assertEqual(0, book.best_sell())
@@ -171,7 +171,7 @@ class ShouldPlaceSellMarketOrderAndMatch(TestCase):
 
 class ShouldPlaceBuyMarketOrderAndMatch(TestCase):
     def test(self):
-        book = lob.LimitOrderBook()
+        book = limit_order_book.LimitOrderBook()
         book.limit_sell(1, 100, 50)
         book.market_buy(1, 10)
         self.assertEqual(50, book.best_sell())
