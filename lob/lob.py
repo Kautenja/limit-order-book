@@ -114,43 +114,104 @@ class LimitOrderBook:
         """
 
     def best_sell(self):
-        """
-        """
+        """Return the best sell price in the book."""
+        return LIB.best_sell(self._book)
 
     def best_buy(self):
-        """
-        """
+        """Return the best buy price in the book."""
+        return LIB.best_buy(self._book)
 
-    def best(self):
+    def best(self, side):
         """
+        Return the best price for the given side.
+
+        Args:
+            side: the side of the book to get the best price for (False=sell)
+
+        Returns:
+            the best price for the given side of the book
+
         """
+        return LIB.best(self._book, side)
 
     def volume_sell(self, price=None):
         """
+        Return the volume of the sell side of the book at the given price.
+
+        Args:
+            price: the price to get the volume at
+
+        Returns:
+            the volume of orders at the given price
+
+        Note:
+            returns the total sell-side volume if price is `None`
+
         """
+        if price is None:
+            return LIB.volume_sell(self._book)
+        return LIB.volume_sell_price(self._book, price)
 
     def volume_buy(self, price=None):
         """
+        Return the volume of the buy side of the book at the given price.
+
+        Args:
+            price: the price to get the volume at
+
+        Returns:
+            the volume of orders at the given price
+
+        Note:
+            returns the total buy-side volume if price is `None`
+
         """
+        if price is None:
+            return LIB.volume_buy(self._book)
+        return LIB.volume_buy_price(self._book, price)
 
     def volume(self, price=None):
         """
-        """
+        Return the volume of the book at the given price.
 
-    def size_at(self):
+        Args:
+            price: the price to get the volume at
+
+        Returns:
+            the volume of orders at the given price
+
+        Note:
+            returns the total volume if price is `None`
+
         """
+        if price is None:
+            return LIB.volume(self._book)
+        return LIB.volume_price(self._book, price)
+
+    def size_at(self, price):
         """
+        Return the size at the given limit price.
+
+        Args:
+            price: the price to get the size of the book for
+
+        Returns:
+            the size of the book at the given price
+
+        """
+        return LIB.size_at(self._book, price)
 
     def size_sell(self):
-        """
-        """
-    def size_buy(self):
-        """
-        """
+        """Return the size of the book on the sell side."""
+        return LIB.size_sell(self._book)
 
-    def size(self, price=None):
-        """
-        """
+    def size_buy(self):
+        """Return the size of the book on the buy side."""
+        return LIB.size_buy(self._book)
+
+    def size(self):
+        """Return the total size of the book (number of orders)."""
+        return LIB.size(self._book)
 
 
 # explicitly define the outward facing API of this module
