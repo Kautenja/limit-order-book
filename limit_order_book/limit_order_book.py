@@ -4,11 +4,11 @@ import os
 import glob
 
 
-LIB_PATH = os.path.join(os.path.dirname(__file__), 'lib_lob*')
+LIB_PATH = os.path.join(os.path.dirname(__file__), 'lib_limit_order_book*')
 try:  # load the library from the shared object file
     LIB = ctypes.cdll.LoadLibrary(glob.glob(LIB_PATH)[0])
 except IndexError:
-    raise OSError('missing static lib_lob*.so library!')
+    raise OSError('missing static lib_limit_order_book*.so library!')
 
 
 class Types:

@@ -16,7 +16,7 @@ with open('README.md') as README_file:
 
 # The prefix name for the .so library to build. It will follow the format
 # lib_lob.*.so where the * changes depending on the build system
-LIB_NAME = 'lob.lib_lob'
+LIB_NAME = 'limit_order_book.lib_limit_order_book'
 # The source files for building the extension. Globs locate all the cpp files
 # used by the LaiNES subproject. MANIFEST.in has to include the blanket
 # "cpp" directory to ensure that the .inc file gets included too

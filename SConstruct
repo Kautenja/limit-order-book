@@ -170,7 +170,7 @@ for main in find_source_files('main', 'build_main'):
 
 
 # Create a shared library (it will add "lib" to the front automatically)
-lib = PRODUCTION_ENV.SharedLibrary('_lob.so', SRC)
+lib = PRODUCTION_ENV.SharedLibrary('_limit_order_book.so', SRC)
 AlwaysBuild(lib)
 # copy the so file to the lob package
 Command(target="limit_order_book", source=lib, action=Copy("$TARGET", "$SOURCE"))

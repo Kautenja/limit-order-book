@@ -11,7 +11,7 @@
 // Windows-base systems
 #if defined(_WIN32) || defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(__BORLANDC__)
     // setup the module initializer. required to link visual studio C++ ctypes
-    void PyInit_lib_lob() { }
+    void PyInit_lib_limit_order_book() { }
     // setup the function modifier to export in the DLL
     #define EXP __declspec(dllexport)
 // Unix-like systems
