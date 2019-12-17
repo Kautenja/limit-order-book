@@ -3,7 +3,7 @@
 //
 
 #include "catch.hpp"
-#include "limit_order_book/limit_order_book.hpp"
+#include "limit_order_book.hpp"
 
 using namespace LOB;
 

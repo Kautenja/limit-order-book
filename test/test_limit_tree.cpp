@@ -3,7 +3,7 @@
 //
 
 #include "catch.hpp"
-#include "limit_order_book/limit_tree.hpp"
+#include "limit_tree.hpp"
 
 using namespace LOB;
 
