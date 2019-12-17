@@ -18,9 +18,9 @@ int main() {
     for (int i = 1; i < 10000000; i++) {
         auto price_ = static_cast<uint64_t>(price(generator));
         auto size_ = static_cast<uint32_t>(size(generator));
-        book.limit(Side::Buy, 100, price_, i);
+        book.limit(Side::Buy, 0, 100, price_, i);
         if (i % 11 == 0) {  // randomly submit a market order
-            book.market(Side::Sell, size_, i);
+            book.market(Side::Sell, 1, size_, i);
         }
     }
 }
