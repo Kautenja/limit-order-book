@@ -35,18 +35,18 @@ extern "C" {
     }
 
     /// Add a new sell limit order to the book.
-    EXP void limit_sell(LimitOrderBook* book) {
-
+    EXP void limit_sell(LimitOrderBook* book, UID order_id, Size size, Price price) {
+        book->limit_sell(order_id, size, price, 0);
     }
 
     /// Add a new buy limit order to the book.
-    EXP void limit_buy(LimitOrderBook* book) {
-
+    EXP void limit_buy(LimitOrderBook* book, UID order_id, Size size, Price price) {
+        book->limit_buy(order_id, size, price, 0);
     }
 
     /// Add a new limit order to the book.
-    EXP void limit(LimitOrderBook* book) {
-
+    EXP void limit(LimitOrderBook* book, Side side, UID order_id, Size size, Price price) {
+        book->limit(side, order_id, size, price, 0);
     }
 
     /// Return true if the book has an order with given ID, false otherwise.
@@ -65,18 +65,18 @@ extern "C" {
     }
 
     /// Execute a sell market order.
-    EXP void market_sell(LimitOrderBook* book) {
-
+    EXP void market_sell(LimitOrderBook* book, UID order_id, Size size) {
+        book->market_sell(order_id, size, 0);
     }
 
     /// Execute a buy market order.
-    EXP void market_buy(LimitOrderBook* book) {
-
+    EXP void market_buy(LimitOrderBook* book, UID order_id, Size size) {
+        book->market_buy(order_id, size, 0);
     }
 
     /// Execute a market order.
-    EXP void market(LimitOrderBook* book) {
-
+    EXP void market(LimitOrderBook* book, Side side, UID order_id, Size size) {
+        book->market(side, order_id, size, 0);
     }
 
     /// Return the best sell price.
