@@ -10,9 +10,7 @@ _MODULE_PATH = os.path.dirname(__file__)
 _SO_PATH = 'lib_lob*'
 # the absolute path to the C++ shared object library
 _LIB_PATH = os.path.join(_MODULE_PATH, _SO_PATH)
-# load the library from the shared object file
-print(glob.glob(os.path.join(_MODULE_PATH, '*')))
-try:
+try:  # load the library from the shared object file
     _LIB = ctypes.cdll.LoadLibrary(glob.glob(_LIB_PATH)[0])
 except IndexError:
     raise OSError('missing static lib_lob*.so library!')

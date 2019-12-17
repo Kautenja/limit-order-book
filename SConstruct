@@ -171,6 +171,6 @@ for main in find_source_files('main', 'build_main'):
 
 # Create a shared library (it will add "lib" to the front automatically)
 lib = PRODUCTION_ENV.SharedLibrary('_lob.so', SRC)
-Command(target = "lob",
-        source = lib,
-        action = Copy("$TARGET", "$SOURCE"))
+AlwaysBuild(lib)
+# copy the so file to the lob package
+Command(target="lob", source=lib, action=Copy("$TARGET", "$SOURCE"))
