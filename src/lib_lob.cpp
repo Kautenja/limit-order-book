@@ -30,45 +30,71 @@ extern "C" {
     /// Delete the limit order book, i.e., purge it from memory
     EXP void Delete(LimitOrderBook* book) { delete book; }
 
-    // /// Return a pointer to a controller on the machine
-    // EXP NES::NES_Byte* Controller(LimitOrderBook* book, int port) {
-    //     return emu->get_controller(port);
-    // }
+    // limit_sell
+    ///
 
-    // /// Return the pointer to the screen buffer
-    // EXP NES::NES_Pixel* Screen(LimitOrderBook* book) {
-    //     return emu->get_screen_buffer();
-    // }
+    // limit_buy
+    ///
 
-    // /// Return the pointer to the memory buffer
-    // EXP NES::NES_Byte* Memory(LimitOrderBook* book) {
-    //     return emu->get_memory_buffer();
-    // }
+    // limit
+    ///
 
-    // /// Reset the emulator
-    // EXP void Reset(LimitOrderBook* book) {
-    //     emu->reset();
-    // }
+    // has
+    ///
 
-    // /// Perform a discrete step in the emulator (i.e., 1 frame)
-    // EXP void Step(LimitOrderBook* book) {
-    //     emu->step();
-    // }
+    // get
+    ///
 
-    // /// Create a deep copy (i.e., a clone) of the given emulator
-    // EXP void Backup(LimitOrderBook* book) {
-    //     emu->backup();
-    // }
+    // cancel
+    ///
 
-    // /// Create a deep copy (i.e., a clone) of the given emulator
-    // EXP void Restore(LimitOrderBook* book) {
-    //     emu->restore();
-    // }
+    // market_sell
+    ///
 
-    // /// Close the emulator, i.e., purge it from memory
-    // EXP void Close(LimitOrderBook* book) {
-    //     delete emu;
-    // }
+    // market_buy
+    ///
+
+    // market
+    ///
+
+    // Price best_sell
+    ///
+
+    // Price best_buy
+    ///
+
+    // Price best
+    ///
+
+    /// Return the total volume for the sell side of the book.
+    EXP Volume volume_sell_price(LimitOrderBook* book, Price price) { return book->volume_sell(price); }
+
+    /// Return the total volume for the sell side of the book.
+    EXP Volume volume_sell(LimitOrderBook* book) { return book->volume_sell(); }
+
+    /// Return the total volume for the buy side of the book.
+    EXP Volume volume_buy_price(LimitOrderBook* book, Price price) { return book->volume_buy(price); }
+
+    /// Return the total volume for the buy side of the book.
+    EXP Volume volume_buy(LimitOrderBook* book) { return book->volume_buy(); }
+
+    /// Return the volume at the given limit price.
+    EXP Volume volume_price(LimitOrderBook* book, Price price) { return book->volume(price); }
+
+    /// Return the total volume for the book.
+    EXP Volume volume(LimitOrderBook* book) { return book->volume(); }
+
+    /// Return the size at the given limit price.
+    EXP Size size_at(LimitOrderBook* book, Price price) { return book->size_at(price); }
+
+    /// Return the total size of the sell side of the book (number of orders).
+    EXP Size size_sell(LimitOrderBook* book) { return book->size_sell(); }
+
+    /// Return the total size of the buy side of the book (number of orders).
+    EXP Size size_buy(LimitOrderBook* book) { return book->size_buy(); }
+
+    /// Return the total size of the book (number of orders).
+    EXP Size size(LimitOrderBook* book) { return book->size(); }
 }
 
 // un-define the macro
