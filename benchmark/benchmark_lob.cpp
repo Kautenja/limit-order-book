@@ -21,7 +21,7 @@ using Catch::Benchmark::Chronometer;
 //
 
 inline void spam_limits(LimitOrderBook book, int count) {
-    for (int i = 0; i < count; i++) book.limit(Side::Buy, 50, i, i);
+    for (int i = 0; i < count; i++) book.limit(Side::Buy, i, 50, i, i);
 }
 
 TEST_CASE("Spam new Limits") {
@@ -57,7 +57,7 @@ TEST_CASE("Spam new Limits") {
 
 inline void spam_orders(LimitOrderBook book, int count, int variance = 5) {
     for (int i = 0; i < count; i++)
-        book.limit(Side::Buy, 50, i % variance, i);
+        book.limit(Side::Buy, i, 50, i % variance, i);
 }
 
 TEST_CASE("Spam new Orders") {
@@ -100,9 +100,9 @@ inline void spam_orders_random_cancels(
 ) {
     auto generator = std::default_random_engine();
     auto price_distribution = std::normal_distribution<double>(mean, variance);
-    book.limit(Side::Buy, 50, price_distribution(generator), 0);
+    book.limit(Side::Buy, 0, 50, price_distribution(generator), 0);
     for (int i = 1; i < count; i++) {
-        book.limit(Side::Buy, 50, price_distribution(generator), i);
+        book.limit(Side::Buy, i, 50, price_distribution(generator), i);
         if (i % cancel_every == 0)
             book.cancel(i - cancel_every);
     }
@@ -154,9 +154,9 @@ inline void spam_limit_random_orders(
     for (int i = 1; i < count; i++) {
         auto price_ = static_cast<uint64_t>(price(generator));
         auto size_ = static_cast<uint32_t>(size(generator));
-        book.limit(Side::Buy, 100, price_, i);
+        book.limit(Side::Buy, i, 100, price_, i);
         if (i % order_every == 0)  // random submit a market order
-            book.market(Side::Sell, size_, i);
+            book.market(Side::Sell, i, size_, i);
     }
 }
 
@@ -189,8 +189,8 @@ inline void spam_limit_many_market_orders(
     for (int i = 1; i < count; i++) {
         auto price_ = static_cast<uint64_t>(price(generator));
         auto size_ = static_cast<uint32_t>(size(generator));
-        book.limit(Side::Buy, 100, price_, i);
-        book.market(Side::Sell, size_, i);
+        book.limit(Side::Buy, i, 100, price_, i);
+        book.market(Side::Sell, i, size_, i);
     }
 }
 

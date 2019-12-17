@@ -31,10 +31,8 @@ SCENARIO("send single order to LimitOrderBook") {
         uint64_t price = 0xFEDCBA9876543210;
         uint64_t arrival = 0x1122334455667788;
         WHEN("the order is sent") {
-            auto uid = book.limit(side, size, price, arrival);
+            book.limit(side, 1, size, price, arrival);
             THEN("order ID is returned and the order is recorded") {
-                // the first order should have ID 1
-                REQUIRE(1 == uid);
                 REQUIRE(size == book.volume(price));
                 REQUIRE(0 == book.volume(price - 1));
                 REQUIRE(0 == book.volume(price + 1));
@@ -50,10 +48,8 @@ SCENARIO("send single order to LimitOrderBook") {
         uint64_t price = 0xFEDCBA9876543210;
         uint64_t arrival = 0x1122334455667788;
         WHEN("the order is sent") {
-            auto uid = book.limit(side, size, price, arrival);
+            book.limit(side, 1, size, price, arrival);
             THEN("order ID is returned and the order is recorded") {
-                // the first order should have ID 1
-                REQUIRE(1 == uid);
                 REQUIRE(size == book.volume(price));
                 REQUIRE(0 == book.volume(price - 1));
                 REQUIRE(0 == book.volume(price + 1));
@@ -76,13 +72,10 @@ SCENARIO("send homogeneous orders to LimitOrderBook at same price") {
         uint64_t arrivalB = 1;
         uint64_t arrivalC = 2;
         WHEN("the orders are sent") {
-            auto uidA = book.limit(side, sizeA, price, arrivalA);
-            auto uidB = book.limit(side, sizeB, price, arrivalB);
-            auto uidC = book.limit(side, sizeC, price, arrivalC);
+            book.limit(side, 1, sizeA, price, arrivalA);
+            book.limit(side, 2, sizeB, price, arrivalB);
+            book.limit(side, 3, sizeC, price, arrivalC);
             THEN("order ID is returned and the order is recorded") {
-                REQUIRE(1 == uidA);
-                REQUIRE(2 == uidB);
-                REQUIRE(3 == uidC);
                 REQUIRE(sizeA + sizeB + sizeC == book.volume(price));
                 REQUIRE(0 == book.volume(price - 1));
                 REQUIRE(0 == book.volume(price + 1));
@@ -102,13 +95,10 @@ SCENARIO("send homogeneous orders to LimitOrderBook at same price") {
         uint64_t arrivalB = 1;
         uint64_t arrivalC = 2;
         WHEN("the orders are sent") {
-            auto uidA = book.limit(side, sizeA, price, arrivalA);
-            auto uidB = book.limit(side, sizeB, price, arrivalB);
-            auto uidC = book.limit(side, sizeC, price, arrivalC);
+            book.limit(side, 1, sizeA, price, arrivalA);
+            book.limit(side, 2, sizeB, price, arrivalB);
+            book.limit(side, 3, sizeC, price, arrivalC);
             THEN("order ID is returned and the order is recorded") {
-                REQUIRE(1 == uidA);
-                REQUIRE(2 == uidB);
-                REQUIRE(3 == uidC);
                 REQUIRE(sizeA + sizeB + sizeC == book.volume(price));
                 REQUIRE(0 == book.volume(price - 1));
                 REQUIRE(0 == book.volume(price + 1));
@@ -133,13 +123,10 @@ SCENARIO("send homogeneous orders to LimitOrderBook at different prices") {
         uint64_t arrivalB = 1;
         uint64_t arrivalC = 2;
         WHEN("the orders are sent") {
-            auto uidA = book.limit(side, sizeA, priceA, arrivalA);
-            auto uidB = book.limit(side, sizeB, priceB, arrivalB);
-            auto uidC = book.limit(side, sizeC, priceC, arrivalC);
+            book.limit(side, 1, sizeA, priceA, arrivalA);
+            book.limit(side, 2, sizeB, priceB, arrivalB);
+            book.limit(side, 3, sizeC, priceC, arrivalC);
             THEN("order ID is returned and the order is recorded") {
-                REQUIRE(1 == uidA);
-                REQUIRE(2 == uidB);
-                REQUIRE(3 == uidC);
                 REQUIRE(sizeA == book.volume(priceA));
                 REQUIRE(sizeB == book.volume(priceB));
                 REQUIRE(sizeC == book.volume(priceC));
@@ -161,13 +148,10 @@ SCENARIO("send homogeneous orders to LimitOrderBook at different prices") {
         uint64_t arrivalB = 1;
         uint64_t arrivalC = 2;
         WHEN("the orders are sent") {
-            auto uidA = book.limit(side, sizeA, priceA, arrivalA);
-            auto uidB = book.limit(side, sizeB, priceB, arrivalB);
-            auto uidC = book.limit(side, sizeC, priceC, arrivalC);
+            book.limit(side, 1, sizeA, priceA, arrivalA);
+            book.limit(side, 2, sizeB, priceB, arrivalB);
+            book.limit(side, 3, sizeC, priceC, arrivalC);
             THEN("order ID is returned and the order is recorded") {
-                REQUIRE(1 == uidA);
-                REQUIRE(2 == uidB);
-                REQUIRE(3 == uidC);
                 REQUIRE(sizeA == book.volume(priceA));
                 REQUIRE(sizeB == book.volume(priceB));
                 REQUIRE(sizeC == book.volume(priceC));
@@ -189,14 +173,11 @@ SCENARIO("a limit order is submitted that crosses") {
         uint64_t arrivalA = 0;
         uint64_t arrivalB = 1;
         uint64_t arrivalC = 2;
-        auto uidA = book.limit(side, size, priceA, arrivalA);
-        auto uidB = book.limit(side, size, priceB, arrivalB);
+        book.limit(side, 1, size, priceA, arrivalA);
+        book.limit(side, 2, size, priceB, arrivalB);
         WHEN("the sell limit order is sent") {
-            auto uidC = book.limit(!side, sizeMarket, priceB, arrivalC);
+            book.limit(!side, 3, sizeMarket, priceB, arrivalC);
             THEN("order ID is returned and the order is recorded") {
-                REQUIRE(1 == uidA);
-                REQUIRE(2 == uidB);
-                REQUIRE(3 == uidC);
                 REQUIRE(size == book.volume(priceA));
                 REQUIRE(sizeMarket - size == book.volume(priceB));
                 REQUIRE(priceA == book.best_buy());
@@ -215,14 +196,11 @@ SCENARIO("a limit order is submitted that crosses") {
         uint64_t arrivalA = 0;
         uint64_t arrivalB = 1;
         uint64_t arrivalC = 2;
-        auto uidA = book.limit(side, size, priceA, arrivalA);
-        auto uidB = book.limit(side, size, priceB, arrivalB);
+        book.limit(side, 1, size, priceA, arrivalA);
+        book.limit(side, 2, size, priceB, arrivalB);
         WHEN("the sell limit order is sent") {
-            auto uidC = book.limit(!side, sizeMarket, priceB, arrivalC);
+            book.limit(!side, 3, sizeMarket, priceB, arrivalC);
             THEN("order ID is returned and the order is recorded") {
-                REQUIRE(1 == uidA);
-                REQUIRE(2 == uidB);
-                REQUIRE(3 == uidC);
                 REQUIRE(size == book.volume(priceA));
                 REQUIRE(sizeMarket - size == book.volume(priceB));
                 REQUIRE(priceA == book.best_sell());
@@ -248,9 +226,9 @@ tree shape (single node):
         uint32_t size = 50;
         uint64_t price = 3253;
         uint64_t arrival = 0x1122334455667788;
-        auto uid = book.limit(side, size, price, arrival);
+        book.limit(side, 1, size, price, arrival);
         WHEN("the order is canceled") {
-            book.cancel(uid);
+            book.cancel(1);
             THEN("the limit is cleared") {
                 REQUIRE(0 == book.volume(price));
                 REQUIRE(0 == book.best_buy());
@@ -259,9 +237,9 @@ tree shape (single node):
         }
         // tree integrity check
         WHEN("the order is duplicated, added, and canceled again") {
-            book.cancel(uid);
-            uint64_t uid1 = book.limit(side, size, price, arrival + 1);
-            book.cancel(uid1);
+            book.cancel(1);
+            book.limit(side, 2, size, price, arrival + 1);
+            book.cancel(2);
             THEN("the limit is cleared") {
                 REQUIRE(0 == book.volume(price));
                 REQUIRE(0 == book.best_buy());
@@ -275,9 +253,9 @@ tree shape (single node):
         uint32_t size = 50;
         uint64_t price = 3253;
         uint64_t arrival = 0x1122334455667788;
-        auto uid = book.limit(side, size, price, arrival);
+        book.limit(side, 1, size, price, arrival);
         WHEN("the orders is canceled") {
-            book.cancel(uid);
+            book.cancel(1);
             THEN("the limit is cleared") {
                 REQUIRE(0 == book.volume(price));
                 REQUIRE(0 == book.best_buy());
@@ -286,9 +264,9 @@ tree shape (single node):
         }
         // tree integrity check
         WHEN("the order is duplicated, added, and canceled again") {
-            book.cancel(uid);
-            uint64_t uid1 = book.limit(side, size, price, arrival + 1);
-            book.cancel(uid1);
+            book.cancel(1);
+            book.limit(side, 2, size, price, arrival + 1);
+            book.cancel(2);
             THEN("the limit is cleared") {
                 REQUIRE(0 == book.volume(price));
                 REQUIRE(0 == book.best_buy());
@@ -311,13 +289,13 @@ tree shape - left:
         auto book = LimitOrderBook();
         auto side = Side::Sell;
         // submit the MIDDLE order first (price-wise)
-        book.limit(side, size, prices[1], arrivals[0]);
+        book.limit(side, 1, size, prices[1], arrivals[0]);
         // the lowest price will be the left child
-        auto uid = book.limit(side, size, prices[0], arrivals[1]);
+        book.limit(side, 2, size, prices[0], arrivals[1]);
         // the highest price will be the right child
-        book.limit(side, size, prices[2], arrivals[2]);
+        book.limit(side, 3, size, prices[2], arrivals[2]);
         WHEN("the left order is canceled") {
-            book.cancel(uid);
+            book.cancel(2);
             THEN("the limit is cleared") {
                 REQUIRE(0 == book.volume(prices[0]));
                 REQUIRE(size == book.volume(prices[1]));
@@ -327,9 +305,9 @@ tree shape - left:
         }
         // tree integrity check
         WHEN("the left order is duplicated, added, and canceled again") {
-            book.cancel(uid);
-            uint64_t uid1 = book.limit(side, size, prices[0], arrivals[3]);
-            book.cancel(uid1);
+            book.cancel(2);
+            book.limit(side, 4, size, prices[0], arrivals[3]);
+            book.cancel(4);
             THEN("the limit is cleared") {
                 REQUIRE(0 == book.volume(prices[0]));
                 REQUIRE(size == book.volume(prices[1]));
@@ -342,13 +320,13 @@ tree shape - left:
         auto book = LimitOrderBook();
         auto side = Side::Buy;
         // submit the MIDDLE order first (price-wise)
-        book.limit(side, size, prices[1], arrivals[0]);
+        book.limit(side, 1, size, prices[1], arrivals[0]);
         // the lowest price will be the left child
-        auto uid = book.limit(side, size, prices[0], arrivals[1]);
+        book.limit(side, 2, size, prices[0], arrivals[1]);
         // the highest price will be the right child
-        book.limit(side, size, prices[2], arrivals[2]);
+        book.limit(side, 3, size, prices[2], arrivals[2]);
         WHEN("the left order is canceled") {
-            book.cancel(uid);
+            book.cancel(2);
             THEN("the limit is cleared") {
                 REQUIRE(0 == book.volume(prices[0]));
                 REQUIRE(size == book.volume(prices[1]));
@@ -358,9 +336,9 @@ tree shape - left:
         }
         // tree integrity check
         WHEN("the left order is duplicated, added, and canceled again") {
-            book.cancel(uid);
-            uint64_t uid1 = book.limit(side, size, prices[0], arrivals[3]);
-            book.cancel(uid1);
+            book.cancel(2);
+            book.limit(side, 4, size, prices[0], arrivals[3]);
+            book.cancel(4);
             THEN("the limit is cleared") {
                 REQUIRE(0 == book.volume(prices[0]));
                 REQUIRE(size == book.volume(prices[1]));
@@ -384,13 +362,13 @@ tree shape - right:
         auto book = LimitOrderBook();
         auto side = Side::Sell;
         // submit the MIDDLE order first (price-wise)
-        book.limit(side, size, prices[1], arrivals[0]);
+        book.limit(side, 1, size, prices[1], arrivals[0]);
         // the lowest price will be the left child
-        book.limit(side, size, prices[0], arrivals[1]);
+        book.limit(side, 2, size, prices[0], arrivals[1]);
         // the highest price will be the right child
-        auto uid = book.limit(side, size, prices[2], arrivals[2]);
+        book.limit(side, 3, size, prices[2], arrivals[2]);
         WHEN("the right order is canceled") {
-            book.cancel(uid);
+            book.cancel(3);
             THEN("the limit is cleared") {
                 REQUIRE(size == book.volume(prices[0]));
                 REQUIRE(size == book.volume(prices[1]));
@@ -400,9 +378,9 @@ tree shape - right:
         }
         // tree integrity check
         WHEN("the right order is duplicated, added, and canceled again") {
-            book.cancel(uid);
-            uint64_t uid1 = book.limit(side, size, prices[2], arrivals[3]);
-            book.cancel(uid1);
+            book.cancel(3);
+            book.limit(side, 4, size, prices[2], arrivals[3]);
+            book.cancel(4);
             THEN("the limit is cleared") {
                 REQUIRE(size == book.volume(prices[0]));
                 REQUIRE(size == book.volume(prices[1]));
@@ -415,13 +393,13 @@ tree shape - right:
         auto book = LimitOrderBook();
         auto side = Side::Buy;
         // submit the MIDDLE order first (price-wise)
-        book.limit(side, size, prices[1], arrivals[0]);
+        book.limit(side, 1, size, prices[1], arrivals[0]);
         // the lowest price will be the left child
-        book.limit(side, size, prices[0], arrivals[1]);
+        book.limit(side, 2, size, prices[0], arrivals[1]);
         // the highest price will be the right child
-        auto uid = book.limit(side, size, prices[2], arrivals[2]);
+        book.limit(side, 3, size, prices[2], arrivals[2]);
         WHEN("the right order is canceled") {
-            book.cancel(uid);
+            book.cancel(3);
             THEN("the limit is cleared") {
                 REQUIRE(size == book.volume(prices[0]));
                 REQUIRE(size == book.volume(prices[1]));
@@ -431,9 +409,9 @@ tree shape - right:
         }
         // tree integrity check
         WHEN("the right order is duplicated, added, and canceled again") {
-            book.cancel(uid);
-            uint64_t uid1 = book.limit(side, size, prices[2], arrivals[3]);
-            book.cancel(uid1);
+            book.cancel(3);
+            book.limit(side, 4, size, prices[2], arrivals[3]);
+            book.cancel(4);
             THEN("the limit is cleared") {
                 REQUIRE(size == book.volume(prices[0]));
                 REQUIRE(size == book.volume(prices[1]));
@@ -457,13 +435,13 @@ tree shape - root:
         auto book = LimitOrderBook();
         auto side = Side::Sell;
         // submit the MIDDLE order first (price-wise)
-        auto uid = book.limit(side, size, prices[1], arrivals[0]);
+        book.limit(side, 1, size, prices[1], arrivals[0]);
         // the lowest price will be the left child
-        book.limit(side, size, prices[0], arrivals[1]);
+        book.limit(side, 2, size, prices[0], arrivals[1]);
         // the highest price will be the right child
-        book.limit(side, size, prices[2], arrivals[2]);
+        book.limit(side, 3, size, prices[2], arrivals[2]);
         WHEN("the root order is canceled") {
-            book.cancel(uid);
+            book.cancel(1);
             THEN("the limit is cleared") {
                 REQUIRE(size == book.volume(prices[0]));
                 REQUIRE(0 == book.volume(prices[1]));
@@ -473,9 +451,9 @@ tree shape - root:
         }
         // tree integrity check
         WHEN("the root order is duplicated, added, and canceled again") {
-            book.cancel(uid);
-            uint64_t uid1 = book.limit(side, size, prices[1], arrivals[3]);
-            book.cancel(uid1);
+            book.cancel(1);
+            book.limit(side, 4, size, prices[1], arrivals[3]);
+            book.cancel(4);
             THEN("the limit is cleared") {
                 REQUIRE(size == book.volume(prices[0]));
                 REQUIRE(0 == book.volume(prices[1]));
@@ -488,13 +466,13 @@ tree shape - root:
         auto book = LimitOrderBook();
         auto side = Side::Buy;
         // submit the MIDDLE order first (price-wise)
-        auto uid = book.limit(side, size, prices[1], arrivals[0]);
+        book.limit(side, 1, size, prices[1], arrivals[0]);
         // the lowest price will be the left child
-        book.limit(side, size, prices[0], arrivals[1]);
+        book.limit(side, 2, size, prices[0], arrivals[1]);
         // the highest price will be the right child
-        book.limit(side, size, prices[2], arrivals[2]);
+        book.limit(side, 3, size, prices[2], arrivals[2]);
         WHEN("the root order is canceled") {
-            book.cancel(uid);
+            book.cancel(1);
             THEN("the limit is cleared") {
                 REQUIRE(size == book.volume(prices[0]));
                 REQUIRE(0 == book.volume(prices[1]));
@@ -504,9 +482,9 @@ tree shape - root:
         }
         // tree integrity check
         WHEN("the root order is duplicated, added, and canceled again") {
-            book.cancel(uid);
-            uint64_t uid1 = book.limit(side, size, prices[1], arrivals[3]);
-            book.cancel(uid1);
+            book.cancel(1);
+            book.limit(side, 4, size, prices[1], arrivals[3]);
+            book.cancel(4);
             THEN("the limit is cleared") {
                 REQUIRE(size == book.volume(prices[0]));
                 REQUIRE(0 == book.volume(prices[1]));
@@ -531,11 +509,11 @@ tree shape - root:
     GIVEN("an order book with right leg shaped limit tree (sell)") {
         auto book = LimitOrderBook();
         auto side = Side::Sell;
-        auto uid = book.limit(side, size, prices[0], arrivals[0]);
-        book.limit(side, size, prices[1], arrivals[1]);
-        book.limit(side, size, prices[2], arrivals[2]);
+        book.limit(side, 1, size, prices[0], arrivals[0]);
+        book.limit(side, 2, size, prices[1], arrivals[1]);
+        book.limit(side, 3, size, prices[2], arrivals[2]);
         WHEN("the root order is canceled") {
-            book.cancel(uid);
+            book.cancel(1);
             THEN("the limit is cleared") {
                 REQUIRE(0 == book.volume(prices[0]));
                 REQUIRE(size == book.volume(prices[1]));
@@ -545,9 +523,9 @@ tree shape - root:
         }
         // tree integrity check
         WHEN("the root order is duplicated, added, and canceled again") {
-            book.cancel(uid);
-            uint64_t uid1 = book.limit(side, size, prices[0], arrivals[3]);
-            book.cancel(uid1);
+            book.cancel(1);
+            book.limit(side, 4, size, prices[0], arrivals[3]);
+            book.cancel(4);
             THEN("the limit is cleared") {
                 REQUIRE(0 == book.volume(prices[0]));
                 REQUIRE(size == book.volume(prices[1]));
@@ -559,11 +537,11 @@ tree shape - root:
     GIVEN("an order book with right leg shaped limit tree (buy)") {
         auto book = LimitOrderBook();
         auto side = Side::Buy;
-        auto uid = book.limit(side, size, prices[0], arrivals[0]);
-        book.limit(side, size, prices[1], arrivals[1]);
-        book.limit(side, size, prices[2], arrivals[2]);
+        book.limit(side, 1, size, prices[0], arrivals[0]);
+        book.limit(side, 2, size, prices[1], arrivals[1]);
+        book.limit(side, 3, size, prices[2], arrivals[2]);
         WHEN("the root order is canceled") {
-            book.cancel(uid);
+            book.cancel(1);
             THEN("the limit is cleared") {
                 REQUIRE(0 == book.volume(prices[0]));
                 REQUIRE(size == book.volume(prices[1]));
@@ -573,9 +551,9 @@ tree shape - root:
         }
         // tree integrity check
         WHEN("the root order is duplicated, added, and canceled again") {
-            book.cancel(uid);
-            uint64_t uid1 = book.limit(side, size, prices[0], arrivals[3]);
-            book.cancel(uid1);
+            book.cancel(1);
+            book.limit(side, 4, size, prices[0], arrivals[3]);
+            book.cancel(4);
             THEN("the limit is cleared") {
                 REQUIRE(0 == book.volume(prices[0]));
                 REQUIRE(size == book.volume(prices[1]));
@@ -600,11 +578,11 @@ tree shape - middle:
     GIVEN("an order book with right leg shaped limit tree (sell)") {
         auto book = LimitOrderBook();
         auto side = Side::Sell;
-        book.limit(side, size, prices[0], arrivals[0]);
-        auto uid = book.limit(side, size, prices[1], arrivals[1]);
-        book.limit(side, size, prices[2], arrivals[2]);
+        book.limit(side, 1, size, prices[0], arrivals[0]);
+        book.limit(side, 2, size, prices[1], arrivals[1]);
+        book.limit(side, 3, size, prices[2], arrivals[2]);
         WHEN("the middle order is canceled") {
-            book.cancel(uid);
+            book.cancel(2);
             THEN("the limit is cleared") {
                 REQUIRE(size == book.volume(prices[0]));
                 REQUIRE(0 == book.volume(prices[1]));
@@ -614,9 +592,9 @@ tree shape - middle:
         }
         // tree integrity check
         WHEN("the middle order is duplicated, added, and canceled again") {
-            book.cancel(uid);
-            uint64_t uid1 = book.limit(side, size, prices[1], arrivals[3]);
-            book.cancel(uid1);
+            book.cancel(2);
+            book.limit(side, 4, size, prices[1], arrivals[3]);
+            book.cancel(4);
             THEN("the limit is cleared") {
                 REQUIRE(size == book.volume(prices[0]));
                 REQUIRE(0 == book.volume(prices[1]));
@@ -628,11 +606,11 @@ tree shape - middle:
     GIVEN("an order book with right leg shaped limit tree (buy)") {
         auto book = LimitOrderBook();
         auto side = Side::Buy;
-        book.limit(side, size, prices[0], arrivals[0]);
-        auto uid = book.limit(side, size, prices[1], arrivals[1]);
-        book.limit(side, size, prices[2], arrivals[2]);
+        book.limit(side, 1, size, prices[0], arrivals[0]);
+        book.limit(side, 2, size, prices[1], arrivals[1]);
+        book.limit(side, 3, size, prices[2], arrivals[2]);
         WHEN("the middle order is canceled") {
-            book.cancel(uid);
+            book.cancel(2);
             THEN("the limit is cleared") {
                 REQUIRE(size == book.volume(prices[0]));
                 REQUIRE(0 == book.volume(prices[1]));
@@ -642,9 +620,9 @@ tree shape - middle:
         }
         // tree integrity check
         WHEN("the middle order is duplicated, added, and canceled again") {
-            book.cancel(uid);
-            uint64_t uid1 = book.limit(side, size, prices[1], arrivals[3]);
-            book.cancel(uid1);
+            book.cancel(2);
+            book.limit(side, 4, size, prices[1], arrivals[3]);
+            book.cancel(4);
             THEN("the limit is cleared") {
                 REQUIRE(size == book.volume(prices[0]));
                 REQUIRE(0 == book.volume(prices[1]));
@@ -669,11 +647,11 @@ tree shape - leaf:
     GIVEN("an order book with right leg shaped limit tree (sell)") {
         auto book = LimitOrderBook();
         auto side = Side::Sell;
-        book.limit(side, size, prices[0], arrivals[0]);
-        book.limit(side, size, prices[1], arrivals[1]);
-        auto uid = book.limit(side, size, prices[2], arrivals[2]);
+        book.limit(side, 1, size, prices[0], arrivals[0]);
+        book.limit(side, 2, size, prices[1], arrivals[1]);
+        book.limit(side, 3, size, prices[2], arrivals[2]);
         WHEN("the leaf order is canceled") {
-            book.cancel(uid);
+            book.cancel(3);
             THEN("the limit is cleared") {
                 REQUIRE(size == book.volume(prices[0]));
                 REQUIRE(size == book.volume(prices[1]));
@@ -683,9 +661,9 @@ tree shape - leaf:
         }
         // tree integrity check
         WHEN("the leaf order is duplicated, added, and canceled again") {
-            book.cancel(uid);
-            uint64_t uid1 = book.limit(side, size, prices[2], arrivals[3]);
-            book.cancel(uid1);
+            book.cancel(3);
+            book.limit(side, 4, size, prices[2], arrivals[3]);
+            book.cancel(4);
             THEN("the limit is cleared") {
                 REQUIRE(size == book.volume(prices[0]));
                 REQUIRE(size == book.volume(prices[1]));
@@ -697,11 +675,11 @@ tree shape - leaf:
     GIVEN("an order book with right leg shaped limit tree (buy)") {
         auto book = LimitOrderBook();
         auto side = Side::Buy;
-        book.limit(side, size, prices[0], arrivals[0]);
-        book.limit(side, size, prices[1], arrivals[1]);
-        auto uid = book.limit(side, size, prices[2], arrivals[2]);
+        book.limit(side, 1, size, prices[0], arrivals[0]);
+        book.limit(side, 2, size, prices[1], arrivals[1]);
+        book.limit(side, 3, size, prices[2], arrivals[2]);
         WHEN("the leaf order is canceled") {
-            book.cancel(uid);
+            book.cancel(3);
             THEN("the limit is cleared") {
                 REQUIRE(size == book.volume(prices[0]));
                 REQUIRE(size == book.volume(prices[1]));
@@ -711,9 +689,9 @@ tree shape - leaf:
         }
         // tree integrity check
         WHEN("the leaf order is duplicated, added, and canceled again") {
-            book.cancel(uid);
-            uint64_t uid1 = book.limit(side, size, prices[2], arrivals[3]);
-            book.cancel(uid1);
+            book.cancel(3);
+            book.limit(side, 4, size, prices[2], arrivals[3]);
+            book.cancel(4);
             THEN("the limit is cleared") {
                 REQUIRE(size == book.volume(prices[0]));
                 REQUIRE(size == book.volume(prices[1]));
@@ -738,11 +716,11 @@ tree shape - root:
     GIVEN("an order book with left leg shaped limit tree (sell)") {
         auto book = LimitOrderBook();
         auto side = Side::Sell;
-        auto uid = book.limit(side, size, prices[2], arrivals[0]);
-        book.limit(side, size, prices[1], arrivals[1]);
-        book.limit(side, size, prices[0], arrivals[2]);
+        book.limit(side, 1, size, prices[2], arrivals[0]);
+        book.limit(side, 2, size, prices[1], arrivals[1]);
+        book.limit(side, 3, size, prices[0], arrivals[2]);
         WHEN("the root order is canceled") {
-            book.cancel(uid);
+            book.cancel(1);
             THEN("the limit is cleared") {
                 REQUIRE(size == book.volume(prices[0]));
                 REQUIRE(size == book.volume(prices[1]));
@@ -752,9 +730,9 @@ tree shape - root:
         }
         // tree integrity check
         WHEN("the root order is duplicated, added, and canceled again") {
-            book.cancel(uid);
-            uint64_t uid1 = book.limit(side, size, prices[2], arrivals[3]);
-            book.cancel(uid1);
+            book.cancel(1);
+            book.limit(side, 4, size, prices[2], arrivals[3]);
+            book.cancel(4);
             THEN("the limit is cleared") {
                 REQUIRE(size == book.volume(prices[0]));
                 REQUIRE(size == book.volume(prices[1]));
@@ -766,11 +744,11 @@ tree shape - root:
     GIVEN("an order book with left leg shaped limit tree (buy)") {
         auto book = LimitOrderBook();
         auto side = Side::Buy;
-        auto uid = book.limit(side, size, prices[2], arrivals[0]);
-        book.limit(side, size, prices[1], arrivals[1]);
-        book.limit(side, size, prices[0], arrivals[2]);
+        book.limit(side, 1, size, prices[2], arrivals[0]);
+        book.limit(side, 2, size, prices[1], arrivals[1]);
+        book.limit(side, 3, size, prices[0], arrivals[2]);
         WHEN("the root order is canceled") {
-            book.cancel(uid);
+            book.cancel(1);
             THEN("the limit is cleared") {
                 REQUIRE(size == book.volume(prices[0]));
                 REQUIRE(size == book.volume(prices[1]));
@@ -780,9 +758,9 @@ tree shape - root:
         }
         // tree integrity check
         WHEN("the root order is duplicated, added, and canceled again") {
-            book.cancel(uid);
-            uint64_t uid1 = book.limit(side, size, prices[2], arrivals[3]);
-            book.cancel(uid1);
+            book.cancel(1);
+            book.limit(side, 4, size, prices[2], arrivals[3]);
+            book.cancel(4);
             THEN("the limit is cleared") {
                 REQUIRE(size == book.volume(prices[0]));
                 REQUIRE(size == book.volume(prices[1]));
@@ -807,11 +785,11 @@ tree shape - middle:
     GIVEN("an order book with left leg shaped limit tree (sell)") {
         auto book = LimitOrderBook();
         auto side = Side::Sell;
-        book.limit(side, size, prices[2], arrivals[0]);
-        auto uid = book.limit(side, size, prices[1], arrivals[1]);
-        book.limit(side, size, prices[0], arrivals[2]);
+        book.limit(side, 1, size, prices[2], arrivals[0]);
+        book.limit(side, 2, size, prices[1], arrivals[1]);
+        book.limit(side, 3, size, prices[0], arrivals[2]);
         WHEN("the middle order is canceled") {
-            book.cancel(uid);
+            book.cancel(2);
             THEN("the limit is cleared") {
                 REQUIRE(size == book.volume(prices[0]));
                 REQUIRE(0 == book.volume(prices[1]));
@@ -821,9 +799,9 @@ tree shape - middle:
         }
         // tree integrity check
         WHEN("the middle order is duplicated, added, and canceled again") {
-            book.cancel(uid);
-            uint64_t uid1 = book.limit(side, size, prices[1], arrivals[3]);
-            book.cancel(uid1);
+            book.cancel(2);
+            book.limit(side, 4, size, prices[1], arrivals[3]);
+            book.cancel(4);
             THEN("the limit is cleared") {
                 REQUIRE(size == book.volume(prices[0]));
                 REQUIRE(0 == book.volume(prices[1]));
@@ -835,11 +813,11 @@ tree shape - middle:
     GIVEN("an order book with left leg shaped limit tree (buy)") {
         auto book = LimitOrderBook();
         auto side = Side::Buy;
-        book.limit(side, size, prices[2], arrivals[0]);
-        auto uid = book.limit(side, size, prices[1], arrivals[1]);
-        book.limit(side, size, prices[0], arrivals[2]);
+        book.limit(side, 1, size, prices[2], arrivals[0]);
+        book.limit(side, 2, size, prices[1], arrivals[1]);
+        book.limit(side, 3, size, prices[0], arrivals[2]);
         WHEN("the middle order is canceled") {
-            book.cancel(uid);
+            book.cancel(2);
             THEN("the limit is cleared") {
                 REQUIRE(size == book.volume(prices[0]));
                 REQUIRE(0 == book.volume(prices[1]));
@@ -849,9 +827,9 @@ tree shape - middle:
         }
         // tree integrity check
         WHEN("the middle order is duplicated, added, and canceled again") {
-            book.cancel(uid);
-            uint64_t uid1 = book.limit(side, size, prices[1], arrivals[3]);
-            book.cancel(uid1);
+            book.cancel(2);
+            book.limit(side, 4, size, prices[1], arrivals[3]);
+            book.cancel(4);
             THEN("the limit is cleared") {
                 REQUIRE(size == book.volume(prices[0]));
                 REQUIRE(0 == book.volume(prices[1]));
@@ -876,11 +854,11 @@ tree shape - leaf:
     GIVEN("an order book with left leg shaped limit tree (sell)") {
         auto book = LimitOrderBook();
         auto side = Side::Sell;
-        book.limit(side, size, prices[2], arrivals[0]);
-        book.limit(side, size, prices[1], arrivals[1]);
-        auto uid = book.limit(side, size, prices[0], arrivals[2]);
+        book.limit(side, 1, size, prices[2], arrivals[0]);
+        book.limit(side, 2, size, prices[1], arrivals[1]);
+        book.limit(side, 3, size, prices[0], arrivals[2]);
         WHEN("the leaf order is canceled") {
-            book.cancel(uid);
+            book.cancel(3);
             THEN("the limit is cleared") {
                 REQUIRE(0 == book.volume(prices[0]));
                 REQUIRE(size == book.volume(prices[1]));
@@ -890,9 +868,9 @@ tree shape - leaf:
         }
         // tree integrity check
         WHEN("the leaf order is duplicated, added, and canceled again") {
-            book.cancel(uid);
-            uint64_t uid1 = book.limit(side, size, prices[0], arrivals[3]);
-            book.cancel(uid1);
+            book.cancel(3);
+            book.limit(side, 4, size, prices[0], arrivals[3]);
+            book.cancel(4);
             THEN("the limit is cleared") {
                 REQUIRE(0 == book.volume(prices[0]));
                 REQUIRE(size == book.volume(prices[1]));
@@ -904,11 +882,11 @@ tree shape - leaf:
     GIVEN("an order book with left leg shaped limit tree (buy)") {
         auto book = LimitOrderBook();
         auto side = Side::Buy;
-        book.limit(side, size, prices[2], arrivals[0]);
-        book.limit(side, size, prices[1], arrivals[1]);
-        auto uid = book.limit(side, size, prices[0], arrivals[2]);
+        book.limit(side, 1, size, prices[2], arrivals[0]);
+        book.limit(side, 2, size, prices[1], arrivals[1]);
+        book.limit(side, 3, size, prices[0], arrivals[2]);
         WHEN("the leaf order is canceled") {
-            book.cancel(uid);
+            book.cancel(3);
             THEN("the limit is cleared") {
                 REQUIRE(0 == book.volume(prices[0]));
                 REQUIRE(size == book.volume(prices[1]));
@@ -918,9 +896,9 @@ tree shape - leaf:
         }
         // tree integrity check
         WHEN("the leaf order is duplicated, added, and canceled again") {
-            book.cancel(uid);
-            uint64_t uid1 = book.limit(side, size, prices[0], arrivals[3]);
-            book.cancel(uid1);
+            book.cancel(3);
+            book.limit(side, 4, size, prices[0], arrivals[3]);
+            book.cancel(4);
             THEN("the limit is cleared") {
                 REQUIRE(0 == book.volume(prices[0]));
                 REQUIRE(size == book.volume(prices[1]));
@@ -946,15 +924,15 @@ tree shape - root:
         auto book = LimitOrderBook();
         auto side = Side::Buy;
         // submit the MIDDLE order first (price-wise)
-        auto uid = book.limit(side, size, prices[1], arrivals[0]);
+        book.limit(side, 1, size, prices[1], arrivals[0]);
         // the lowest price will be the left child
-        book.limit(side, size, prices[0], arrivals[1]);
+        book.limit(side, 2, size, prices[0], arrivals[1]);
         // the highest price will be the right child
-        book.limit(side, size, prices[2], arrivals[2]);
+        book.limit(side, 3, size, prices[2], arrivals[2]);
         // the last price will be the left branch of the right child
-        book.limit(side, size, prices[3], arrivals[3]);
+        book.limit(side, 4, size, prices[3], arrivals[3]);
         WHEN("the root order is canceled") {
-            book.cancel(uid);
+            book.cancel(1);
             THEN("the limit is cleared") {
                 REQUIRE(size == book.volume(prices[0]));
                 REQUIRE(0 == book.volume(prices[1]));
@@ -965,9 +943,9 @@ tree shape - root:
         }
         // tree integrity check
         WHEN("the root order is duplicated, added, and canceled again") {
-            book.cancel(uid);
-            uint64_t uid1 = book.limit(side, size, prices[1], arrivals[4]);
-            book.cancel(uid1);
+            book.cancel(1);
+            book.limit(side, 5, size, prices[1], arrivals[4]);
+            book.cancel(5);
             THEN("the limit is cleared") {
                 REQUIRE(size == book.volume(prices[0]));
                 REQUIRE(0 == book.volume(prices[1]));
@@ -996,17 +974,17 @@ tree shape - root:
         auto book = LimitOrderBook();
         auto side = Side::Buy;
         // submit the MIDDLE order first (price-wise)
-        auto uid = book.limit(side, size, prices[1], arrivals[0]);
+        book.limit(side, 1, size, prices[1], arrivals[0]);
         // the lowest price will be the left child
-        book.limit(side, size, prices[0], arrivals[1]);
+        book.limit(side, 2, size, prices[0], arrivals[1]);
         // the highest price will be the right child
-        book.limit(side, size, prices[2], arrivals[2]);
+        book.limit(side, 3, size, prices[2], arrivals[2]);
         // the last price will be the left branch of the right child
-        book.limit(side, size, prices[3], arrivals[3]);
+        book.limit(side, 4, size, prices[3], arrivals[3]);
         // the last price will be the left branch of the right child
-        book.limit(side, size, prices[4], arrivals[4]);
+        book.limit(side, 5, size, prices[4], arrivals[4]);
         WHEN("the root order is canceled") {
-            book.cancel(uid);
+            book.cancel(1);
             THEN("the limit is cleared") {
                 REQUIRE(size == book.volume(prices[0]));
                 REQUIRE(0 == book.volume(prices[1]));
@@ -1018,9 +996,9 @@ tree shape - root:
         }
         // tree integrity check
         WHEN("the root order is duplicated, added, and canceled again") {
-            book.cancel(uid);
-            uint64_t uid1 = book.limit(side, size, prices[1], arrivals[5]);
-            book.cancel(uid1);
+            book.cancel(1);
+            book.limit(side, 6, size, prices[1], arrivals[5]);
+            book.cancel(6);
             THEN("the limit is cleared") {
                 REQUIRE(size == book.volume(prices[0]));
                 REQUIRE(0 == book.volume(prices[1]));
@@ -1049,12 +1027,12 @@ tree shape - node 4:
     GIVEN("an order book with right zigzag--shaped limit tree (buy)") {
         auto book = LimitOrderBook();
         auto side = Side::Buy;
-        book.limit(side, size, prices[0], arrivals[0]);
-        auto uid = book.limit(side, size, prices[1], arrivals[1]);
-        book.limit(side, size, prices[2], arrivals[2]);
-        book.limit(side, size, prices[3], arrivals[3]);
+        book.limit(side, 1, size, prices[0], arrivals[0]);
+        book.limit(side, 2, size, prices[1], arrivals[1]);
+        book.limit(side, 3, size, prices[2], arrivals[2]);
+        book.limit(side, 4, size, prices[3], arrivals[3]);
         WHEN("the root-child order is canceled") {
-            book.cancel(uid);
+            book.cancel(2);
             THEN("the limit is cleared") {
                 REQUIRE(size == book.volume(prices[0]));
                 REQUIRE(0 == book.volume(prices[1]));
@@ -1065,9 +1043,9 @@ tree shape - node 4:
         }
         // tree integrity check
         WHEN("the root-child order is duplicated, added, and canceled again") {
-            book.cancel(uid);
-            uint64_t uid1 = book.limit(side, size, prices[1], arrivals[4]);
-            book.cancel(uid1);
+            book.cancel(2);
+            book.limit(side, 5, size, prices[1], arrivals[4]);
+            book.cancel(5);
             THEN("the limit is cleared") {
                 REQUIRE(size == book.volume(prices[0]));
                 REQUIRE(0 == book.volume(prices[1]));
@@ -1095,12 +1073,12 @@ tree shape - node 1:
     GIVEN("an order book with left zigzag--shaped limit tree (sell)") {
         auto book = LimitOrderBook();
         auto side = Side::Sell;
-        book.limit(side, size, prices[0], arrivals[0]);
-        auto uid = book.limit(side, size, prices[1], arrivals[1]);
-        book.limit(side, size, prices[2], arrivals[2]);
-        book.limit(side, size, prices[3], arrivals[3]);
+        book.limit(side, 1, size, prices[0], arrivals[0]);
+        book.limit(side, 2, size, prices[1], arrivals[1]);
+        book.limit(side, 3, size, prices[2], arrivals[2]);
+        book.limit(side, 4, size, prices[3], arrivals[3]);
         WHEN("the root-child order is canceled") {
-            book.cancel(uid);
+            book.cancel(2);
             THEN("the limit is cleared") {
                 REQUIRE(size == book.volume(prices[0]));
                 REQUIRE(0 == book.volume(prices[1]));
@@ -1111,9 +1089,9 @@ tree shape - node 1:
         }
         // tree integrity check
         WHEN("the root-child order is duplicated, added, and canceled again") {
-            book.cancel(uid);
-            uint64_t uid1 = book.limit(side, size, prices[1], arrivals[4]);
-            book.cancel(uid1);
+            book.cancel(2);
+            book.limit(side, 5, size, prices[1], arrivals[4]);
+            book.cancel(5);
             THEN("the limit is cleared") {
                 REQUIRE(size == book.volume(prices[0]));
                 REQUIRE(0 == book.volume(prices[1]));
@@ -1138,11 +1116,11 @@ SCENARIO("cancel first order in a Limit queue of orders") {
         uint64_t arrivalA = 0;
         uint64_t arrivalB = 1;
         uint64_t arrivalC = 2;
-        auto uid = book.limit(side, sizeA, price, arrivalA);
-        book.limit(side, sizeB, price, arrivalB);
-        book.limit(side, sizeC, price, arrivalC);
+        book.limit(side, 1, sizeA, price, arrivalA);
+        book.limit(side, 2, sizeB, price, arrivalB);
+        book.limit(side, 3, sizeC, price, arrivalC);
         WHEN("the first order is canceled") {
-            book.cancel(uid);
+            book.cancel(1);
             THEN("order ID is returned and the order is recorded") {
                 REQUIRE(sizeB + sizeC == book.volume(price));
                 REQUIRE(0 == book.best_buy());
@@ -1160,11 +1138,11 @@ SCENARIO("cancel first order in a Limit queue of orders") {
         uint64_t arrivalA = 0;
         uint64_t arrivalB = 1;
         uint64_t arrivalC = 2;
-        auto uid = book.limit(side, sizeA, price, arrivalA);
-        book.limit(side, sizeB, price, arrivalB);
-        book.limit(side, sizeC, price, arrivalC);
+        book.limit(side, 1, sizeA, price, arrivalA);
+        book.limit(side, 2, sizeB, price, arrivalB);
+        book.limit(side, 3, sizeC, price, arrivalC);
         WHEN("the first order is canceled") {
-            book.cancel(uid);
+            book.cancel(1);
             THEN("order ID is returned and the order is recorded") {
                 REQUIRE(sizeB + sizeC == book.volume(price));
                 REQUIRE(price == book.best_buy());
@@ -1185,11 +1163,11 @@ SCENARIO("cancel middle order in a Limit queue of orders") {
         uint64_t arrivalA = 0;
         uint64_t arrivalB = 1;
         uint64_t arrivalC = 2;
-        book.limit(side, sizeA, price, arrivalA);
-        auto uid = book.limit(side, sizeB, price, arrivalB);
-        book.limit(side, sizeC, price, arrivalC);
+        book.limit(side, 1, sizeA, price, arrivalA);
+        book.limit(side, 2, sizeB, price, arrivalB);
+        book.limit(side, 3, sizeC, price, arrivalC);
         WHEN("the middle order is canceled") {
-            book.cancel(uid);
+            book.cancel(2);
             THEN("order ID is returned and the order is recorded") {
                 REQUIRE(sizeA + sizeC == book.volume(price));
                 REQUIRE(0 == book.best_buy());
@@ -1207,11 +1185,11 @@ SCENARIO("cancel middle order in a Limit queue of orders") {
         uint64_t arrivalA = 0;
         uint64_t arrivalB = 1;
         uint64_t arrivalC = 2;
-        book.limit(side, sizeA, price, arrivalA);
-        auto uid = book.limit(side, sizeB, price, arrivalB);
-        book.limit(side, sizeC, price, arrivalC);
+        book.limit(side, 1, sizeA, price, arrivalA);
+        book.limit(side, 2, sizeB, price, arrivalB);
+        book.limit(side, 3, sizeC, price, arrivalC);
         WHEN("the middle order is canceled") {
-            book.cancel(uid);
+            book.cancel(2);
             THEN("order ID is returned and the order is recorded") {
                 REQUIRE(sizeA + sizeC == book.volume(price));
                 REQUIRE(price == book.best_buy());
@@ -1232,11 +1210,11 @@ SCENARIO("cancel last order in a Limit queue of orders") {
         uint64_t arrivalA = 0;
         uint64_t arrivalB = 1;
         uint64_t arrivalC = 2;
-        book.limit(side, sizeA, price, arrivalA);
-        book.limit(side, sizeB, price, arrivalB);
-        auto uid = book.limit(side, sizeC, price, arrivalC);
+        book.limit(side, 1, sizeA, price, arrivalA);
+        book.limit(side, 2, sizeB, price, arrivalB);
+        book.limit(side, 3, sizeC, price, arrivalC);
         WHEN("the last order is canceled") {
-            book.cancel(uid);
+            book.cancel(3);
             THEN("order ID is returned and the order is recorded") {
                 REQUIRE(sizeA + sizeB == book.volume(price));
                 REQUIRE(0 == book.best_buy());
@@ -1254,11 +1232,11 @@ SCENARIO("cancel last order in a Limit queue of orders") {
         uint64_t arrivalA = 0;
         uint64_t arrivalB = 1;
         uint64_t arrivalC = 2;
-        book.limit(side, sizeA, price, arrivalA);
-        book.limit(side, sizeB, price, arrivalB);
-        auto uid = book.limit(side, sizeC, price, arrivalC);
+        book.limit(side, 1, sizeA, price, arrivalA);
+        book.limit(side, 2, sizeB, price, arrivalB);
+        book.limit(side, 3, sizeC, price, arrivalC);
         WHEN("the last order is canceled") {
-            book.cancel(uid);
+            book.cancel(3);
             THEN("order ID is returned and the order is recorded") {
                 REQUIRE(sizeA + sizeB == book.volume(price));
                 REQUIRE(price == book.best_buy());
@@ -1278,7 +1256,7 @@ SCENARIO("a market order is submitted with no order in the book") {
         auto size = 100;
         auto arrival = 1;
         WHEN("a buy market order is submitted") {
-            book.market(Side::Sell, size, arrival);
+            book.market(Side::Sell, 1, size, arrival);
         }
     }
 }
@@ -1292,8 +1270,8 @@ SCENARIO("a market order is submitted with a perfect match") {
         auto book = LimitOrderBook();
 
         WHEN("a sell market order is matched to a buy limit order") {
-            book.limit(Side::Buy, size, price, arrival1);
-            book.market(Side::Sell, size, arrival2);
+            book.limit(Side::Buy, 1, size, price, arrival1);
+            book.market(Side::Sell, 2, size, arrival2);
             THEN("the limit_fill and market_fill functions should fire") {
                 REQUIRE(0 == book.best_buy());
                 REQUIRE(0 == book.volume(price));
@@ -1310,10 +1288,10 @@ SCENARIO("a market order is submitted that is partially filled by a limit") {
         auto arrival1 = 1;
         auto arrival2 = 2;
         auto book = LimitOrderBook();
-        book.limit(Side::Buy, size_limit, price, arrival1);
+        book.limit(Side::Buy, 1, size_limit, price, arrival1);
 
         WHEN("a buy market order is submitted") {
-            book.market(Side::Sell, size_market, arrival2);
+            book.market(Side::Sell, 2, size_market, arrival2);
             THEN("the limit_fill and market_fill functions should fire") {
                 REQUIRE(price == book.best_buy());
                 REQUIRE(size_limit - size_market == book.volume(price));
@@ -1332,11 +1310,11 @@ SCENARIO("a market order is submitted that spans several limits") {
         auto arrival2 = 2;
         auto arrival3 = 3;
         auto book = LimitOrderBook();
-        book.limit(Side::Buy, size_limit1, price, arrival1);
-        book.limit(Side::Buy, size_limit2, price, arrival2);
+        book.limit(Side::Buy, 1, size_limit1, price, arrival1);
+        book.limit(Side::Buy, 2, size_limit2, price, arrival2);
 
         WHEN("a buy market order is submitted") {
-            book.market(Side::Sell, size_market, arrival3);
+            book.market(Side::Sell, 3, size_market, arrival3);
             THEN("the limit_fill and market_fill functions should fire") {
                 REQUIRE(100 == book.best_buy());
                 REQUIRE(size_limit1 + size_limit2 - size_market == book.volume(price));
@@ -1355,11 +1333,11 @@ SCENARIO("a market order is submitted that spans several limits and depletes boo
         auto arrival2 = 2;
         auto arrival3 = 3;
         auto book = LimitOrderBook();
-        book.limit(Side::Buy, size_limit1, price, arrival1);
-        book.limit(Side::Buy, size_limit2, price, arrival2);
+        book.limit(Side::Buy, 1, size_limit1, price, arrival1);
+        book.limit(Side::Buy, 2, size_limit2, price, arrival2);
 
         WHEN("a buy market order is submitted") {
-            book.market(Side::Sell, size_market, arrival3);
+            book.market(Side::Sell, 3, size_market, arrival3);
             THEN("the limit_fill and market_fill functions should fire") {
                 REQUIRE(0 == book.best_buy());
                 REQUIRE(0 == book.volume(price));
