@@ -108,6 +108,20 @@ struct LimitTree {
         size(0),
         volume(0) { }
 
+    /// Clear all the limits in the tree
+    void clear() {
+        // delete all the limits
+        for(auto item = limits.begin(); item != limits.end(); item++)
+            delete item->second;
+        // clear the pairs from the map
+        limits.clear();
+        // set remaining tracers to 0
+        root = nullptr;
+        best = nullptr;
+        size = 0;
+        volume = 0;
+    }
+
     /// Place a limit order on the limit tree.
     ///
     /// @param order an order that matches the side of this tree

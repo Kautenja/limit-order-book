@@ -1345,3 +1345,399 @@ SCENARIO("a market order is submitted that spans several limits and depletes boo
         }
     }
 }
+
+// ---------------------------------------------------------------------------
+// MARK: clear
+// ---------------------------------------------------------------------------
+
+SCENARIO(R"(LOB
+clear()
+tree shape (single node):
+*
+)") {
+    GIVEN("an order book and an ID for a single sell order") {
+        auto book = LimitOrderBook();
+        auto side = Side::Sell;
+        uint32_t size = 50;
+        uint64_t price = 3253;
+        uint64_t arrival = 0x1122334455667788;
+        book.limit(side, 1, size, price, arrival);
+        WHEN("the book is cleared") {
+            book.clear();
+            THEN("the book is cleared") {
+                REQUIRE(0 == book.volume(price));
+                REQUIRE(0 == book.volume_buy());
+                REQUIRE(0 == book.volume_sell());
+                REQUIRE(0 == book.volume());
+                REQUIRE(0 == book.best_buy());
+                REQUIRE(0 == book.best_sell());
+            }
+        }
+    }
+    GIVEN("an order book and an ID for a single buy order") {
+        auto book = LimitOrderBook();
+        auto side = Side::Buy;
+        uint32_t size = 50;
+        uint64_t price = 3253;
+        uint64_t arrival = 0x1122334455667788;
+        book.limit(side, 1, size, price, arrival);
+        WHEN("the book is cleared") {
+            book.clear();
+            THEN("the book is cleared") {
+                REQUIRE(0 == book.volume(price));
+                REQUIRE(0 == book.volume_buy());
+                REQUIRE(0 == book.volume_sell());
+                REQUIRE(0 == book.volume());
+                REQUIRE(0 == book.best_buy());
+                REQUIRE(0 == book.best_sell());
+            }
+        }
+    }
+}
+
+SCENARIO(R"(LOB
+clear()
+tree shape:
+  1
+ / \
+0   2
+)") {
+    uint32_t size = 50;
+    uint64_t prices[3] = {1, 2, 3};
+    uint64_t arrivals[4] = {1, 2, 3, 4};
+    GIVEN("an order book with V shaped limit tree (sell)") {
+        auto book = LimitOrderBook();
+        auto side = Side::Sell;
+        // submit the MIDDLE order first (price-wise)
+        book.limit(side, 1, size, prices[1], arrivals[0]);
+        // the lowest price will be the left child
+        book.limit(side, 2, size, prices[0], arrivals[1]);
+        // the highest price will be the right child
+        book.limit(side, 3, size, prices[2], arrivals[2]);
+        WHEN("the book is cleared") {
+            book.clear();
+            THEN("the book is cleared") {
+                REQUIRE(0 == book.volume_buy());
+                REQUIRE(0 == book.volume_sell());
+                REQUIRE(0 == book.volume());
+                REQUIRE(0 == book.best_buy());
+                REQUIRE(0 == book.best_sell());
+            }
+        }
+    }
+    GIVEN("an order book with V shaped limit tree (buy)") {
+        auto book = LimitOrderBook();
+        auto side = Side::Buy;
+        // submit the MIDDLE order first (price-wise)
+        book.limit(side, 1, size, prices[1], arrivals[0]);
+        // the lowest price will be the left child
+        book.limit(side, 2, size, prices[0], arrivals[1]);
+        // the highest price will be the right child
+        book.limit(side, 3, size, prices[2], arrivals[2]);
+        WHEN("the book is cleared") {
+            book.clear();
+            THEN("the book is cleared") {
+                REQUIRE(0 == book.volume_buy());
+                REQUIRE(0 == book.volume_sell());
+                REQUIRE(0 == book.volume());
+                REQUIRE(0 == book.best_buy());
+                REQUIRE(0 == book.best_sell());
+            }
+        }
+    }
+}
+
+
+SCENARIO(R"(LOB
+clear()
+tree shape:
+0
+ \
+  1
+   \
+    2
+)") {
+    uint32_t size = 50;
+    uint64_t prices[3] = {1, 2, 3};
+    uint64_t arrivals[4] = {1, 2, 3, 4};
+    GIVEN("an order book with right leg shaped limit tree (sell)") {
+        auto book = LimitOrderBook();
+        auto side = Side::Sell;
+        book.limit(side, 1, size, prices[0], arrivals[0]);
+        book.limit(side, 2, size, prices[1], arrivals[1]);
+        book.limit(side, 3, size, prices[2], arrivals[2]);
+        WHEN("the book is cleared") {
+            book.clear();
+            THEN("the book is cleared") {
+                REQUIRE(0 == book.volume_buy());
+                REQUIRE(0 == book.volume_sell());
+                REQUIRE(0 == book.volume());
+                REQUIRE(0 == book.best_buy());
+                REQUIRE(0 == book.best_sell());
+            }
+        }
+    }
+    GIVEN("an order book with right leg shaped limit tree (buy)") {
+        auto book = LimitOrderBook();
+        auto side = Side::Buy;
+        book.limit(side, 1, size, prices[0], arrivals[0]);
+        book.limit(side, 2, size, prices[1], arrivals[1]);
+        book.limit(side, 3, size, prices[2], arrivals[2]);
+        WHEN("the book is cleared") {
+            book.clear();
+            THEN("the book is cleared") {
+                REQUIRE(0 == book.volume_buy());
+                REQUIRE(0 == book.volume_sell());
+                REQUIRE(0 == book.volume());
+                REQUIRE(0 == book.best_buy());
+                REQUIRE(0 == book.best_sell());
+            }
+        }
+    }
+}
+
+SCENARIO(R"(LOB
+clear()
+tree shape:
+    2
+   /
+  1
+ /
+0
+)") {
+    uint32_t size = 50;
+    uint64_t prices[3] = {1, 2, 3};
+    uint64_t arrivals[4] = {1, 2, 3, 4};
+    GIVEN("an order book with left leg shaped limit tree (sell)") {
+        auto book = LimitOrderBook();
+        auto side = Side::Sell;
+        book.limit(side, 1, size, prices[2], arrivals[0]);
+        book.limit(side, 2, size, prices[1], arrivals[1]);
+        book.limit(side, 3, size, prices[0], arrivals[2]);
+        WHEN("the book is cleared") {
+            book.clear();
+            THEN("the book is cleared") {
+                REQUIRE(0 == book.volume_buy());
+                REQUIRE(0 == book.volume_sell());
+                REQUIRE(0 == book.volume());
+                REQUIRE(0 == book.best_buy());
+                REQUIRE(0 == book.best_sell());
+            }
+        }
+    }
+    GIVEN("an order book with left leg shaped limit tree (buy)") {
+        auto book = LimitOrderBook();
+        auto side = Side::Buy;
+        book.limit(side, 1, size, prices[2], arrivals[0]);
+        book.limit(side, 2, size, prices[1], arrivals[1]);
+        book.limit(side, 3, size, prices[0], arrivals[2]);
+        WHEN("the book is cleared") {
+            book.clear();
+            THEN("the book is cleared") {
+                REQUIRE(0 == book.volume_buy());
+                REQUIRE(0 == book.volume_sell());
+                REQUIRE(0 == book.volume());
+                REQUIRE(0 == book.best_buy());
+                REQUIRE(0 == book.best_sell());
+            }
+        }
+    }
+}
+
+SCENARIO(R"(LOB
+clear()
+tree shape:
+  2
+ / \
+1   4
+   /
+  3
+)") {
+    uint32_t size = 50;
+    uint64_t prices[4] = {1, 2, 4, 3};
+    uint64_t arrivals[5] = {1, 2, 3, 4, 5};
+    GIVEN("an order book with right subtree with left branch--shaped limit tree (buy)") {
+        auto book = LimitOrderBook();
+        auto side = Side::Buy;
+        // submit the MIDDLE order first (price-wise)
+        book.limit(side, 1, size, prices[1], arrivals[0]);
+        // the lowest price will be the left child
+        book.limit(side, 2, size, prices[0], arrivals[1]);
+        // the highest price will be the right child
+        book.limit(side, 3, size, prices[2], arrivals[2]);
+        // the last price will be the left branch of the right child
+        book.limit(side, 4, size, prices[3], arrivals[3]);
+        WHEN("the book is cleared") {
+            book.clear();
+            THEN("the book is cleared") {
+                REQUIRE(0 == book.volume_buy());
+                REQUIRE(0 == book.volume_sell());
+                REQUIRE(0 == book.volume());
+                REQUIRE(0 == book.best_buy());
+                REQUIRE(0 == book.best_sell());
+            }
+        }
+    }
+}
+
+SCENARIO(R"(LOB
+clear()
+tree shape:
+  2
+ / \
+1   5
+   /
+  3
+   \
+    4
+)") {
+    uint32_t size = 50;
+    uint64_t prices[5] = {1, 2, 5, 3, 4};
+    uint64_t arrivals[6] = {1, 2, 3, 4, 5, 6};
+    GIVEN("an order book with right subtree with left branch and terminal right child--shaped limit tree (buy)") {
+        auto book = LimitOrderBook();
+        auto side = Side::Buy;
+        // submit the MIDDLE order first (price-wise)
+        book.limit(side, 1, size, prices[1], arrivals[0]);
+        // the lowest price will be the left child
+        book.limit(side, 2, size, prices[0], arrivals[1]);
+        // the highest price will be the right child
+        book.limit(side, 3, size, prices[2], arrivals[2]);
+        // the last price will be the left branch of the right child
+        book.limit(side, 4, size, prices[3], arrivals[3]);
+        // the last price will be the left branch of the right child
+        book.limit(side, 5, size, prices[4], arrivals[4]);
+        WHEN("the book is cleared") {
+            book.clear();
+            THEN("the book is cleared") {
+                REQUIRE(0 == book.volume_buy());
+                REQUIRE(0 == book.volume_sell());
+                REQUIRE(0 == book.volume());
+                REQUIRE(0 == book.best_buy());
+                REQUIRE(0 == book.best_sell());
+            }
+        }
+    }
+}
+
+SCENARIO(R"(LOB
+clear()
+tree shape:
+1
+ \
+  4
+ /
+2
+ \
+  3
+)") {
+    uint32_t size = 50;
+    uint64_t prices[4] = {1, 4, 2, 3};
+    uint64_t arrivals[5] = {1, 2, 3, 4, 5};
+    GIVEN("an order book with right zigzag--shaped limit tree (buy)") {
+        auto book = LimitOrderBook();
+        auto side = Side::Buy;
+        book.limit(side, 1, size, prices[0], arrivals[0]);
+        book.limit(side, 2, size, prices[1], arrivals[1]);
+        book.limit(side, 3, size, prices[2], arrivals[2]);
+        book.limit(side, 4, size, prices[3], arrivals[3]);
+        WHEN("the book is cleared") {
+            book.clear();
+            THEN("the book is cleared") {
+                REQUIRE(0 == book.volume_buy());
+                REQUIRE(0 == book.volume_sell());
+                REQUIRE(0 == book.volume());
+                REQUIRE(0 == book.best_buy());
+                REQUIRE(0 == book.best_sell());
+            }
+        }
+    }
+}
+
+SCENARIO(R"(LOB
+clear()
+tree shape:
+  4
+ /
+1
+ \
+  3
+ /
+2
+)") {
+    uint32_t size = 50;
+    uint64_t prices[4] = {4, 1, 3, 2};
+    uint64_t arrivals[5] = {1, 2, 3, 4, 5};
+    GIVEN("an order book with left zigzag--shaped limit tree (sell)") {
+        auto book = LimitOrderBook();
+        auto side = Side::Sell;
+        book.limit(side, 1, size, prices[0], arrivals[0]);
+        book.limit(side, 2, size, prices[1], arrivals[1]);
+        book.limit(side, 3, size, prices[2], arrivals[2]);
+        book.limit(side, 4, size, prices[3], arrivals[3]);
+        WHEN("the book is cleared") {
+            book.clear();
+            THEN("the book is cleared") {
+                REQUIRE(0 == book.volume_buy());
+                REQUIRE(0 == book.volume_sell());
+                REQUIRE(0 == book.volume());
+                REQUIRE(0 == book.best_buy());
+                REQUIRE(0 == book.best_sell());
+            }
+        }
+    }
+}
+
+
+// order removal
+
+SCENARIO("clear book with queue of orders at limit") {
+    GIVEN("an order book and a Limit queue of sell orders") {
+        auto book = LimitOrderBook();
+        auto side = Side::Sell;
+        uint32_t sizeA = 50;
+        uint32_t sizeB = 40;
+        uint32_t sizeC = 30;
+        uint64_t price = 3253;
+        uint64_t arrivalA = 0;
+        uint64_t arrivalB = 1;
+        uint64_t arrivalC = 2;
+        book.limit(side, 1, sizeA, price, arrivalA);
+        book.limit(side, 2, sizeB, price, arrivalB);
+        book.limit(side, 3, sizeC, price, arrivalC);
+        WHEN("the book is cleared") {
+            book.clear();
+            THEN("the book is cleared") {
+                REQUIRE(0 == book.volume_buy());
+                REQUIRE(0 == book.volume_sell());
+                REQUIRE(0 == book.volume());
+                REQUIRE(0 == book.best_buy());
+                REQUIRE(0 == book.best_sell());
+            }
+        }
+    }
+    GIVEN("an order book and a Limit queue of buy orders") {
+        auto book = LimitOrderBook();
+        auto side = Side::Buy;
+        uint32_t sizeA = 50;
+        uint32_t sizeB = 40;
+        uint32_t sizeC = 30;
+        uint64_t price = 3253;
+        uint64_t arrivalA = 0;
+        uint64_t arrivalB = 1;
+        uint64_t arrivalC = 2;
+        book.limit(side, 1, sizeA, price, arrivalA);
+        book.limit(side, 2, sizeB, price, arrivalB);
+        book.limit(side, 3, sizeC, price, arrivalC);
+        WHEN("the book is cleared") {
+            book.clear();
+            THEN("the book is cleared") {
+                REQUIRE(0 == book.volume_buy());
+                REQUIRE(0 == book.volume_sell());
+                REQUIRE(0 == book.volume());
+                REQUIRE(0 == book.best_buy());
+                REQUIRE(0 == book.best_sell());
+            }
+        }
+    }
+}

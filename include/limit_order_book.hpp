@@ -27,6 +27,13 @@ class LimitOrderBook {
     /// Initialize a new limit order book object.
     LimitOrderBook() : sells(), buys(), orders() { }
 
+    /// Clear all the orders in the book.
+    void clear() {
+        sells.clear();
+        buys.clear();
+        orders.clear();
+    }
+
     /// Add a new sell limit order to the book.
     ///
     /// @param order_id the ID for the order

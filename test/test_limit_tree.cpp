@@ -670,3 +670,106 @@ SCENARIO("a market order is submitted with a limit price that spans") {
         }
     }
 }
+
+// ---------------------------------------------------------------------------
+// MARK: clear
+// ---------------------------------------------------------------------------
+
+SCENARIO("clear a single limit from LimitTree") {
+    Size size = 0x4545;
+    Price price = 0xAABBCCDD00112233;
+    Timestamp arrival = 0xABABCDCDDEDEF0F0;
+    GIVEN("a LimitTree with a single buy order") {
+        auto tree = LimitTree<Side::Buy>();
+        Order node = {1, Side::Buy, size, price, arrival};
+        tree.limit(&node);
+        WHEN("the tree is cleared") {
+            tree.clear();
+            THEN("the data structures are updated") {
+                REQUIRE(0 == tree.limits.size());
+                REQUIRE(0 == tree.volume_at(price));
+                REQUIRE(0 == tree.size_at(price));
+                REQUIRE(nullptr == tree.root);
+                REQUIRE(nullptr == tree.best);
+            }
+        }
+    }
+    GIVEN("a LimitTree and with a single sell order") {
+        auto tree = LimitTree<Side::Sell>();
+        Order node = {1, Side::Sell, size, price, arrival};
+        tree.limit(&node);
+        WHEN("the tree is cleared") {
+            tree.clear();
+            THEN("the data structures are updated") {
+                REQUIRE(0 == tree.limits.size());
+                REQUIRE(0 == tree.volume_at(price));
+                REQUIRE(0 == tree.size_at(price));
+                REQUIRE(nullptr == tree.root);
+                REQUIRE(nullptr == tree.best);
+            }
+        }
+    }
+    GIVEN("a LimitTree and with 2 single sell orders of the same price") {
+        // just need to test sell because logic is side independent
+        auto tree = LimitTree<Side::Sell>();
+        Order node1 = {1, Side::Sell, size, price, arrival};
+        tree.limit(&node1);
+        Order node2 = {2, Side::Sell, size, price, arrival};
+        tree.limit(&node2);
+        WHEN("the tree is cleared") {
+            tree.clear();
+            THEN("the data structures are updated") {
+                REQUIRE(0 == tree.limits.size());
+                REQUIRE(0 == tree.volume_at(price));
+                REQUIRE(0 == tree.size_at(price));
+                REQUIRE(nullptr == tree.root);
+                REQUIRE(nullptr == tree.best);
+            }
+        }
+    }
+}
+
+SCENARIO("clear multiple limits from the tree") {
+    Size size = 0x4545;
+    Price price = 0xAABBCCDD00112233;
+    auto priceHigher = price + 1;
+    Timestamp arrival = 0xABABCDCDDEDEF0F0;
+    GIVEN("a LimitTree with 2 buy orders") {
+        auto tree = LimitTree<Side::Buy>();
+        Order node1 = {1, Side::Buy, size, priceHigher, arrival};
+        tree.limit(&node1);
+        Order node2 = {2, Side::Buy, size, price, arrival};
+        tree.limit(&node2);
+        WHEN("the tree is cleared") {
+            tree.clear();
+            THEN("the data structures are updated") {
+                REQUIRE(0 == tree.limits.size());
+                REQUIRE(0 == tree.volume_at(priceHigher));
+                REQUIRE(0 == tree.volume_at(price));
+                REQUIRE(0 == tree.size_at(price));
+                REQUIRE(0 == tree.size_at(priceHigher));
+                REQUIRE(nullptr == tree.root);
+                REQUIRE(nullptr == tree.best);
+            }
+        }
+    }
+    GIVEN("a LimitTree with 2 sell orders") {
+        auto tree = LimitTree<Side::Sell>();
+        Order node1 = {1, Side::Sell, size, price, arrival};
+        tree.limit(&node1);
+        Order node2 = {2, Side::Buy, size, priceHigher, arrival};
+        tree.limit(&node2);
+        WHEN("the tree is cleared") {
+            tree.clear();
+            THEN("the data structures are updated") {
+                REQUIRE(0 == tree.limits.size());
+                REQUIRE(0 == tree.volume_at(priceHigher));
+                REQUIRE(0 == tree.volume_at(price));
+                REQUIRE(0 == tree.size_at(price));
+                REQUIRE(0 == tree.size_at(priceHigher));
+                REQUIRE(nullptr == tree.root);
+                REQUIRE(nullptr == tree.best);
+            }
+        }
+    }
+}
