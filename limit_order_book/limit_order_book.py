@@ -27,12 +27,15 @@ class Types:
     Volume = ctypes.c_uint32
 
 
-# setup the argument and return types for Initialize
+# setup the argument and return types for new_
 LIB.new_.argtypes = None
 LIB.new_.restype = Types.Pointer
-# setup the argument and return types for Delete
+# setup the argument and return types for delete_
 LIB.delete_.argtypes = [Types.Pointer]
 LIB.delete_.restype = None
+# setup the argument and return types for clear
+LIB.clear.argtypes = [Types.Pointer]
+LIB.clear.restype = None
 
 
 # setup the argument and return types for limit_sell
@@ -123,6 +126,10 @@ class LimitOrderBook:
     def __del__(self):
         """Delete this limit order book."""
         LIB.delete_(self._book)
+
+    def clear(self):
+        """Clear all the orders in the book."""
+        LIB.clear(self._book)
 
     def limit_sell(self, order_id, size, price):
         """

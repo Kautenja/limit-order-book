@@ -34,6 +34,11 @@ extern "C" {
         delete book;
     }
 
+    /// Clear all the orders in the book.
+    EXP void clear(LimitOrderBook* book) {
+        book->clear();
+    }
+
     /// Add a new sell limit order to the book.
     EXP void limit_sell(LimitOrderBook* book, UID order_id, Size size, Price price) {
         book->limit_sell(order_id, size, price, 0);
