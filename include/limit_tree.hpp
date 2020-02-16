@@ -219,6 +219,7 @@ struct LimitTree {
                     // update the volume for the entire tree
                     volume -= order->size;
                 }
+                order->size = 0;
                 return;
             }  // else: current match can NOT fill
             // decrement the remaining size of the market order
