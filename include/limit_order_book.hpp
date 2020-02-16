@@ -48,8 +48,10 @@ class LimitOrderBook {
         if (buys.best != nullptr && price <= buys.best->key) {  // crosses
             // place a market order with the limit price
             buys.market(&orders.at(order_id), [&](UID uid) { orders.erase(uid); });
-            if (orders.at(order_id).size == 0)  // order filled
+            if (orders.at(order_id).size == 0) {  // order filled
                 orders.erase(order_id);
+                return;
+            }
         }
         sells.limit(&orders.at(order_id));
     }
@@ -68,8 +70,10 @@ class LimitOrderBook {
         if (sells.best != nullptr && price >= sells.best->key) {  // crosses
             // place a market order with the limit price
             sells.market(&orders.at(order_id), [&](UID uid) { orders.erase(uid); });
-            if (orders.at(order_id).size == 0)  // order filled
+            if (orders.at(order_id).size == 0) {  // order filled
                 orders.erase(order_id);
+                return;
+            }
         }
         buys.limit(&orders.at(order_id));
     }
