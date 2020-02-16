@@ -175,7 +175,7 @@ class LimitOrderBook:
             None
 
         """
-        LIB.limit_buy(self._book, side, order_id, size, price)
+        LIB.limit(self._book, side, order_id, size, price)
 
     def has(self, order_id):
         """
