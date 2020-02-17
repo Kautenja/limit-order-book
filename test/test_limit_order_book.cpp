@@ -178,14 +178,18 @@ SCENARIO("a limit order is submitted that crosses") {
         WHEN("the sell limit order is sent") {
             book.limit(!side, 3, sizeMarket, priceB, arrivalC);
             THEN("order ID is returned and the order is recorded") {
-                REQUIRE(size == book.volume(priceA));
-                REQUIRE(sizeMarket - size == book.volume(priceB));
+                // check the buy side
+                REQUIRE(1 == book.size_buy());
+                REQUIRE(size == book.volume_buy(priceA));
+                REQUIRE(0 == book.volume_buy(priceB));
                 REQUIRE(priceA == book.best_buy());
+                // check the sell side
+                REQUIRE(1 == book.size_sell());
+                REQUIRE(sizeMarket - size == book.volume_sell(priceB));
                 REQUIRE(priceB == book.best_sell());
             }
         }
     }
-
     GIVEN("a book with 2 sell limit orders and a buy limit order") {
         auto book = LimitOrderBook();
         auto side = Side::Sell;
@@ -201,14 +205,71 @@ SCENARIO("a limit order is submitted that crosses") {
         WHEN("the sell limit order is sent") {
             book.limit(!side, 3, sizeMarket, priceB, arrivalC);
             THEN("order ID is returned and the order is recorded") {
-                REQUIRE(size == book.volume(priceA));
-                REQUIRE(sizeMarket - size == book.volume(priceB));
+                // check the sell side
+                REQUIRE(1 == book.size_sell());
+                REQUIRE(size == book.volume_sell(priceA));
+                REQUIRE(0 == book.volume_sell(priceB));
                 REQUIRE(priceA == book.best_sell());
+                // check the buy side
+                REQUIRE(1 == book.size_buy());
+                REQUIRE(sizeMarket - size == book.volume_buy(priceB));
                 REQUIRE(priceB == book.best_buy());
+
             }
         }
     }
 }
+
+SCENARIO("a limit order is submitted that crosses and fills") {
+    GIVEN("a book with a buy limit order") {
+        auto book = LimitOrderBook();
+        auto side = Side::Buy;
+        uint32_t size = 20;
+        uint64_t price = 100;
+        uint64_t arrivalA = 0;
+        uint64_t arrivalB = 1;
+        book.limit(side, 1, size, price, arrivalA);
+        WHEN("the sell limit order is sent") {
+            book.limit(!side, 2, size, price, arrivalB);
+            THEN("order ID is returned and the order is recorded") {
+                // check the buy side
+                REQUIRE(0 == book.size_buy());
+                REQUIRE(0 == book.volume_buy(price));
+                REQUIRE(0 == book.volume_buy());
+                REQUIRE(0 == book.best_buy());
+                // check the sell side
+                REQUIRE(0 == book.size_sell());
+                REQUIRE(0 == book.volume_sell(price));
+                REQUIRE(0 == book.best_sell());
+            }
+        }
+    }
+    GIVEN("a book with a sell limit order") {
+        auto book = LimitOrderBook();
+        auto side = Side::Sell;
+        uint32_t size = 20;
+        uint64_t price = 100;
+        uint64_t arrivalA = 0;
+        uint64_t arrivalB = 1;
+        book.limit(side, 1, size, price, arrivalA);
+        WHEN("the sell limit order is sent") {
+            book.limit(!side, 2, size, price, arrivalB);
+            THEN("order ID is returned and the order is recorded") {
+                // check the sell side
+                REQUIRE(0 == book.size_sell());
+                REQUIRE(0 == book.volume_sell(price));
+                REQUIRE(0 == book.volume_sell());
+                REQUIRE(0 == book.best_sell());
+                // check the buy side
+                REQUIRE(0 == book.size_buy());
+                REQUIRE(0 == book.volume_buy(price));
+                REQUIRE(0 == book.best_buy());
+            }
+        }
+    }
+}
+
+// limit market
 
 // ---------------------------------------------------------------------------
 // MARK: cancel
