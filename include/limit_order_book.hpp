@@ -44,7 +44,11 @@ class LimitOrderBook {
     ///
     void limit_sell(UID order_id, Size size, Price price, Timestamp arrival) {
         // put the order into the map
-        orders.insert({order_id, {order_id, Side::Sell, size, price, arrival}});
+        // orders.insert({order_id, {order_id, Side::Sell, size, price, arrival}});
+        orders.emplace(std::piecewise_construct,
+            std::forward_as_tuple(order_id),
+            std::forward_as_tuple(order_id, Side::Sell, size, price, arrival)
+        );
         if (buys.best != nullptr && price <= buys.best->key) {  // crosses
             // place a market order with the limit price
             buys.market(&orders.at(order_id), [&](UID uid) { orders.erase(uid); });
@@ -66,7 +70,11 @@ class LimitOrderBook {
     ///
     void limit_buy(UID order_id, Size size, Price price, Timestamp arrival) {
         // put the order into the map
-        orders.insert({order_id, {order_id, Side::Buy, size, price, arrival}});
+        // orders.insert({order_id, {order_id, Side::Buy, size, price, arrival}});
+        orders.emplace(std::piecewise_construct,
+            std::forward_as_tuple(order_id),
+            std::forward_as_tuple(order_id, Side::Buy, size, price, arrival)
+        );
         if (sells.best != nullptr && price >= sells.best->key) {  // crosses
             // place a market order with the limit price
             sells.market(&orders.at(order_id), [&](UID uid) { orders.erase(uid); });
