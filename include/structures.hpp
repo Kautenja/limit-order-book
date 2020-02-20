@@ -94,6 +94,10 @@ struct Order : DLL::Node {
         arrival(arrival_),
         execution(execution_),
         limit(nullptr) { }
+
+ private:
+    /// disable the copy constructor
+    Order(const Order& other) { }
 };
 
 /// A representation of a price limit with a FIFO queue of orders.
@@ -125,6 +129,10 @@ struct Limit : BST::Node<Price> {
         volume(order->size),
         order_head(order),
         order_tail(order) { }
+
+ private:
+    /// disable the copy constructor
+    Limit(const Limit& other) { }
 };
 
 }  // namespace LOB
