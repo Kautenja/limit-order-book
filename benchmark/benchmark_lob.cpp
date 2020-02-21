@@ -20,7 +20,7 @@ using Catch::Benchmark::Chronometer;
 // MARK: new limits
 //
 
-inline void spam_limits(LimitOrderBook book, int count) {
+inline void spam_limits(LimitOrderBook& book, int count) {
     for (int i = 0; i < count; i++) book.limit(Side::Buy, i, 50, i, i);
 }
 
@@ -55,7 +55,7 @@ TEST_CASE("Spam new Limits") {
 // MARK: new orders
 //
 
-inline void spam_orders(LimitOrderBook book, int count, int variance = 5) {
+inline void spam_orders(LimitOrderBook& book, int count, int variance = 5) {
     for (int i = 0; i < count; i++)
         book.limit(Side::Buy, i, 50, i % variance, i);
 }
@@ -92,7 +92,7 @@ TEST_CASE("Spam new Orders") {
 //
 
 inline void spam_orders_random_cancels(
-    LimitOrderBook book,
+    LimitOrderBook& book,
     int count,
     int mean = 500,
     int variance = 30,
@@ -140,7 +140,7 @@ TEST_CASE("Spam orders and randomly cancel orders") {
 //
 
 inline void spam_limit_random_orders(
-    LimitOrderBook book,
+    LimitOrderBook& book,
     int count,
     int price_mean = 500,
     int price_variance = 20,
@@ -176,7 +176,7 @@ TEST_CASE("Spam limit orders and occasional market orders") {
 }
 
 inline void spam_limit_many_market_orders(
-    LimitOrderBook book,
+    LimitOrderBook& book,
     int count,
     int price_mean = 500,
     int price_variance = 20,
