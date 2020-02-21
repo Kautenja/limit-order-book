@@ -45,7 +45,7 @@ LIBRARY = Extension(LIB_NAME,
 
 setup(
     name='limit_order_book',
-    version='1.1.3',
+    version='1.1.4',
     description='A Limit Order Book (LOB) implementation',
     long_description=README,
     long_description_content_type='text/markdown',
