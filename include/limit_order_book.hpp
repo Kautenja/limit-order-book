@@ -136,7 +136,7 @@ class LimitOrderBook {
     /// @arrival the arrival of the market order
     ///
     void market_sell(UID order_id, Size size, Timestamp arrival) {
-        auto order = Order(order_id, Side::Sell, size, 0, arrival);
+        Order order(order_id, Side::Sell, size, 0, arrival);
         order.execution = arrival;
         buys.market(&order, [&](UID uid) { orders.erase(uid); });
     }
@@ -148,7 +148,7 @@ class LimitOrderBook {
     /// @arrival the arrival of the market order
     ///
     void market_buy(UID order_id, Size size, Timestamp arrival) {
-        auto order = Order(order_id, Side::Buy, size, 0, arrival);
+        Order order(order_id, Side::Buy, size, 0, arrival);
         order.execution = arrival;
         sells.market(&order, [&](UID uid) { orders.erase(uid); });
     }
