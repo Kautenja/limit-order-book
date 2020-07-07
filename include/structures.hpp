@@ -1,9 +1,28 @@
-// Types and structures for the limit order book: order, limit, and account
-// Copyright 2019 Christian Kauten
+// Types and structures for the LimitOrderBook: order, limit
+//
+// Copyright (c) 2020 Christian Kauten
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 //
 
-#ifndef LIMIT_ORDER_BOOK_STRUCTURES
-#define LIMIT_ORDER_BOOK_STRUCTURES
+#ifndef LOB_STRUCTURES_HPP_
+#define LOB_STRUCTURES_HPP_
 
 #include <cstdint>
 #include "binary_search_tree.hpp"
@@ -137,4 +156,4 @@ struct Limit : BST::Node<Price> {
 
 }  // namespace LOB
 
-#endif  // LIMIT_ORDER_BOOK_STRUCTURES
+#endif  // LOB_STRUCTURES_HPP_
