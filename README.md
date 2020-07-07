@@ -1,11 +1,11 @@
-# Limit Order Book (LOB)
+# Limit Order Book
 
 [![build-status][]][build-server]
 [![PackageVersion][pypi-version]][pypi-home]
 [![PythonVersion][python-version]][python-home]
 [![Stable][pypi-status]][pypi-home]
 [![Format][pypi-format]][pypi-home]
-[![License][pypi-license]](LICENSE)
+[![License][pypi-license]][license]
 
 [build-status]: https://travis-ci.com/Kautenja/limit-order-book.svg
 [build-server]: https://travis-ci.com/Kautenja/limit-order-book
@@ -16,11 +16,10 @@
 [pypi-home]: https://badge.fury.io/py/limit-order-book
 [python-version]: https://img.shields.io/pypi/pyversions/limit-order-book.svg
 [python-home]: https://python.org
+[license]: ./LICENSE
 
 This is an implementation of the limit order book structure and matching
 algorithm for C++ (and Python through ctypes) for market data streaming.
-
-![Limit order book](img/limit-order-book.svg)
 
 ## Usage
 
