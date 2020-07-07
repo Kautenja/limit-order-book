@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['side_122',['side',['../struct_l_o_b_1_1_order.html#a958f5a54a613fb012214b71332add261',1,'LOB::Order']]]
+  ['side_128',['side',['../struct_l_o_b_1_1_order.html#a958f5a54a613fb012214b71332add261',1,'LOB::Order']]]
 ];
