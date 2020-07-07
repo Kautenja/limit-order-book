@@ -7,8 +7,8 @@
 [![Format][pypi-format]][pypi-home]
 [![License][pypi-license]][license]
 
-[build-status]: https://travis-ci.com/Kautenja/limit-order-book.svg
-[build-server]: https://travis-ci.com/Kautenja/limit-order-book
+[build-status]: https://travis-ci.org/Kautenja/limit-order-book.svg
+[build-server]: https://travis-ci.org/Kautenja/limit-order-book
 [pypi-version]: https://badge.fury.io/py/limit-order-book.svg
 [pypi-license]: https://img.shields.io/pypi/l/limit-order-book.svg
 [pypi-status]: https://img.shields.io/pypi/status/limit-order-book.svg
