@@ -113,30 +113,18 @@ BENCHMARK_SRC = [BENCHMARK_ENV.Object(f.replace('.cpp', '') + '-bench', f) for f
 #
 
 
-# the path to the main test file
-MAIN_TEST_FILE = 'test/main.cpp'
-MAIN_TEST_FILE_BUILD = 'build_test/main.cpp'
+# locate all the testing source files
+TEST_FILES = find_source_files('test/', 'build_test/')
+# create a list to store all the test target aliases in
+UNIT_TEST_ALIASES = []
+for file in TEST_FILES:  # iterate over all the test source files
+    UNIT_TEST_PROGRAM = TESTING_ENV.Program(file.replace('.cpp', ''), [file] + TEST_SRC)
+    UNIT_TEST_ALIASES.append(Alias('test/' + file.replace('build_test/', ''), [UNIT_TEST_PROGRAM], UNIT_TEST_PROGRAM[0].path))
+    AlwaysBuild(UNIT_TEST_ALIASES[-1])
 
 
-def create_main_test_file():
-    """Create the main test file by locating files to '#include'."""
-    # delete the main.cpp file if it exists
-    if os.path.isfile(MAIN_TEST_FILE):
-        os.remove(MAIN_TEST_FILE)
-    files = find_source_files('test/', '')
-    # iterate over the files to create the include script as a string
-    includes = '\n'.join(map(lambda x: '#include "{}"'.format(x), files))
-    # create the contents of the file from the string of includes and template
-    with open(MAIN_TEST_FILE, 'w') as test_runner:
-        test_runner.write("#define CATCH_CONFIG_MAIN\n{}".format(includes))
-
-
-# create the test runner
-create_main_test_file()
-UNIT_TEST_PROGRAM = TESTING_ENV.Program('build_test/test', [MAIN_TEST_FILE_BUILD] + TEST_SRC)
-# create a scons alias for the binary
-UNIT_TEST_ALIAS = Alias('test', [UNIT_TEST_PROGRAM], UNIT_TEST_PROGRAM[0].path)
-AlwaysBuild(UNIT_TEST_ALIAS)
+# create an alias to run all test suites
+Alias("test", UNIT_TEST_ALIASES)
 
 
 #

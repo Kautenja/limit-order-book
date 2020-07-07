@@ -2,6 +2,7 @@
 // Copyright 2019 Christian Kauten
 //
 
+#define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 #include "limit_tree.hpp"
 
