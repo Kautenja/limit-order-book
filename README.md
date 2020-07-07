@@ -18,8 +18,9 @@
 [python-home]: https://python.org
 [license]: ./LICENSE
 
-This is an implementation of the limit order book structure and matching
-algorithm for C++ (and Python through ctypes) for market data streaming.
+This is an implementation of the limit order book with a price-time priority
+matching policy for reception of market data streams. There are APIs for C++,
+C, and Python.
 
 ## Usage
 
@@ -27,6 +28,10 @@ algorithm for C++ (and Python through ctypes) for market data streaming.
 
 Simply add [include/*.hpp](include) to your C++ project either by copying
 directly or using git submodules.
+
+### C
+
+A C-level API is defined in [include/lib_lob.hpp](include/lib_lob.hpp).
 
 ### Python
 
@@ -36,13 +41,17 @@ The preferred Python installation of `limit-order-book` is from `pip`:
 pip install limit-order-book
 ```
 
+## Usage Caveats
+
 ### Windows
 
 You'll need to install the Visual-Studio 17.0 tools for Windows installation.
 The [Visual Studio Community](https://visualstudio.microsoft.com/downloads/)
 package provides these tools for free.
 
-## Testing
+## Development
+
+### Testing
 
 To run all the unit-test suites, run:
 
@@ -50,7 +59,7 @@ To run all the unit-test suites, run:
 make test
 ```
 
-### C++
+#### C++
 
 To run the C++ unit-test suite, run:
 
@@ -58,7 +67,7 @@ To run the C++ unit-test suite, run:
 scons test
 ```
 
-### Python
+#### Python
 
 To run the Python unit-test suite, run:
 
@@ -66,9 +75,9 @@ To run the Python unit-test suite, run:
 python -m unittest discover .
 ```
 
-## Benchmarking
+### Benchmarking
 
-### C++
+#### C++
 
 To run the C++ benchmark code, run:
 
