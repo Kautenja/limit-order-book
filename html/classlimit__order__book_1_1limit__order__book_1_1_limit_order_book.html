@@ -31,7 +31,7 @@
                     <tr style="height: 56px;">
                         <td id="projectalign" style="padding-left: 0.5em;">
                             <div id="projectname">Limit Order Book
-                                &#160;<span id="projectnumber">1.6</span>
+                                &#160;<span id="projectnumber">2.0.0</span>
                             </div>
                         </td>
                     </tr>
@@ -121,14 +121,14 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ad859c49dd2909e97b22f0004be057b0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a83d98fa3da1e2f0e536e4b6112b00912"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlimit__order__book_1_1limit__order__book_1_1_limit_order_book.html#a83d98fa3da1e2f0e536e4b6112b00912">volume</a> (self, price=None)</td></tr>
 <tr class="separator:a83d98fa3da1e2f0e536e4b6112b00912"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afebb5413fd7c3771427662ef4b5a87c1"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlimit__order__book_1_1limit__order__book_1_1_limit_order_book.html#afebb5413fd7c3771427662ef4b5a87c1">size_at</a> (self, price)</td></tr>
-<tr class="separator:afebb5413fd7c3771427662ef4b5a87c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2a39138ca5fe3cf17afa6733ee3a89a4"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlimit__order__book_1_1limit__order__book_1_1_limit_order_book.html#a2a39138ca5fe3cf17afa6733ee3a89a4">size_sell</a> (self)</td></tr>
-<tr class="separator:a2a39138ca5fe3cf17afa6733ee3a89a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a34e2d0b0ebbff4ec6d50abaa3b4509b0"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlimit__order__book_1_1limit__order__book_1_1_limit_order_book.html#a34e2d0b0ebbff4ec6d50abaa3b4509b0">size_buy</a> (self)</td></tr>
-<tr class="separator:a34e2d0b0ebbff4ec6d50abaa3b4509b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa042c693bcccf33a0e9b831c5b89b622"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlimit__order__book_1_1limit__order__book_1_1_limit_order_book.html#aa042c693bcccf33a0e9b831c5b89b622">size</a> (self)</td></tr>
-<tr class="separator:aa042c693bcccf33a0e9b831c5b89b622"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2dad26578106236fc33e49bcbc73700d"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlimit__order__book_1_1limit__order__book_1_1_limit_order_book.html#a2dad26578106236fc33e49bcbc73700d">count_at</a> (self, price)</td></tr>
+<tr class="separator:a2dad26578106236fc33e49bcbc73700d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af2ffb73530c2d234c34358223a07f5bf"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlimit__order__book_1_1limit__order__book_1_1_limit_order_book.html#af2ffb73530c2d234c34358223a07f5bf">count_sell</a> (self)</td></tr>
+<tr class="separator:af2ffb73530c2d234c34358223a07f5bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa91e3640a90267d5b99c158a102c9216"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlimit__order__book_1_1limit__order__book_1_1_limit_order_book.html#aa91e3640a90267d5b99c158a102c9216">count_buy</a> (self)</td></tr>
+<tr class="separator:aa91e3640a90267d5b99c158a102c9216"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a05cdeb18e40432a3f8f1034e2fe91df0"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlimit__order__book_1_1limit__order__book_1_1_limit_order_book.html#a05cdeb18e40432a3f8f1034e2fe91df0">count</a> (self)</td></tr>
+<tr class="separator:a05cdeb18e40432a3f8f1034e2fe91df0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><pre class="fragment">The Limit Order Book (LOB).</pre> </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
@@ -289,6 +289,94 @@ Returns:
       </table>
 </div><div class="memdoc">
 <pre class="fragment">Clear all the orders in the book.</pre> 
+</div>
+</div>
+<a id="a05cdeb18e40432a3f8f1034e2fe91df0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a05cdeb18e40432a3f8f1034e2fe91df0">&#9670;&nbsp;</a></span>count()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def limit_order_book.limit_order_book.LimitOrderBook.count </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<pre class="fragment">Return the total count of the book (number of orders).</pre> 
+</div>
+</div>
+<a id="a2dad26578106236fc33e49bcbc73700d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2dad26578106236fc33e49bcbc73700d">&#9670;&nbsp;</a></span>count_at()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def limit_order_book.limit_order_book.LimitOrderBook.count_at </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>price</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<pre class="fragment">Return the count at the given limit price.
+
+Args:
+    price: the price to get the count of the book for
+
+Returns:
+    the count of the book at the given price</pre> 
+</div>
+</div>
+<a id="aa91e3640a90267d5b99c158a102c9216"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa91e3640a90267d5b99c158a102c9216">&#9670;&nbsp;</a></span>count_buy()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def limit_order_book.limit_order_book.LimitOrderBook.count_buy </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<pre class="fragment">Return the count of the book on the buy side.</pre> 
+</div>
+</div>
+<a id="af2ffb73530c2d234c34358223a07f5bf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af2ffb73530c2d234c34358223a07f5bf">&#9670;&nbsp;</a></span>count_sell()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def limit_order_book.limit_order_book.LimitOrderBook.count_sell </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<pre class="fragment">Return the count of the book on the sell side.</pre> 
 </div>
 </div>
 <a id="a1eec0bf717ba05c096779b01906356b3"></a>
@@ -638,94 +726,6 @@ Args:
 
 Returns:
     None</pre> 
-</div>
-</div>
-<a id="aa042c693bcccf33a0e9b831c5b89b622"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa042c693bcccf33a0e9b831c5b89b622">&#9670;&nbsp;</a></span>size()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">def limit_order_book.limit_order_book.LimitOrderBook.size </td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>self</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<pre class="fragment">Return the total count of the book (number of orders).</pre> 
-</div>
-</div>
-<a id="afebb5413fd7c3771427662ef4b5a87c1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afebb5413fd7c3771427662ef4b5a87c1">&#9670;&nbsp;</a></span>size_at()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">def limit_order_book.limit_order_book.LimitOrderBook.size_at </td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>self</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>price</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<pre class="fragment">Return the count at the given limit price.
-
-Args:
-    price: the price to get the count of the book for
-
-Returns:
-    the count of the book at the given price</pre> 
-</div>
-</div>
-<a id="a34e2d0b0ebbff4ec6d50abaa3b4509b0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a34e2d0b0ebbff4ec6d50abaa3b4509b0">&#9670;&nbsp;</a></span>size_buy()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">def limit_order_book.limit_order_book.LimitOrderBook.size_buy </td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>self</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<pre class="fragment">Return the count of the book on the buy side.</pre> 
-</div>
-</div>
-<a id="a2a39138ca5fe3cf17afa6733ee3a89a4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2a39138ca5fe3cf17afa6733ee3a89a4">&#9670;&nbsp;</a></span>size_sell()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">def limit_order_book.limit_order_book.LimitOrderBook.size_sell </td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>self</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<pre class="fragment">Return the count of the book on the sell side.</pre> 
 </div>
 </div>
 <a id="a83d98fa3da1e2f0e536e4b6112b00912"></a>

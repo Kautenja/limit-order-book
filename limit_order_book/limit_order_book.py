@@ -341,7 +341,7 @@ class LimitOrderBook:
             return self._library.volume(self._book)
         return self._library.volume_price(self._book, price)
 
-    def size_at(self, price):
+    def count_at(self, price):
         """
         Return the count at the given limit price.
 
@@ -354,15 +354,15 @@ class LimitOrderBook:
         """
         return self._library.count_at(self._book, price)
 
-    def size_sell(self):
+    def count_sell(self):
         """Return the count of the book on the sell side."""
         return self._library.count_sell(self._book)
 
-    def size_buy(self):
+    def count_buy(self):
         """Return the count of the book on the buy side."""
         return self._library.count_buy(self._book)
 
-    def size(self):
+    def count(self):
         """Return the total count of the book (number of orders)."""
         return self._library.count(self._book)
 

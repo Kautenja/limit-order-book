@@ -17,10 +17,10 @@ class ShouldInitializeLimitOrderBook(TestCase):
         self.assertEqual(0, book.volume_buy(100))
         self.assertEqual(0, book.volume())
         self.assertEqual(0, book.volume(100))
-        self.assertEqual(0, book.size_at(100))
-        self.assertEqual(0, book.size_sell())
-        self.assertEqual(0, book.size_buy())
-        self.assertEqual(0, book.size())
+        self.assertEqual(0, book.count_at(100))
+        self.assertEqual(0, book.count_sell())
+        self.assertEqual(0, book.count_buy())
+        self.assertEqual(0, book.count())
 
 #
 # MARK: limit
@@ -39,10 +39,10 @@ class ShouldPlaceSellLimitOrder(TestCase):
         self.assertEqual(0, book.volume_buy())
         self.assertEqual(100, book.volume())
         self.assertEqual(100, book.volume(50))
-        self.assertEqual(1, book.size_at(50))
-        self.assertEqual(1, book.size_sell())
-        self.assertEqual(0, book.size_buy())
-        self.assertEqual(1, book.size())
+        self.assertEqual(1, book.count_at(50))
+        self.assertEqual(1, book.count_sell())
+        self.assertEqual(0, book.count_buy())
+        self.assertEqual(1, book.count())
 
 
 class ShouldPlaceSellLimitOrderByValue(TestCase):
@@ -58,10 +58,10 @@ class ShouldPlaceSellLimitOrderByValue(TestCase):
         self.assertEqual(0, book.volume_buy())
         self.assertEqual(100, book.volume())
         self.assertEqual(100, book.volume(50))
-        self.assertEqual(1, book.size_at(50))
-        self.assertEqual(1, book.size_sell())
-        self.assertEqual(0, book.size_buy())
-        self.assertEqual(1, book.size())
+        self.assertEqual(1, book.count_at(50))
+        self.assertEqual(1, book.count_sell())
+        self.assertEqual(0, book.count_buy())
+        self.assertEqual(1, book.count())
 
 
 class ShouldPlaceBuyLimitOrder(TestCase):
@@ -78,10 +78,10 @@ class ShouldPlaceBuyLimitOrder(TestCase):
         self.assertEqual(100, book.volume_buy(50))
         self.assertEqual(100, book.volume())
         self.assertEqual(100, book.volume(50))
-        self.assertEqual(1, book.size_at(50))
-        self.assertEqual(0, book.size_sell())
-        self.assertEqual(1, book.size_buy())
-        self.assertEqual(1, book.size())
+        self.assertEqual(1, book.count_at(50))
+        self.assertEqual(0, book.count_sell())
+        self.assertEqual(1, book.count_buy())
+        self.assertEqual(1, book.count())
 
 
 class ShouldPlaceBuyLimitOrderByValue(TestCase):
@@ -98,10 +98,10 @@ class ShouldPlaceBuyLimitOrderByValue(TestCase):
         self.assertEqual(100, book.volume_buy(50))
         self.assertEqual(100, book.volume())
         self.assertEqual(100, book.volume(50))
-        self.assertEqual(1, book.size_at(50))
-        self.assertEqual(0, book.size_sell())
-        self.assertEqual(1, book.size_buy())
-        self.assertEqual(1, book.size())
+        self.assertEqual(1, book.count_at(50))
+        self.assertEqual(0, book.count_sell())
+        self.assertEqual(1, book.count_buy())
+        self.assertEqual(1, book.count())
 
 #
 # MARK: limit match
@@ -122,10 +122,10 @@ class ShouldMatchSellLimitOrderWithIncomingBuy(TestCase):
         self.assertEqual(0, book.volume_buy(50))
         self.assertEqual(0, book.volume())
         self.assertEqual(0, book.volume(50))
-        self.assertEqual(0, book.size_at(50))
-        self.assertEqual(0, book.size_sell())
-        self.assertEqual(0, book.size_buy())
-        self.assertEqual(0, book.size())
+        self.assertEqual(0, book.count_at(50))
+        self.assertEqual(0, book.count_sell())
+        self.assertEqual(0, book.count_buy())
+        self.assertEqual(0, book.count())
 
 
 class ShouldMatchBuyLimitOrderWithIncomingSell(TestCase):
@@ -143,10 +143,10 @@ class ShouldMatchBuyLimitOrderWithIncomingSell(TestCase):
         self.assertEqual(0, book.volume_buy(50))
         self.assertEqual(0, book.volume())
         self.assertEqual(0, book.volume(50))
-        self.assertEqual(0, book.size_at(50))
-        self.assertEqual(0, book.size_sell())
-        self.assertEqual(0, book.size_buy())
-        self.assertEqual(0, book.size())
+        self.assertEqual(0, book.count_at(50))
+        self.assertEqual(0, book.count_sell())
+        self.assertEqual(0, book.count_buy())
+        self.assertEqual(0, book.count())
 
 #
 # MARK: cancel
@@ -169,10 +169,10 @@ class ShouldCancelSellLimitOrder(TestCase):
         self.assertEqual(0, book.volume_buy(100))
         self.assertEqual(0, book.volume())
         self.assertEqual(0, book.volume(100))
-        self.assertEqual(0, book.size_at(100))
-        self.assertEqual(0, book.size_sell())
-        self.assertEqual(0, book.size_buy())
-        self.assertEqual(0, book.size())
+        self.assertEqual(0, book.count_at(100))
+        self.assertEqual(0, book.count_sell())
+        self.assertEqual(0, book.count_buy())
+        self.assertEqual(0, book.count())
 
 
 class ShouldCancelBuyLimitOrder(TestCase):
@@ -192,10 +192,10 @@ class ShouldCancelBuyLimitOrder(TestCase):
         self.assertEqual(0, book.volume_buy(100))
         self.assertEqual(0, book.volume())
         self.assertEqual(0, book.volume(100))
-        self.assertEqual(0, book.size_at(100))
-        self.assertEqual(0, book.size_sell())
-        self.assertEqual(0, book.size_buy())
-        self.assertEqual(0, book.size())
+        self.assertEqual(0, book.count_at(100))
+        self.assertEqual(0, book.count_sell())
+        self.assertEqual(0, book.count_buy())
+        self.assertEqual(0, book.count())
 
 #
 # MARK: market
@@ -215,10 +215,10 @@ class ShouldPlaceSellMarketOrderEmptyBook(TestCase):
         self.assertEqual(0, book.volume_buy(100))
         self.assertEqual(0, book.volume())
         self.assertEqual(0, book.volume(100))
-        self.assertEqual(0, book.size_at(100))
-        self.assertEqual(0, book.size_sell())
-        self.assertEqual(0, book.size_buy())
-        self.assertEqual(0, book.size())
+        self.assertEqual(0, book.count_at(100))
+        self.assertEqual(0, book.count_sell())
+        self.assertEqual(0, book.count_buy())
+        self.assertEqual(0, book.count())
 
 
 class ShouldPlaceBuyMarketOrderEmptyBook(TestCase):
@@ -235,10 +235,10 @@ class ShouldPlaceBuyMarketOrderEmptyBook(TestCase):
         self.assertEqual(0, book.volume_buy(100))
         self.assertEqual(0, book.volume())
         self.assertEqual(0, book.volume(100))
-        self.assertEqual(0, book.size_at(100))
-        self.assertEqual(0, book.size_sell())
-        self.assertEqual(0, book.size_buy())
-        self.assertEqual(0, book.size())
+        self.assertEqual(0, book.count_at(100))
+        self.assertEqual(0, book.count_sell())
+        self.assertEqual(0, book.count_buy())
+        self.assertEqual(0, book.count())
 
 
 class ShouldPlaceSellMarketOrderAndMatch(TestCase):
@@ -256,10 +256,10 @@ class ShouldPlaceSellMarketOrderAndMatch(TestCase):
         self.assertEqual(90, book.volume_buy(50))
         self.assertEqual(90, book.volume())
         self.assertEqual(90, book.volume(50))
-        self.assertEqual(1, book.size_at(50))
-        self.assertEqual(0, book.size_sell())
-        self.assertEqual(1, book.size_buy())
-        self.assertEqual(1, book.size())
+        self.assertEqual(1, book.count_at(50))
+        self.assertEqual(0, book.count_sell())
+        self.assertEqual(1, book.count_buy())
+        self.assertEqual(1, book.count())
 
 
 class ShouldPlaceBuyMarketOrderAndMatch(TestCase):
@@ -277,10 +277,10 @@ class ShouldPlaceBuyMarketOrderAndMatch(TestCase):
         self.assertEqual(0, book.volume_buy(50))
         self.assertEqual(90, book.volume())
         self.assertEqual(90, book.volume(50))
-        self.assertEqual(1, book.size_at(50))
-        self.assertEqual(1, book.size_sell())
-        self.assertEqual(0, book.size_buy())
-        self.assertEqual(1, book.size())
+        self.assertEqual(1, book.count_at(50))
+        self.assertEqual(1, book.count_sell())
+        self.assertEqual(0, book.count_buy())
+        self.assertEqual(1, book.count())
 
 #
 # MARK: clear
@@ -309,10 +309,10 @@ class ShouldClearSellLimitOrders(TestCase):
         self.assertEqual(0, book.volume_buy(100))
         self.assertEqual(0, book.volume())
         self.assertEqual(0, book.volume(100))
-        self.assertEqual(0, book.size_at(100))
-        self.assertEqual(0, book.size_sell())
-        self.assertEqual(0, book.size_buy())
-        self.assertEqual(0, book.size())
+        self.assertEqual(0, book.count_at(100))
+        self.assertEqual(0, book.count_sell())
+        self.assertEqual(0, book.count_buy())
+        self.assertEqual(0, book.count())
 
 
 class ShouldClearBuyLimitOrders(TestCase):
@@ -338,7 +338,7 @@ class ShouldClearBuyLimitOrders(TestCase):
         self.assertEqual(0, book.volume_buy(100))
         self.assertEqual(0, book.volume())
         self.assertEqual(0, book.volume(100))
-        self.assertEqual(0, book.size_at(100))
-        self.assertEqual(0, book.size_sell())
-        self.assertEqual(0, book.size_buy())
-        self.assertEqual(0, book.size())
+        self.assertEqual(0, book.count_at(100))
+        self.assertEqual(0, book.count_sell())
+        self.assertEqual(0, book.count_buy())
+        self.assertEqual(0, book.count())
