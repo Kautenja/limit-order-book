@@ -24,13 +24,9 @@
 #ifndef LOB_STRUCTURES_HPP_
 #define LOB_STRUCTURES_HPP_
 
-#include <cstdint>
-#include "binary_search_tree.hpp"
 #include "doubly_linked_list.hpp"
-
-// TODO: arrival time necessary?
-// TODO: execution time necessary?
-// TODO: rearrange the order of structures for better memory / cache access?
+#include "binary_search_tree.hpp"
+#include <cstdint>
 
 namespace LOB {
 

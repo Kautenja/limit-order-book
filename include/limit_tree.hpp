@@ -24,8 +24,8 @@
 #ifndef LOB_LIMIT_TREE_HPP_
 #define LOB_LIMIT_TREE_HPP_
 
-#include "tsl/robin_map.h"
 #include "structures.hpp"
+#include "tsl/robin_map.h"
 
 namespace LOB {
 

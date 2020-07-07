@@ -24,8 +24,8 @@
 #ifndef LOB_LIMIT_ORDER_BOOK_HPP_
 #define LOB_LIMIT_ORDER_BOOK_HPP_
 
-#include <unordered_map>
 #include "limit_tree.hpp"
+#include <unordered_map>
 
 namespace LOB {
 
