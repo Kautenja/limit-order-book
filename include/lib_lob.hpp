@@ -21,8 +21,8 @@
 // SOFTWARE.
 //
 
-#ifndef LOB_C_LIBRARY_HPP_
-#define LOB_C_LIBRARY_HPP_
+#ifndef LOB_LIB_LOB_HPP_
+#define LOB_LIB_LOB_HPP_
 
 #include "limit_order_book.hpp"
 
@@ -300,4 +300,4 @@ extern "C" {
 // un-define the export macro
 #undef EXTERN
 
-#endif  // LOB_C_LIBRARY_HPP_
+#endif  // LOB_LIB_LOB_HPP_
