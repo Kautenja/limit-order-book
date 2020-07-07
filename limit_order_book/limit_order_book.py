@@ -1,181 +1,187 @@
 """The Limit Order Book (LOB)."""
-import ctypes
-import os
-import glob
 
 
-LIB_PATH = os.path.join(os.path.dirname(__file__), 'lib_limit_order_book*')
-try:  # load the library from the shared object file
-    LIB = ctypes.cdll.LoadLibrary(glob.glob(LIB_PATH)[0])
-except IndexError:
-    raise OSError('missing static lib_limit_order_book*.so library!')
+def _load_library():
+    """
+    Load the ctypes library and configure the parameter and return types.
 
+    Returns:
+        the ctypes library object
 
-class Types:
-    """Types used in the C++ code."""
+    """
+    import ctypes
+    import os
+    import glob
+    # attempt to load the binary library from file
+    libpath = os.path.join(os.path.dirname(__file__), 'lib_limit_order_book*')
+    try:  # load the library from the shared object file
+        library = ctypes.cdll.LoadLibrary(glob.glob(libpath)[0])
+    except IndexError:
+        raise OSError('missing static lib_limit_order_book*.so library!')
+
     # a type for pointers
     Pointer = ctypes.c_void_p
     # a type for the side of the order (i.e., sell or buy)
     Side = ctypes.c_bool
     # a type for the unique order ID
     UID = ctypes.c_uint64
-    # a type for the size of an order
-    Size = ctypes.c_uint32
+    # a type for the quantity of an order
+    Quantity = ctypes.c_uint32
     # a type for the price of an order
     Price = ctypes.c_uint64
     # a type for the volume measures in the book
     Volume = ctypes.c_uint32
+    # a type for counting orders (accumulator)
+    Count = ctypes.c_uint32
 
+    # setup the argument and return types for new_
+    library.new_.argtypes = None
+    library.new_.restype = Pointer
+    # setup the argument and return types for delete_
+    library.delete_.argtypes = [Pointer]
+    library.delete_.restype = None
+    # setup the argument and return types for clear
+    library.clear.argtypes = [Pointer]
+    library.clear.restype = None
 
-# setup the argument and return types for new_
-LIB.new_.argtypes = None
-LIB.new_.restype = Types.Pointer
-# setup the argument and return types for delete_
-LIB.delete_.argtypes = [Types.Pointer]
-LIB.delete_.restype = None
-# setup the argument and return types for clear
-LIB.clear.argtypes = [Types.Pointer]
-LIB.clear.restype = None
+    # setup the argument and return types for limit_sell
+    library.limit_sell.argtypes = [Pointer, UID, Quantity, Price]
+    library.limit_sell.restype = None
+    # setup the argument and return types for limit_buy
+    library.limit_buy.argtypes = [Pointer, UID, Quantity, Price]
+    library.limit_buy.restype = None
+    # setup the argument and return types for limit
+    library.limit.argtypes = [Pointer, Side, UID, Quantity, Price]
+    library.limit.restype = None
 
+    # setup the argument and return types for has
+    library.has.argtypes = [Pointer, UID]
+    library.has.restype = ctypes.c_bool
+    # setup the argument and return types for get
+    library.get.argtypes = [Pointer, UID]
+    library.get.restype = Pointer
+    # setup the argument and return types for cancel
+    library.cancel.argtypes = [Pointer, UID]
+    library.cancel.restype = None
 
-# setup the argument and return types for limit_sell
-LIB.limit_sell.argtypes = [Types.Pointer, Types.UID, Types.Size, Types.Price]
-LIB.limit_sell.restype = None
-# setup the argument and return types for limit_buy
-LIB.limit_buy.argtypes = [Types.Pointer, Types.UID, Types.Size, Types.Price]
-LIB.limit_buy.restype = None
-# setup the argument and return types for limit
-LIB.limit.argtypes = [Types.Pointer, Types.Side, Types.UID, Types.Size, Types.Price]
-LIB.limit.restype = None
+    # setup the argument and return types for market_sell
+    library.market_sell.argtypes = [Pointer, UID, Quantity]
+    library.market_sell.restype = None
+    # setup the argument and return types for market_buy
+    library.market_buy.argtypes = [Pointer, UID, Quantity]
+    library.market_buy.restype = None
+    # setup the argument and return types for market
+    library.market.argtypes = [Pointer, Side, UID, Quantity]
+    library.market.restype = None
 
+    # setup the argument and return types for best_sell
+    library.best_sell.argtypes = [Pointer]
+    library.best_sell.restype = Price
+    # setup the argument and return types for best_buy
+    library.best_buy.argtypes = [Pointer]
+    library.best_buy.restype = Price
+    # setup the argument and return types for best
+    library.best.argtypes = [Pointer, Side]
+    library.best.restype = Price
 
-# setup the argument and return types for has
-LIB.has.argtypes = [Types.Pointer, Types.UID]
-LIB.has.restype = ctypes.c_bool
-# setup the argument and return types for get
-LIB.get.argtypes = [Types.Pointer, Types.UID]
-LIB.get.restype = Types.Pointer
-# setup the argument and return types for cancel
-LIB.cancel.argtypes = [Types.Pointer, Types.UID]
-LIB.cancel.restype = None
+    # setup the argument and return types for volume_sell_price
+    library.volume_sell_price.argtypes = [Pointer, Price]
+    library.volume_sell_price.restype = Volume
+    # setup the argument and return types for volume_sell
+    library.volume_sell.argtypes = [Pointer]
+    library.volume_sell.restype = Volume
+    # setup the argument and return types for volume_buy_price
+    library.volume_buy_price.argtypes = [Pointer, Price]
+    library.volume_buy_price.restype = Volume
+    # setup the argument and return types for volume_buy
+    library.volume_buy.argtypes = [Pointer]
+    library.volume_buy.restype = Volume
+    # setup the argument and return types for volume_price
+    library.volume_price.argtypes = [Pointer, Price]
+    library.volume_price.restype = Volume
+    # setup the argument and return types for volume
+    library.volume.argtypes = [Pointer]
+    library.volume.restype = Volume
 
+    # setup the argument and return types for count_at
+    library.count_at.argtypes = [Pointer, Price]
+    library.count_at.restype = Count
+    # setup the argument and return types for count_sell
+    library.count_sell.argtypes = [Pointer]
+    library.count_sell.restype = Count
+    # setup the argument and return types for count_buy
+    library.count_buy.argtypes = [Pointer]
+    library.count_buy.restype = Count
+    # setup the argument and return types for count
+    library.count.argtypes = [Pointer]
+    library.count.restype = Count
 
-# setup the argument and return types for market_sell
-LIB.market_sell.argtypes = [Types.Pointer, Types.UID, Types.Size]
-LIB.market_sell.restype = None
-# setup the argument and return types for market_buy
-LIB.market_buy.argtypes = [Types.Pointer, Types.UID, Types.Size]
-LIB.market_buy.restype = None
-# setup the argument and return types for market
-LIB.market.argtypes = [Types.Pointer, Types.Side, Types.UID, Types.Size]
-LIB.market.restype = None
-
-
-# setup the argument and return types for best_sell
-LIB.best_sell.argtypes = [Types.Pointer]
-LIB.best_sell.restype = Types.Price
-# setup the argument and return types for best_buy
-LIB.best_buy.argtypes = [Types.Pointer]
-LIB.best_buy.restype = Types.Price
-# setup the argument and return types for best
-LIB.best.argtypes = [Types.Pointer, Types.Side]
-LIB.best.restype = Types.Price
-
-
-# setup the argument and return types for volume_sell_price
-LIB.volume_sell_price.argtypes = [Types.Pointer, Types.Price]
-LIB.volume_sell_price.restype = Types.Volume
-# setup the argument and return types for volume_sell
-LIB.volume_sell.argtypes = [Types.Pointer]
-LIB.volume_sell.restype = Types.Volume
-# setup the argument and return types for volume_buy_price
-LIB.volume_buy_price.argtypes = [Types.Pointer, Types.Price]
-LIB.volume_buy_price.restype = Types.Volume
-# setup the argument and return types for volume_buy
-LIB.volume_buy.argtypes = [Types.Pointer]
-LIB.volume_buy.restype = Types.Volume
-# setup the argument and return types for volume_price
-LIB.volume_price.argtypes = [Types.Pointer, Types.Price]
-LIB.volume_price.restype = Types.Volume
-# setup the argument and return types for volume
-LIB.volume.argtypes = [Types.Pointer]
-LIB.volume.restype = Types.Volume
-
-
-# setup the argument and return types for size_at
-LIB.size_at.argtypes = [Types.Pointer, Types.Price]
-LIB.size_at.restype = Types.Size
-# setup the argument and return types for size_sell
-LIB.size_sell.argtypes = [Types.Pointer]
-LIB.size_sell.restype = Types.Size
-# setup the argument and return types for size_buy
-LIB.size_buy.argtypes = [Types.Pointer]
-LIB.size_buy.restype = Types.Size
-# setup the argument and return types for size
-LIB.size.argtypes = [Types.Pointer]
-LIB.size.restype = Types.Size
+    return library
 
 
 class LimitOrderBook:
     """The Limit Order Book (LOB)."""
 
+    # the class instance of the ctypes-based library to interact with
+    _library = _load_library()
+
     def __init__(self):
         """Initialize a new limit order book."""
-        self._book = LIB.new_()
+        self._book = self._library.new_()
 
     def __del__(self):
         """Delete this limit order book."""
-        LIB.delete_(self._book)
+        self._library.delete_(self._book)
 
     def clear(self):
         """Clear all the orders in the book."""
-        LIB.clear(self._book)
+        self._library.clear(self._book)
 
-    def limit_sell(self, order_id, size, price):
+    def limit_sell(self, order_id, quantity, price):
         """
-        Place a sell limit order with given size and price.
+        Place a sell limit order with given quantity and price.
 
         Args:
             order_id: the ID for the order to add
-            size: the size of the limit order to place
+            quantity: the quantity of shares in the limit order to place
             price: the price of the limit order to place
 
         Returns:
             None
 
         """
-        LIB.limit_sell(self._book, order_id, size, price)
+        self._library.limit_sell(self._book, order_id, quantity, price)
 
-    def limit_buy(self, order_id, size, price):
+    def limit_buy(self, order_id, quantity, price):
         """
-        Place a sell limit order with given size and price.
+        Place a sell limit order with given quantity and price.
 
         Args:
             order_id: the ID for the order to add
-            size: the size of the limit order to place
+            quantity: the quantity of shares in the limit order to place
             price: the price of the limit order to place
 
         Returns:
             None
 
         """
-        LIB.limit_buy(self._book, order_id, size, price)
+        self._library.limit_buy(self._book, order_id, quantity, price)
 
-    def limit(self, side, order_id, size, price):
+    def limit(self, side, order_id, quantity, price):
         """
-        Place a sell limit order with given size and price.
+        Place a sell limit order with given quantity and price.
 
         Args:
             side: the side of the order to place
             order_id: the ID for the order to add
-            size: the size of the limit order to place
+            quantity: the quantity of shares in the limit order to place
             price: the price of the limit order to place
 
         Returns:
             None
 
         """
-        LIB.limit(self._book, side, order_id, size, price)
+        self._library.limit(self._book, side, order_id, quantity, price)
 
     def has(self, order_id):
         """
@@ -188,7 +194,7 @@ class LimitOrderBook:
             True if the order is in the book, False otherwise
 
         """
-        return LIB.has(self._book, order_id)
+        return self._library.has(self._book, order_id)
 
     def get(self, order_id):
         """
@@ -201,7 +207,7 @@ class LimitOrderBook:
             an order object wrapped around the pointer
 
         """
-        # pointer = LIB.get(self._book, order_id)
+        # pointer = self._library.get(self._book, order_id)
         raise NotImplementedError
 
     def cancel(self, order_id):
@@ -215,58 +221,58 @@ class LimitOrderBook:
             None
 
         """
-        LIB.cancel(self._book, order_id)
+        self._library.cancel(self._book, order_id)
 
-    def market_sell(self, order_id, size):
+    def market_sell(self, order_id, quantity):
         """
         Place a market sell order.
 
         Args:
             order_id: the ID for the order to add
-            size: the size of the market order to place
+            quantity: the quantity of shares in the market order to place
 
         Returns:
             None
 
         """
-        LIB.market_sell(self._book, order_id, size)
+        self._library.market_sell(self._book, order_id, quantity)
 
-    def market_buy(self, order_id, size):
+    def market_buy(self, order_id, quantity):
         """
         Place a market buy order.
 
         Args:
             order_id: the ID for the order to add
-            size: the size of the market order to place
+            quantity: the quantity of shares in the market order to place
 
         Returns:
             None
 
         """
-        LIB.market_buy(self._book, order_id, size)
+        self._library.market_buy(self._book, order_id, quantity)
 
-    def market(self, side, order_id, size):
+    def market(self, side, order_id, quantity):
         """
         Place a market order.
 
         Args:
             side: the side of the order to place
             order_id: the ID for the order to add
-            size: the size of the market order to place
+            quantity: the quantity of shares in the market order to place
 
         Returns:
             None
 
         """
-        LIB.market(self._book, side, order_id, size)
+        self._library.market(self._book, side, order_id, quantity)
 
     def best_sell(self):
         """Return the best sell price in the book."""
-        return LIB.best_sell(self._book)
+        return self._library.best_sell(self._book)
 
     def best_buy(self):
         """Return the best buy price in the book."""
-        return LIB.best_buy(self._book)
+        return self._library.best_buy(self._book)
 
     def best(self, side):
         """
@@ -279,7 +285,7 @@ class LimitOrderBook:
             the best price for the given side of the book
 
         """
-        return LIB.best(self._book, side)
+        return self._library.best(self._book, side)
 
     def volume_sell(self, price=None):
         """
@@ -296,8 +302,8 @@ class LimitOrderBook:
 
         """
         if price is None:
-            return LIB.volume_sell(self._book)
-        return LIB.volume_sell_price(self._book, price)
+            return self._library.volume_sell(self._book)
+        return self._library.volume_sell_price(self._book, price)
 
     def volume_buy(self, price=None):
         """
@@ -314,8 +320,8 @@ class LimitOrderBook:
 
         """
         if price is None:
-            return LIB.volume_buy(self._book)
-        return LIB.volume_buy_price(self._book, price)
+            return self._library.volume_buy(self._book)
+        return self._library.volume_buy_price(self._book, price)
 
     def volume(self, price=None):
         """
@@ -332,33 +338,33 @@ class LimitOrderBook:
 
         """
         if price is None:
-            return LIB.volume(self._book)
-        return LIB.volume_price(self._book, price)
+            return self._library.volume(self._book)
+        return self._library.volume_price(self._book, price)
 
     def size_at(self, price):
         """
-        Return the size at the given limit price.
+        Return the count at the given limit price.
 
         Args:
-            price: the price to get the size of the book for
+            price: the price to get the count of the book for
 
         Returns:
-            the size of the book at the given price
+            the count of the book at the given price
 
         """
-        return LIB.size_at(self._book, price)
+        return self._library.count_at(self._book, price)
 
     def size_sell(self):
-        """Return the size of the book on the sell side."""
-        return LIB.size_sell(self._book)
+        """Return the count of the book on the sell side."""
+        return self._library.count_sell(self._book)
 
     def size_buy(self):
-        """Return the size of the book on the buy side."""
-        return LIB.size_buy(self._book)
+        """Return the count of the book on the buy side."""
+        return self._library.count_buy(self._book)
 
     def size(self):
-        """Return the total size of the book (number of orders)."""
-        return LIB.size(self._book)
+        """Return the total count of the book (number of orders)."""
+        return self._library.count(self._book)
 
 
 # explicitly define the outward facing API of this module

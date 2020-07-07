@@ -242,7 +242,7 @@ extern "C" {
     /// @param price the price to get the order count at
     /// @returns the number of orders at the given price
     ///
-    EXP LOB::Count size_at(LOB::LimitOrderBook* book, LOB::Price price) {
+    EXP LOB::Count count_at(LOB::LimitOrderBook* book, LOB::Price price) {
         return book->count_at(price);
     }
 
@@ -251,7 +251,7 @@ extern "C" {
     /// @param book a pointer to the limit order book object
     /// @returns the number of orders on the sell side of the book
     ///
-    EXP LOB::Count size_sell(LOB::LimitOrderBook* book) {
+    EXP LOB::Count count_sell(LOB::LimitOrderBook* book) {
         return book->count_sell();
     }
 
@@ -260,7 +260,7 @@ extern "C" {
     /// @param book a pointer to the limit order book object
     /// @returns the number of orders on the buy side of the book
     ///
-    EXP LOB::Count size_buy(LOB::LimitOrderBook* book) {
+    EXP LOB::Count count_buy(LOB::LimitOrderBook* book) {
         return book->count_buy();
     }
 
@@ -269,7 +269,7 @@ extern "C" {
     /// @param book a pointer to the limit order book object
     /// @returns the number of orders in the book
     ///
-    EXP LOB::Count size(LOB::LimitOrderBook* book) {
+    EXP LOB::Count count(LOB::LimitOrderBook* book) {
         return book->count();
     }
 }
