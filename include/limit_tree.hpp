@@ -27,38 +27,63 @@
 #include "structures.hpp"
 #include "tsl/robin_map.h"
 
+/// Logic for maintaining a continuous double auction via a limit-order book.
 namespace LOB {
 
 /// a map of prices to limit pointers
 typedef tsl::robin_map<Price, Limit*> PriceLimitMap;
 
-/// Set the best to the given limit if the given limit is better.
+// ---------------------------------------------------------------------------
+// MARK: set_best
+// ---------------------------------------------------------------------------
+
+/// @brief Set the best to the given limit if the given limit is better.
 ///
+/// @tparam side the side of the book to perform the calculation from
 /// @param best the current best limit
 /// @param limit the limit node to compare to
 ///
-template<Side>
+template<Side side>
 void set_best(Limit** best, Limit* limit);
-// Compare best buy to limit and set if it's better.
+
+/// @brief Set the best buy to the given limit if the given limit is better.
+///
+/// @param highest_buy the current best buy limit
+/// @param limit the buy limit node to compare to
+///
 template<>
 inline void set_best<Side::Buy>(Limit** highest_buy, Limit* limit) {
     if (*highest_buy == nullptr) *highest_buy = limit;
     else if (limit->key > (*highest_buy)->key) *highest_buy = limit;
 }
-// Compare best sell to limit and set if it's better.
+
+/// @brief Set the best sell to the given limit if the given limit is better.
+///
+/// @param lowest_sell the current best sell limit
+/// @param limit the sell limit node to compare to
+///
 template<>
 inline void set_best<Side::Sell>(Limit** lowest_sell, Limit* limit) {
     if (*lowest_sell == nullptr) *lowest_sell = limit;
     else if (limit->key < (*lowest_sell)->key) *lowest_sell = limit;
 }
 
-/// Find the next best when removing the best from the tree.
+// ---------------------------------------------------------------------------
+// MARK: find_best
+// ---------------------------------------------------------------------------
+
+/// @brief Find the next best when removing the best from the tree.
 ///
+/// @tparam side the side of the book to perform the calculation from
 /// @param best the best limit node
 ///
-template<Side>
+template<Side side>
 void find_best(Limit** best);
-// Replace the highest buy
+
+/// @brief Find the next buy when removing the best buy from the tree.
+///
+/// @param highest_buy the best buy limit node
+///
 template<>
 inline void find_best<Side::Buy>(Limit** highest_buy) {
     if ((*highest_buy)->parent == nullptr)  // removing root node
@@ -69,7 +94,11 @@ inline void find_best<Side::Buy>(Limit** highest_buy) {
     if (*highest_buy != nullptr)  // highest buy exists
         *highest_buy = static_cast<Limit*>(BST::max(*highest_buy));
 }
-// Replace the lowest sell
+
+/// @brief Find the next sell when removing the best sell from the tree.
+///
+/// @param lowest_sell the best sell limit node
+///
 template<>
 inline void find_best<Side::Sell>(Limit** lowest_sell) {
     if ((*lowest_sell)->parent == nullptr)  // removing root node
@@ -81,53 +110,65 @@ inline void find_best<Side::Sell>(Limit** lowest_sell) {
         *lowest_sell = static_cast<Limit*>(BST::min(*lowest_sell));
 }
 
-/// Return true if
+// ---------------------------------------------------------------------------
+// MARK: can_match
+// ---------------------------------------------------------------------------
+
+/// @brief Return true if the market price can match with the limit price.
 ///
-/// @param best the best limit price of the given side
-/// @param price the price of the opposing side limit order to compare to
+/// @tparam side the side of the book to perform the calculation from
+/// @param limit the price of the limit order (i.e., the best price)
+/// @param market the price of the opposing side market order to compare
+/// @returns true if the market price can match with the limit price
 ///
-template<Side>
-bool is_in_limit(Price best, Price price);
-// Replace the highest buy
+template<Side side>
+bool can_match(Price limit, Price market);
+
+/// @brief Return true if the sell market price can match with the buy limit price.
+///
+/// @param limit the price of the buy limit order (i.e., the best price)
+/// @param market the price of the sell side market order to compare
+/// @returns true if the sell market price can match with the buy limit price
+///
 template<>
-inline bool is_in_limit<Side::Buy>(Price best, Price price) {
+inline bool can_match<Side::Buy>(Price limit, Price market) {
     // short circuit on price > 0: 0 is sentinel for no limit
     // the price should be less than or equal to the best on the buy side.
     // i.e., the submitted order is a sell limit with a lower price
-    return price == 0 || price <= best;
+    return market == 0 || market <= limit;
 }
-// Replace the lowest sell
+
+/// @brief Return true if the buy market price can match with the sell limit price.
+///
+/// @param limit the price of the sell limit order (i.e., the best price)
+/// @param market the price of the buy side market order to compare
+/// @returns true if the buy market price can match with the sell limit price
+///
 template<>
-inline bool is_in_limit<Side::Sell>(Price best, Price price) {
+inline bool can_match<Side::Sell>(Price limit, Price market) {
     // short circuit on price > 0: 0 is sentinel for no limit
     // the price should be greater than or equal to the best on the sell side.
     // i.e., the submitted order is a buy limit with a higher price
-    return price == 0 || price >= best;
+    return market == 0 || market >= limit;
 }
 
-/// The Limit Order Book (LOB).
+/// A single side (buy/sell) of the LimitOrderBook.
 template<Side side>
 struct LimitTree {
     /// the sorted tree of orders in the book
-    Limit* root;
+    Limit* root = nullptr;
     /// a mapping of limit prices to limits
     PriceLimitMap limits;
     /// the best order
-    Limit* best;
+    Limit* best = nullptr;
+    /// the last best price
+    Price last_best_price = 0;
     /// the total number of active orders for this tree
-    Size size;
+    Count count = 0;
     /// the total volume of orders for this tree
-    Volume volume;
+    Volume volume = 0;
 
-    /// Initialize a new limit tree.
-    LimitTree() :
-        root(nullptr),
-        limits(),
-        best(nullptr),
-        size(0),
-        volume(0) { }
-
-    /// Clear all the limits in the tree
+    /// @brief Clear all the limits in the tree
     void clear() {
         // delete all the limits
         for(auto item = limits.begin(); item != limits.end(); item++)
@@ -137,11 +178,11 @@ struct LimitTree {
         // set remaining tracers to 0
         root = nullptr;
         best = nullptr;
-        size = 0;
+        count = 0;
         volume = 0;
     }
 
-    /// Place a limit order on the limit tree.
+    /// @brief Place a limit order on the limit tree.
     ///
     /// @param order an order that matches the side of this tree
     ///
@@ -161,23 +202,25 @@ struct LimitTree {
         } else {  // push to existing queue of orders at limit price
             // set the order's limit to the limit node for the order's price
             order->limit = limits.at(order->price);
-            // increment the size of the orders at this limit node
-            ++order->limit->size;
+            // increment the count of the orders at this limit node
+            ++order->limit->count;
             // increment the volume of the orders at this limit node
-            order->limit->volume += order->size;
+            order->limit->volume += order->quantity;
             // add the order to the queue of orders for the limit node
             DLL::append(
                 reinterpret_cast<DLL::Node**>(&order->limit->order_tail),
                 static_cast<DLL::Node*>(order)
             );
         }
-        // update the size and volume for the entire tree
-        ++size;
-        volume += order->size;
+        // update the count and volume for the entire tree
+        ++count;
+        volume += order->quantity;
+        // set the last best price
+        if (best != nullptr) last_best_price = best->key;
     }
 
     // TODO: use object pool for limit reuse?
-    /// Remove an order from the limit tree.
+    /// @brief Remove an order from the limit tree.
     ///
     /// @param order an order that exists in the limit tree
     ///
@@ -197,8 +240,8 @@ struct LimitTree {
             limits.erase(limit_->key);
             delete limit_;
         } else {  // at least 1 other Order in queue
-            --limit_->size;
-            limit_->volume -= order->size;
+            --limit_->count;
+            limit_->volume -= order->quantity;
             // remove the order from the queue (update head and tail)
             DLL::remove(
                 reinterpret_cast<DLL::Node**>(&limit_->order_head),
@@ -206,69 +249,68 @@ struct LimitTree {
                 static_cast<DLL::Node*>(order)
             );
         }
-        // update the size and volume for the entire tree
-        --size;
-        volume -= order->size;
+        // update the count and volume for the entire tree
+        --count;
+        volume -= order->quantity;
+        // set the last best price
+        if (best != nullptr) last_best_price = best->key;
     }
 
-    /// Perform a market order of given size on the given limit tree.
+    /// @brief Perform a market order of given quantity on the given limit tree.
     ///
+    /// @tparam Callback a callable function that excepts an order ID
     /// @param order the order to find a market order for
     /// @param did_fill the callback handler for when an order is filled
     ///
     template<typename Callback>
     void market(Order* order, Callback did_fill) {
         // find orders until there are none
-        while (best != nullptr && is_in_limit<side>(best->key, order->price)) {
+        while (best != nullptr && can_match<side>(best->key, order->price)) {
             // get the next match as the front of the best price
             auto match = best->order_head;
-            // TODO: Update timestamping?
-            // set the execution time for the current match
-            match->execution = order->arrival;
-            if (match->size >= order->size) {  // current match can fill
-                if (match->size == order->size) {  // limit order filled
+            if (match->quantity >= order->quantity) {  // current match can fill
+                if (match->quantity == order->quantity) {  // limit order filled
                     // remove the current match from the book
                     cancel(match);
                     did_fill(match->uid);
                 } else {  // limit order partially filled
                     // remove the market order quantity from the limit quantity
-                    match->size -= order->size;
+                    match->quantity -= order->quantity;
                     // update the match's limit volume
-                    match->limit->volume -= order->size;
+                    match->limit->volume -= order->quantity;
                     // update the volume for the entire tree
-                    volume -= order->size;
+                    volume -= order->quantity;
                 }
-                // clear the size of the market order
-                order->size = 0;
+                // clear the remaining quantity for the order
+                order->quantity = 0;
                 return;
             }  // else: current match can NOT fill
-            // decrement the remaining size of the market order
-            order->size -= match->size;
+            // decrement the remaining quantity of the market order
+            order->quantity -= match->quantity;
             // remove the current match from the book
             cancel(match);
             did_fill(match->uid);
         }
+
     }
 
-    /// Return the volume of orders at the given limit price.
+    /// @brief Return the volume of orders at the given limit price.
     ///
     /// @param price the limit price to return the volume for
     /// @returns the volume of orders at the given limit price
     ///
-    inline Volume volume_at(Price price) {
-        if (limits.count(price))
-            return limits.at(price)->volume;
+    inline Volume volume_at(Price price) const {
+        if (limits.count(price)) return limits.at(price)->volume;
         return 0;
     }
 
-    /// Return the number of orders at the given limit price.
+    /// @brief Return the number of orders at the given limit price.
     ///
     /// @param price the limit price to return the number of orders for
     /// @returns the number of orders at the given limit price
     ///
-    inline Size size_at(Price price) {
-        if (limits.count(price))
-            return limits.at(price)->size;
+    inline Count count_at(Price price) const {
+        if (limits.count(price)) return limits.at(price)->count;
         return 0;
     }
 };
