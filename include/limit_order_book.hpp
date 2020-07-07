@@ -212,7 +212,7 @@ class LimitOrderBook {
 
     /// @brief Return the best sell price.
     ///
-    /// @return the best ask price in the book
+    /// @returns the best ask price in the book
     ///
     inline Price best_sell() const {
         if (sells.best == nullptr)
@@ -222,7 +222,7 @@ class LimitOrderBook {
 
     /// @brief Return the best buy price.
     ///
-    /// @return the best bid price in the book
+    /// @returns the best bid price in the book
     ///
     inline Price best_buy() const {
         if (buys.best == nullptr)
@@ -243,6 +243,9 @@ class LimitOrderBook {
     }
 
     /// @brief Return the current price of the asset.
+    ///
+    /// @returns the best price in the book (the midpoint price)
+    ///
     inline Price price() const {
         if (sells.best == nullptr && buys.best == nullptr)  // empty book
             return 0;
@@ -256,13 +259,13 @@ class LimitOrderBook {
 
     /// @brief Return the last best sell price.
     ///
-    /// @return the best bid price in the book
+    /// @returns the best bid price in the book
     ///
     inline Price last_best_sell() const { return sells.last_best_price; }
 
     /// @brief Return the last best buy price.
     ///
-    /// @return the best bid price in the book
+    /// @returns the best bid price in the book
     ///
     inline Price last_best_buy() const { return buys.last_best_price; }
 
@@ -279,6 +282,9 @@ class LimitOrderBook {
     }
 
     /// @brief Return the current price of the asset using last prices.
+    ///
+    /// @returns the last midpoint price
+    ///
     inline Price last_price() const {
         return (sells.last_best_price + buys.last_best_price) / 2;
     }
@@ -286,7 +292,7 @@ class LimitOrderBook {
     /// @brief Return the total volume for the sell side of the book.
     ///
     /// @param price the limit price to get the volume for
-    /// @return the volume for the given limit price
+    /// @returns the volume for the given limit price
     ///
     inline Volume volume_sell(Price price) const {
         return sells.volume_at(price);
@@ -294,11 +300,14 @@ class LimitOrderBook {
 
     /// @brief Return the total volume for the sell side of the book.
     ///
-    /// @return the total volume on the sell side of the book
+    /// @returns the total volume on the sell side of the book
     ///
     inline Volume volume_sell() const { return sells.volume; }
 
     /// @brief Return the volume at the best sell price.
+    ///
+    /// @returns the volume of sell orders at the best price
+    ///
     inline Volume volume_sell_best() const {
         if (sells.best == nullptr) return 0;
         return sells.best->volume;
@@ -307,7 +316,7 @@ class LimitOrderBook {
     /// @brief Return the total volume for the buy side of the book.
     ///
     /// @param price the limit price to get the volume for
-    /// @return the volume for the given limit price
+    /// @returns the volume for the given limit price
     ///
     inline Volume volume_buy(Price price) const {
         return buys.volume_at(price);
@@ -315,11 +324,14 @@ class LimitOrderBook {
 
     /// @brief Return the total volume for the buy side of the book.
     ///
-    /// @return the total volume on the buy side of the book
+    /// @returns the total volume on the buy side of the book
     ///
     inline Volume volume_buy() const { return buys.volume; }
 
     /// @brief Return the volume at the best sell price.
+    ///
+    /// @returns the volume of buy orders at the best price
+    ///
     inline Volume volume_buy_best() const {
         if (buys.best == nullptr) return 0;
         return buys.best->volume;
@@ -328,31 +340,43 @@ class LimitOrderBook {
     /// @brief Return the volume at the given limit price.
     ///
     /// @param price the limit price to get the volume for
-    /// @return the volume for the given limit price
+    /// @returns the volume for the given limit price
     ///
     inline Volume volume(Price price) const {
         return buys.volume_at(price) + sells.volume_at(price);
     }
 
     /// @brief Return the total volume for the book.
+    ///
+    /// @returns the total volume of orders in the book (for both sides)
+    ///
     inline Volume volume() const { return sells.volume + buys.volume; }
 
     /// @brief Return the total number of orders at the given limit price.
     ///
     /// @param price the limit price to get the volume for
-    /// @return the volume for the given limit price
+    /// @returns the volume for the given limit price
     ///
     inline Count count_at(Price price) const {
         return buys.count_at(price) + sells.count_at(price);
     }
 
-    /// @brief Return the total number of orders on the sell-side of the book.
+    /// @brief Return the total number of orders on the sell side of the book.
+    ///
+    /// @returns the total count of orders on the sell side of the book
+    ///
     inline Count count_sell() const { return sells.count; }
 
-    /// @brief Return the total number of orders on the buy-side of the book.
+    /// @brief Return the total number of orders on the buy side of the book.
+    ///
+    /// @returns the total count of orders on the buy side of the book
+    ///
     inline Count count_buy() const { return buys.count; }
 
     /// @brief Return the total number of orders in the book.
+    ///
+    /// @returns the total count of orders in the book
+    ///
     inline Count count() const { return sells.count + buys.count; }
 };
 
