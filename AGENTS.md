@@ -126,13 +126,6 @@ PyPI extension with `-std=c++1y`, or `/std:c++14` under MSVC. Code in
 updated. Wheels must stay portable, so never add `-march=native` or other
 host-tuned flags to `setup.py`.
 
-**Note:** The vendored Catch2 2.9 header uses an x86-only debugger trap, so
-the Catch2 suites and benchmarks fail to compile on Apple Silicon. On arm64
-macOS, `scons test` and `make test` fail before any test runs; build the
-shared library into the package with `scons limit_order_book` and run the
-Python suite.
-Report the C++ suites as not run rather than passed.
-
 Validate changes by type:
 
 -   **Matching or data structures:** `make test`, plus a benchmark run before
