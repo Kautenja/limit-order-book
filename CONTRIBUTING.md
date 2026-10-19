@@ -217,9 +217,10 @@ Build a source distribution and a wheel in `.build/dist/` with:
 ./main.sh deployment
 ```
 
-scikit-build-core drives the CMake build for the wheel. All build outputs go
-to the ignored `.build/` directory. To remove them and the Cython extension
-copied into the package, run:
+scikit-build-core drives the CMake build for the wheel. Native and Python
+outputs go to the root `.build/`; the report uses `docs/whitepaper/.build/`.
+Both are ignored by Git. To remove them and the Cython extension copied into
+the package, run:
 
 ```shell
 ./main.sh clean
@@ -230,6 +231,10 @@ covers the C++ suites and package checks, and the Python suite and
 distribution builds for CPython 3.13 and 3.14, on Linux x64 and arm64, macOS
 x64 and arm64, and Windows x64. The benchmarks are not run in CI; include
 local results for changes that need them.
+
+CI also builds the report PDF and attaches it to tag releases. The
+[report build guide](docs/development/technical-report.md) describes the local
+output, LaTeX dependencies, and published-release workflow.
 
 ### Choosing Validation
 

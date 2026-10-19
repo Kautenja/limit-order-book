@@ -67,7 +67,7 @@ else
   PYTHON="${PYTHON:-python3}"
 fi
 
-# the root of every build output, and the CMake build tree inside it
+# C++ and Python build outputs; the report keeps its own local .build directory
 BUILD_ROOT="${SCRIPT_DIR}/.build"
 BUILD_DIR="${BUILD_ROOT}/cmake"
 BUILD_TYPE="${CMAKE_BUILD_TYPE:-Release}"
@@ -212,7 +212,7 @@ run_install_cpp() {
 }
 
 run_clean() {
-  rm -rf "${BUILD_ROOT}"
+  rm -rf "${BUILD_ROOT}" "${SCRIPT_DIR}/docs/whitepaper/.build"
   find limit_order_book -type f -name "*.pyc" -exec rm -f {} +
   find limit_order_book -type d -name "__pycache__" -prune -exec rm -rf {} +
   find limit_order_book -maxdepth 1 -type f \

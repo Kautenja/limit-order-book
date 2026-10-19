@@ -45,10 +45,12 @@ material, not dependencies.
 -   **`test/package/`:** C++ and C consumer projects that check
     `find_package` and FetchContent.
 -   **`main.sh`:** The development command wrapper, modeled on nes-py's.
--   **`.build/`:** Every build output, ignored by Git: the CMake build in
-    `.build/cmake/`, scikit-build-core builds in `.build/python/`, package
+-   **`.build/`:** Native and Python build outputs, ignored by Git: the CMake
+    build in `.build/cmake/`, scikit-build-core builds in `.build/python/`, package
     checks in `.build/prefix/` and `.build/package-*/`, and distributions in
-    `.build/dist/`. `./main.sh clean` removes it.
+    `.build/dist/`. The report uses `docs/whitepaper/.build/` instead;
+    `./main.sh clean` removes both. See the
+    [report build guide](docs/development/technical-report.md).
 -   **`vendor/`:** Third-party and owner-authored dependencies, committed
     in-tree. Treat them as read-only.
 -   **`docs/`:** Documentation, indexed in [docs/README.md](docs/README.md).
@@ -65,7 +67,8 @@ material, not dependencies.
 -   Do not edit `vendor/`. Fixes to the owner-authored `binary-search-tree`
     and `doubly-linked-list` libraries belong in their upstream
     repositories; ask before changing a vendored copy here.
--   Reserve `.build/` for build outputs. Put scratch files, experiments, and
+-   Reserve the root `.build/` for native and Python outputs, and
+    `docs/whitepaper/.build/` for report outputs. Put scratch files, experiments, and
     benchmark captures outside the repository, and remove them when the task
     is finished. Do not add new top-level build or output directories.
 -   Commit only when requested. Push, tag, and publish to PyPI only when

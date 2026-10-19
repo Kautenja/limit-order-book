@@ -21,11 +21,18 @@ make -C docs/whitepaper
 ```
 
 The PDF is written to
-[.build/report/limit-order-book.pdf](../../.build/report/limit-order-book.pdf).
+[.build/limit-order-book.pdf](.build/limit-order-book.pdf), beside this source
+directory. From the repository root, its full relative path is
+`docs/whitepaper/.build/limit-order-book.pdf`.
 The build disables shell escape and typesets the checked-in evidence; it does
-not run benchmarks or fetch research. All compiler outputs stay under the
-root `.build/` directory. `make -C docs/whitepaper clean` removes the LaTeX
-outputs, while `./main.sh clean` removes every project build output.
+not run benchmarks or fetch research. LaTeX outputs stay under this directory's
+ignored `.build/`. `make -C docs/whitepaper clean` removes the LaTeX outputs;
+`./main.sh clean` removes both the root and report build directories.
+
+GitHub Actions uses the same build command and attaches `limit-order-book.pdf`
+to tag releases and manually published releases. Branch builds also expose it
+as the `limit-order-book-report` Actions artifact. See the
+[report build guide](../development/technical-report.md) for workflow details.
 
 The source uses the two-column layout, 10-point type, 0.75-inch margins,
 running headers, and restrained blue and orange palette of the RackNES and

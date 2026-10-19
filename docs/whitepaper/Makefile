@@ -1,6 +1,5 @@
 # Build the manuscript using checked-in evidence; do not rerun experiments.
-ROOT := ../..
-BUILD := $(abspath $(ROOT)/.build/report)
+BUILD := $(abspath .build)
 LATEXMK ?= latexmk
 
 .PHONY: all data clean

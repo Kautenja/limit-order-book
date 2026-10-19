@@ -20,6 +20,8 @@ for installation, usage, and development commands.
     library, C API, tests, and benchmarks.
 -   [Python bindings](development/python-bindings.md): Cython ownership,
     conversions, builds, and repeatable performance measurements.
+-   [Report builds](development/technical-report.md): Local PDF output,
+    LaTeX dependencies, and GitHub release attachments.
 -   [Markdown Style Guide](development/style-guide-markdown.md): Document
     organization, prose, formatting, links, and review checks.
 -   [Changelog](../CHANGELOG.md): Release history and compatibility changes.

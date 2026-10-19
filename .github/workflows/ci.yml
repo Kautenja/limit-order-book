@@ -12,6 +12,14 @@ permissions:
   contents: read
 
 jobs:
+  report:
+    name: Technical report
+    uses: ./.github/workflows/report.yml
+    permissions:
+      # The reusable workflow restricts the build to read access; its
+      # published-release upload job needs write access and is skipped here.
+      contents: write
+
   native-test:
     name: C++ / ${{ matrix.platform.name }}
     runs-on: ${{ matrix.platform.runner }}
@@ -117,6 +125,7 @@ jobs:
     needs:
       - native-test
       - build-test
+      - report
     runs-on: ubuntu-24.04
     if: startsWith(github.ref, 'refs/tags/')
     permissions:
@@ -129,6 +138,12 @@ jobs:
           pattern: limit-order-book-*-dist
           path: release-dist
           merge-multiple: true
+
+      - name: Download technical report
+        uses: actions/download-artifact@v8
+        with:
+          name: limit-order-book-report
+          path: release-dist
 
       - name: Create or update GitHub Release
         env:

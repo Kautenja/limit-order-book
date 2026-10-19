@@ -240,9 +240,12 @@ that reused book state are not directly comparable.
 
 ### Build Outputs
 
-All build outputs go to the ignored `.build/` directory: the CMake build in
+Native and Python build outputs go to the root `.build/`: the CMake build in
 `.build/cmake/`, Python builds in `.build/python/`, and distributions from
-`./main.sh deployment` in `.build/dist/`. To remove them, run:
+`./main.sh deployment` in `.build/dist/`. Build the technical report with
+`make -C docs/whitepaper`; its PDF is
+`docs/whitepaper/.build/limit-order-book.pdf`. Both `.build` directories are
+ignored by Git. To remove the build outputs, run:
 
 ```shell
 ./main.sh clean
@@ -253,14 +256,17 @@ All build outputs go to the ignored `.build/` directory: the CMake build in
 The [CI workflow](.github/workflows/ci.yml) runs the C++ suites and the
 installed-package and FetchContent checks on Linux, macOS, and Windows, and
 the Python suite and distribution builds for CPython 3.13 and 3.14 on the same
-platforms. It runs on pull requests, pushes to `master`, and
-tag pushes.
+platforms. It also builds the technical report from the archived evidence.
+It runs on pull requests, pushes to `master`, and tag pushes.
 
 To release, update `VERSION` in the `project()` call of
 [CMakeLists.txt](CMakeLists.txt), which sets both the C++ package and the
 Python package versions, then push a tag that matches it, optionally prefixed
-with `v`. Tag CI creates or updates a GitHub release with the built
-distributions. Publish that release to start the
+with `v`. Tag CI waits for the report and package checks, then creates or
+updates a GitHub release with the distributions and `limit-order-book.pdf`.
+Manually published releases also build and attach their tag's report through
+the [report workflow](.github/workflows/report.yml). Publish that release to
+start the
 [Publish to PyPI](.github/workflows/publish.yml) workflow, which builds the
 sdist and wheels and uploads them through the `pypi` environment's trusted
 publisher. A release created by the CI workflow's token does not trigger

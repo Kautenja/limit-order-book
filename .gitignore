@@ -1,5 +1,5 @@
 # MARK: Project Files
-# all C++ and Python build outputs, see CMakeLists.txt, pyproject.toml, and main.sh
+# C++, Python, and report outputs, including docs/whitepaper/.build/
 .build/
 
 # MARK: Python gitignore
