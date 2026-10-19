@@ -29,7 +29,7 @@
 \definecolor{accent}{HTML}{B85C38}
 \definecolor{pale}{HTML}{F3F5F7}
 \usepackage[colorlinks=true,linkcolor=ink,citecolor=ink,urlcolor=ink]{hyperref}
-\hypersetup{pdftitle={Limit Order Book: A Price-Time Priority Matching Engine for C++, C, and Python},pdfauthor={Christian Kauten},pdfsubject={Project technical report; revision October 18, 2026},pdfkeywords={limit order book, price-time priority, matching, C++, C, Python, reproducible evaluation}}
+\hypersetup{pdftitle={Limit Order Book: A Price-Time Priority Matching Engine for C++, C, and Python},pdfauthor={Christian Kauten},pdfsubject={Project technical report; revision October 19, 2026},pdfkeywords={limit order book, price-time priority, matching, C++, C, Python, reproducible evaluation}}
 \setlength{\columnsep}{0.25in}
 \setlength{\headheight}{14pt}
 \setlength{\emergencystretch}{1.5em}
@@ -50,33 +50,32 @@
 \input{evidence/results.tex}
 \title{\textbf{Limit Order Book: A Price-Time Priority\\Matching Engine for C++, C, and Python}}
 \author{Christian Kauten}
-\date{Technical report revision: October 18, 2026}
+\date{Technical report revision: October 19, 2026}
 
 \begin{document}
 \twocolumn[\maketitle
 \begin{abstract}
 \noindent
-A limit order book combines an ordering rule with several views of mutable
-state: orders by identifier, price levels by value, arrival order within a
-level, and aggregate liquidity. This report documents \emph{limit-order-book},
-a header-only C++14 implementation with C and Python interfaces. Its design
-follows established combinations of price trees, FIFO queues, and hash
-indices; the contribution is an explicit account of the implementation's
-semantics, ownership, complexity, and measured behavior. An independent
-vector model agrees on the checked order fields, FIFO links, and aggregates
-after 200,000 generated event selections, including no-ops. A controlled study
-on one Apple M1 Pro host distinguishes existing-level
-updates, price-level creation, and market sweeps. At 4,096 distinct prices,
-ascending insertion costs \StudyInsertionRatio{} times as much per order as a
-fixed shuffled insertion sequence, using the ratio of median batch averages.
-The result is consistent with the unbalanced-tree analysis, although timing
-does not isolate tree traversal from other costs. Existing-level add--cancel
-pairs remain nearly unchanged
-across the tested depths, while sweeps cost more when they remove many price
-levels. The report supplies the study code, individual measurements, source
-hashes, and regeneration commands. These results characterize selected
-in-memory workloads; they establish neither exchange-level latency nor
-performance superiority over other matching engines.
+\emph{Limit-order-book} turns an established price-time matching design into
+a compact C++ library with C and Python interfaces. The construction gives
+each access pattern its own representation: a tree orders occupied prices,
+intrusive FIFO queues preserve arrival priority, hash indices locate orders
+and levels, and cached pointers and aggregates answer common queries. This
+organization follows the 2011 \emph{How to HFT} account and was present in the
+project's first commit in December 2019. Historical engine sources included
+with that commit illustrate alternatives: a bounded price array and order
+arena in voyager's QuantCup submission, and indexed records with reuse in
+Joshua Levine's Island2. We explain why the library's combination is useful
+for sparse integer prices, direct cancellation, and reuse across applications,
+and how its first-party tree and list work with the vendored hash map. These
+benefits have specific limits: the tree is unbalanced, allocation remains on
+mutation paths, and explicit lifetime discipline is required. An archived
+study of an earlier source snapshot supports the analysis with 200,000
+model comparisons and repeated C++/C timings on one Apple M1 Pro. It finds
+stable existing-level update costs across the tested depths and strong
+insertion-order sensitivity. The study characterizes this design; it is not
+a ranking against the historical engines or a measurement of later dependency
+updates.
 \end{abstract}
 \par\vspace{0.7em}
 \noindent\textbf{Keywords:} limit order book; price-time priority; matching;
@@ -85,103 +84,151 @@ intrusive data structures; language interfaces; reproducible measurement.
 ]
 
 \section{Introduction}
-An order book is small enough to describe with a few data structures, but its
-behavior depends on keeping those structures consistent through every partial
-fill, cancellation, and price-level transition. An order may disappear from an
-identifier index while its neighbors remain in a FIFO queue. Removing the last
-order at a price also removes a tree node and may change the best available
-price. These cases make an implementation account useful even when the
-underlying matching policy and container choices are established.
+A useful limit order book must answer several different questions about the
+same orders. Matching needs the best eligible price and the oldest order at
+that price. Cancellation needs an order by identifier. A strategy may need
+inside prices or accumulated volume without walking the book. Putting every
+operation through one sorted container would make some of these questions
+more expensive than necessary. The design used here combines specialized
+views while keeping one order object and one node for each occupied price.
 
-The \emph{limit-order-book} library provides a price-time priority book for
-one instrument~\cite{kauten-limit-order-book-2019}. Incoming limit orders first match eligible
-opposing orders and then rest any remainder. Market orders consume eligible
-liquidity without resting. The core is a header-only C++14 library; an opaque
-C interface and a native Python wrapper expose selected operations. The code
-can serve as a component in simulations or applications that supply their own
-event sequencing and surrounding infrastructure.
+The \emph{limit-order-book} project implements that organization for one
+instrument~\cite{kauten-limit-order-book-2019}. Incoming limit orders cross
+eligible opposing liquidity and rest any remainder; market orders consume
+liquidity without resting. The current implementation is a header-only C++14
+library with separate C and Python bindings. Applications supply event
+sequencing and the surrounding simulation or trading infrastructure.
 
-This report makes three contributions. First, it specifies the observable
-matching behavior and the invariants connecting the implementation's indices.
-Second, it analyzes the actual tree and ownership paths, distinguishing common
-constant-time updates from operations that depend on tree height. Third, it
-provides a reproducible correctness and timing study whose workloads preserve
-the operation being measured across repetitions. No priority claim is made for
-price-time matching, intrusive queues, hash indexing, or tree-based books.
+The engineering value lies in how the parts fit together. A hash lookup and
+intrusive links make an existing-level update independent of the price tree.
+A price tree represents only occupied prices, without reserving an array for
+the numeric tick range. Cached best pointers and incremental aggregates make
+frequent state queries direct reads. A shared native core keeps the matching
+policy in one place across language interfaces. These are concrete reasons
+for choosing this organization, with costs in pointers, allocation, and the
+need to maintain agreement between indices.
 
-The evaluation identifies its base source revision as
-\code{3a4d254e9bda}; full identifiers and SHA-256 hashes accompany the evidence.
-The implementation sources are taken from that revision, including the
-Cython binding. The study and manuscript are additions to the checkout.
-Timing covers only the C++ core and C interface. The supplied SHA-256 manifest
-identifies the evaluated implementation and study files, including additions
-not present in the base revision.
+This report first places the design in its historical context, then follows
+its construction from nodes to matching operations and language interfaces.
+The detailed behavior, complexity analysis, and archived evaluation establish
+where those benefits hold. The report explains an implementation of known
+ideas; it does not introduce a new matching policy or claim a universally
+fastest representation.
 
-\section{Foundations and Attribution}
-The archived \emph{How to HFT} article ``How to Build a Fast Limit Order
-Book'' describes the central organization used here: one price tree per side,
-a doubly linked order queue at each level, a map from order identifiers to
-orders, a map from prices to levels, and cached inside prices~\cite{howtohft}.
-The project's imported research notes preserve that account. The report
-attributes the design to the original article, using its published author
-handle \emph{howtohft}; it does not treat the imported notes as original
-project research.
+\section{Design Context: What Was Already Known}
+\subsection{The 2011 design and the 2019 implementation}
+The \emph{How to HFT} article ``How to Build a Fast Limit Order Book,'' dated
+February 15, 2011, describes one tree per side, a doubly linked queue per
+price, order-ID and price indices, and cached inside prices~\cite{howtohft}.
+Its central insight is to organize the book around the operations that need
+to be cheap. Finding an order, ordering prices, and maintaining time priority
+are different jobs. The repository preserves an attributed transcription;
+the original site was unavailable during this review.
 
-The article also calls for a strategy to keep the tree balanced. That
-qualification matters: the present implementation uses an ordinary binary
-search tree without rotations or another balancing mechanism. The familiar
-logarithmic insertion description therefore requires an assumption that this
-implementation does not enforce. Section~\ref{sec:complexity} derives costs
-from the source rather than adopting the background article's operation table
-as a guarantee.
+The project's initial commit, \code{c0dfd34} (December 16, 2019), already
+contains these notes, both historical engine files discussed below, and the
+core tree/queue/hash organization. Its headers use intrusive \code{Order} and
+\code{Limit} nodes, \code{std::unordered\_map} for order values, and
+\code{tsl::robin\_map} for price-to-limit pointers. This gives a verifiable
+historical frame: those ideas and examples were present when this codebase
+began. It does not imply that the initial API, quantities, or ownership
+behavior were identical to today's implementation. Exact Git paths and
+source provenance are recorded in the accompanying source map.
 
-The project uses Christian Kauten's separately maintained
-\emph{binary-search-tree} and \emph{doubly-linked-list} libraries for intrusive
-nodes and pointer manipulation~\cite{bst,dll}. The price index uses Tessil's
-\emph{robin-map}, an open-addressed hash map with Robin Hood probing and
-backward-shift deletion~\cite{robin}. The order index uses
-\code{std::unordered\_map}. These are reused building blocks; this report
-introduces no new tree, list, or hashing algorithm.
+The article also calls for keeping the price tree balanced. The project uses
+an ordinary binary search tree, so it implements the organization without
+that guarantee. The distinction is central to evaluating the design fairly:
+existing-level updates can bypass the tree, but new-level insertion still
+depends on its height. Section~\ref{sec:complexity} derives the actual costs.
 
-Cython supplies the current Python-to-C++ integration mechanism~\cite{cython}.
-Its extension types and C++ declarations support a wrapper around an owned
-native book, with exception translation declared at the call boundary.
-Earlier project versions used Python's \code{ctypes} to call the C library.
-The change in binding mechanism leaves the matching policy in the same C++
-core. This report does not infer a binding speedup from that architectural
-change; such a claim needs its own matched measurements.
+\subsection{Alternative engineering choices in the reference engines}
+The QuantCup~1 source credits \emph{voyager}~\cite{quantcup}. A fixed
+\code{pricePoints} array indexes queues by numeric price; a contiguous
+\code{arenaBookEntries} array supplies order storage. Tail insertion
+preserves arrival order. Cancellation marks an entry's size zero, leaving
+matching to pass over it later. This construction avoids per-order heap
+allocation and makes locating a price an array access. It also commits to a
+bounded price range and arena, and scans price slots when seeking liquidity.
+Its advantages are plausible for the constrained simulated feed described in
+the source; the comments are not evidence of performance on arbitrary books.
 
-\subsection{Historical engine references}
-Two imported engine sources provide additional design context. The QuantCup~1
-submission in \path{docs/references/engines/engine.c} credits the handle
-\emph{voyager}~\cite{quantcup}. Its \code{pricePoints} array is indexed directly
-by numeric price, and a fixed \code{arenaBookEntries} array supplies orders.
-Orders append to singly linked queues. Cancellation marks an order's size
-zero; matching later skips the cancelled entries. Thus a short cancellation
-path can defer work to future matching. Scanning across price-array slots
-also makes price range and sparsity relevant. These choices differ from this
-library's dynamically allocated levels, price tree, and immediate unlinking.
-The submission's comments about its simulated feed are not measurements of
-this library, and no contest ranking or speedup is asserted here.
+Our representation makes a different tradeoff. It allocates nodes only for
+occupied prices, accepts caller-supplied integer IDs, and unlinks cancelled
+orders immediately. Memory need not scale with the numeric gap between two
+prices, and later matching need not walk cancelled queue entries. In return,
+it pays for hash tables, pointers, and dynamic allocation. A dense, bounded
+price grid or an arena can be a better choice for a suitably constrained
+workload. The local QuantCup file is undated; its presence in the 2019 commit
+establishes availability to this project, not a contest ranking or a precise
+publication date.
 
-The Island source, \path{docs/references/engines/island.prg}, identifies
-\emph{Island2}, version 2.40, and credits Joshua Levine in a 1996 copyright
-notice~\cite{island}. Levine's release page describes a FoxPro engine snapshot
-from December 15, 2003; the copyright year alone does not date the local file.
-In the inspected \code{enter2order} procedure, \code{SSEEK}/\code{BSEEK}
-database indices select opposing records, quantities determine partial fills,
-and depleted records enter a reuse list. The file also emits acceptance,
-execution, and cancellation messages and handles minimum-quantity conditions.
-Its database index definitions and supporting runtime are not included here,
-so this file alone does not establish every ordering rule or its complexity.
-Levine describes indexing and messaging support outside the matching logic.
+Joshua Levine's \emph{Island2} source identifies version 2.40 and carries a
+1996 copyright notice~\cite{island}. The release page describes a December 15,
+2003 FoxPro snapshot; the notice alone does not date the local copy. Its
+matching procedure selects opposing records through database indices, handles
+partial fills and quantity conditions, emits messages, and places depleted
+records on a reuse list. Levine describes indexing and messaging support
+outside that procedure. The useful lesson is architectural: a short matching
+loop can rely on substantial storage and integration machinery. This library
+puts its indices in C++ and leaves external sequencing, messaging, and
+persistence to its caller. It does not provide Island's surrounding system.
 
-These sources illustrate different storage, cancellation, and integration
-tradeoffs. They are credited as historical reference implementations; their
-presence does not establish that this library descends from either codebase.
-Neither is compiled or benchmarked in this study. Their code is not copied
-into the study harness or manuscript, and the repository's licensing guide
-keeps their attribution and terms separate from first-party material.
+Table~\ref{tab:design-context} summarizes the tradeoffs visible in the sources.
+Neither historical engine is compiled or timed here, and the comparison does
+not establish direct code ancestry. Their original attribution and licensing
+scope remain separate from the project's first-party implementation.
+
+\begin{table*}[t]
+\centering\small
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.16\textwidth}
+ *{3}{>{\raggedright\arraybackslash}X}@{}}
+\toprule
+Design or source & Representation & Useful consequence & Cost or condition\\
+\midrule
+How to HFT (2011) & Price trees, per-price queues, hash indices & Different
+access paths for matching, cancellation, and queries & Logarithmic tree work
+requires a balancing strategy\\
+\addlinespace
+voyager / QuantCup & Price array, fixed order arena, singly linked queues &
+Direct price indexing; no per-order heap allocation & Bounded range and
+capacity; scans and deferred cancellation work\\
+\addlinespace
+Levine / Island2 & Indexed records, depleted-record reuse, messaging calls &
+Small matching procedure supported by reusable records and indices & Depends
+on database and supporting runtime absent from the local excerpt\\
+\addlinespace
+This library & Occupied-price tree, intrusive queues, two hash indices &
+Sparse price storage; direct unlinking; cached best and aggregates & Dynamic
+allocation; unbalanced tree; explicit lifetime constraints\\
+\bottomrule
+\end{tabularx}
+\caption{Source-based design comparison, not a throughput ranking. The
+historical examples were already included in the project's first commit.
+The last row describes the implementation inspected for this revision.}
+\label{tab:design-context}
+\end{table*}
+
+\subsection{Current components and the measured snapshot}
+Christian Kauten's tree and list helpers now live in \path{include/} under
+\code{LOB::BST} and \code{LOB::DLL}~\cite{bst,dll}. Their October 2026
+integration makes them first-party components maintained with the matching
+engine and its tests. It preserves the intrusive representation; moving the
+sources and namespacing them does not balance the tree or imply a speedup.
+
+The remaining vendored component is Tessil's \emph{robin-map}, which uses
+open addressing, Robin Hood probing, and backward-shift deletion~\cite{robin}.
+The current vendoring pins v1.3.0, commit \code{188c45569cc2}, with upstream
+headers, license, and file checksums. This is a later maintenance choice,
+not the version used by the original 2019 implementation. Cython bindings
+and the current CMake distribution are likewise later developments.
+
+The archived study uses base revision \code{3a4d254e9bda}, with exact
+implementation and study inputs identified by SHA-256 manifests. It predates
+the helper integration and the v1.3.0 update. Its earlier tree/list paths and
+hash-map bytes remain in the archive. The architecture discussion follows
+the current source where these choices persist; every numerical result in
+this report belongs to the archived snapshot. No result is relabeled as a
+measurement of the updated dependency.
 
 \section{Behavioral Model}
 \subsection{Prices, quantities, and priority}
@@ -247,13 +294,15 @@ an unknown identifier. The interfaces share a matching core but do not expose
 every C++ method or identical failure behavior. In particular, reduction and
 several last-price queries are C++ operations in the inspected interfaces.
 
-\section{Architecture and Ownership}
+\section{Building the Book from Intrusive Components}
 \subsection{Indices and intrusive links}
 Figure~\ref{fig:architecture} summarizes the organization. An \code{Order}
 derives from a doubly linked list node. Its predecessor and successor are
 part of the order object, and it carries a pointer to its containing
 \code{Limit}. A limit derives from a binary search tree node and stores its
-queue head and tail, order count, and total quantity.
+queue head and tail, order count, and total quantity. The first-party helpers
+manipulate these embedded links; they do not allocate a second list or tree
+wrapper for each object. The node owner remains responsible for storage.
 
 \begin{figure}[t]
 \centering
@@ -293,6 +342,38 @@ price map stores pointers to separately allocated limits, so movement of
 entries within that hash table does not move the tree nodes. This distinction
 explains why replacing one container with another requires a lifetime audit
 as well as a timing comparison.
+
+\subsection{Why the access paths are separate}
+A noncrossing order at an existing price reaches its level through the price
+hash index and appends through the cached queue tail. No price-tree search or
+queue traversal is needed. On cancellation, the ID map supplies the order,
+its back-pointer supplies the level, and its previous/next links supply its
+neighbors. Removing a middle order therefore does not search the queue.
+The extra predecessor pointer earns its space on this cancellation path.
+
+The queue's head encodes the next order to execute. A partial fill changes
+quantity while leaving that position intact. This represents time priority
+structurally, without sorting timestamps on every match. It also makes the
+caller responsible for the sequence in which operations arrive. Level and
+side counts and volumes are updated with each mutation, exchanging a few
+writes for constant-time reads of those stored aggregates. Arbitrary price
+range sums are not supplied by these aggregates.
+
+The two hash maps have different storage duties. The order map owns objects
+whose addresses must survive rehashing; the price map holds pointers to
+separately allocated tree nodes. Robin Hood insertion and backward-shift
+erasure may relocate hash-table entries, but moving a stored \code{Limit*}
+does not move its target. The vendored map is therefore suitable for the
+price index without assuming stable addresses inside its buckets. Replacing
+the order map with the same flat container while retaining order values
+inline would invalidate the queue's lifetime assumptions. This is a
+representation constraint, not evidence that one hash table is always faster.
+
+Finally, \code{LimitTree<Side>} expresses the two sides with shared queue and
+matching logic and side-specific comparisons. The outer book handles IDs
+and crossing; the side handles price eligibility and fills; the node helpers
+handle links. This division keeps a small implementation inspectable while
+allowing C and Python to use the same native matching behavior.
 
 \subsection{Invariants and update order}
 For each live level $\ell$, with queue $Q_\ell$, the intended aggregates are
@@ -397,7 +478,8 @@ different structural work. Section~\ref{sec:results} measures this distinction.
 \section{Language and Distribution Boundaries}
 The C++ library is header-only and requires C++14. Its CMake target is
 \path{limit_order_book::limit_order_book}. Installed headers include the
-three required vendored libraries. A default subproject does not build the
+tree and list components and the vendored \emph{robin-map} library.
+A default subproject does not build the
 study, tests, or language bindings. Packaging is part of the reproducibility
 surface, but successful installation alone is not evidence of matching
 correctness or speed.
@@ -410,7 +492,7 @@ C timing experiment loads a separately compiled shared library, so the bridge
 is not inlined into the C++ calling loop.
 
 The current Python wrapper holds an owned C++ book through a Cython extension
-type and exposes it through a Python subclass. Its declarations translate C++
+type~\cite{cython} and exposes it through a Python subclass. Its declarations translate C++
 exceptions, and the wrapper keeps the GIL during scalar operations. Integer
 arguments follow the integer-index protocol and preserve unsigned-width
 wrapping from the historical \code{ctypes} interface. Wrapping is a
@@ -451,86 +533,16 @@ macOS 26.6.2 on arm64. The archive records UTC timestamps, full compiler
 identification, exact commands, source hashes, raw timings, and check results.
 These are the only measured host and toolchain.
 
-\subsection{Independent state checking}
-The reference book is an arrival-ordered vector of value objects. It finds
-an eligible best order by scanning all live orders, preserving the first
-arrival when prices tie. It shares no tree, hash index, intrusive links, or
-matching helper with the implementation. Its purpose is an understandable
-semantic oracle; it is not a performance competitor.
-
-Twenty streams, seeded 1 through 20, each contain 10,000 generated event
-selections; this count includes no-ops and is not a count of state mutations.
-A specified xorshift64* generator supplies identifiers from 1 to 256, positive
-quantities from 1 to 50, and prices from 80 to 120. Event selection uses 50\%
-limit submissions, 15\% market submissions, 20\% cancellations, 14\% quantity
-reductions, and 1\% clears. Cancellation and reduction select an existing
-order when the book is nonempty; reductions are bounded by its live quantity.
-Selections on an empty book do nothing. Duplicate limit IDs can arise
-naturally. Modulo selection is deterministic and is not a model of market
-arrival statistics. These percentages are selection weights, not exact
-observed frequencies. Per-seed selection counts, duplicate limits, and empty
-cancellation/reduction selections are recorded in \path{checks.json}.
-
-After every generated event, the checker compares the complete live ID set,
-remaining quantity, side, and price of each live order, both best prices,
-side and total counts and volumes, and volume by side and count at every
-price in the generated domain. It also compares each order's predecessor,
-successor, containing level, and queue endpoints against the vector's arrival
-order. This checks FIFO directly even before a later fill exposes a changed
-residual identity. It does not inspect every tree or hash-table invariant.
-A comparison failure reports its seed and event index.
-Agreement on this finite set of traces is evidence of consistency, not a proof
-for all inputs. Zero-valued limits, integer overflow, invalid reductions,
-copying, exception safety, concurrency, and historical last-price fields are
-outside this generated check. This differential check exercises C++; it does
-not establish complete C/Python interface equivalence or exhaustive path
-coverage. The vector model can itself contain mistakes.
-
-\subsection{Timing protocol}
-There are 25 configurations and nine measured process runs per configuration,
-for 225 recorded observations. Each process performs one untimed warmup of
-the same workload before its measured run. The driver randomizes configuration
-order within each round using a fixed seed. The shuffled price permutation
-is fixed across repetitions, so ranges describe timing variation for that
-permutation, not variation over many random tree shapes. Fresh logical books
-do not imply cold caches or a fresh allocator: warmup, repeated batches, and
-untimed preparation can warm both. Existing-level pairs repeatedly address
-one price and ID, so they characterize a particularly hot update path.
-
-A steady monotonic clock measures elapsed wall time. The harness sums timed
-batch durations and divides by the number of stated operations. Each reported
-observation is therefore a batch average. Tables give the median and complete
-minimum--maximum range of the nine observations; ranges are neither confidence
-intervals nor request-latency percentiles. CPU affinity, power state, competing
-processes, and thermal conditions are not controlled. The publication makes
-no claims about differences smaller than the observed variation.
-
-\emph{New-level insertion} builds an initially empty buy book with one
-quantity-ten order at each price from 1 through $M$, using ascending,
-descending, or shuffled order. $M$ is 16, 128, 1,024, or 4,096. Every batch
-has a new book, and one observation contains 65,536 insertions in total.
-Permutation generation, construction of the empty book, validation, clearing,
-and destruction are excluded. Order-map allocation, level allocation, hash
-rehashing, and tree insertion occur inside timing.
-
-\emph{Existing-level updates} begin with 16, 256, or 4,096 shuffled levels,
-each with one quantity-ten anchor order. Each timed iteration adds a fresh
-quantity-one order at price one and cancels it, restoring the anchor state.
-The same ID is safe to reuse because the preceding cancellation removed it.
-There are 65,536 pairs per observation. A pair is the reporting unit, not an
-individual call. C++ and C use the same initial state and loop structure;
-the C wrapper additionally checks identifier existence during cancellation.
-Their difference includes wrapper behavior and compiler boundaries, not just
-a pure function-call overhead.
-
-\emph{Market sweeps} prepare either $k$ orders at one price or one order at
-each of $k$ shuffled price levels, with quantity ten per order. A single
-market buy empties the prepared sell book. Here $k$ is 1, 16, or 256, and
-65,536 resting orders are consumed per observation. Setup and final checks
-are excluded, but fill processing, index erasure, and level deallocation are
-included. The reporting unit is one market request. An empty timed interval
-is also measured as a clock-cost control; its cost is reported without
-subtraction from the workload measurements.
+The vector reference model scans arrival-ordered values without using the
+book's tree, maps, or matching helpers. After each of 200,000 event selections
+it compares live IDs, order fields, FIFO links and endpoints, best prices,
+and aggregates. Timing covers new-level insertion in three price orders,
+existing-level add--cancel pairs through C++ and C, and sweeps within or across
+levels. Each of 25 configurations has nine process-level batch averages,
+with fresh or restored book state and an untimed warmup. Medians and full
+observed ranges describe these batches, not request-tail latency.
+Appendix~\ref{sec:protocol} gives the input domain, seeds, no-op handling,
+measurement denominators, and complete timing boundaries.
 
 \section{Results and Interpretation}\label{sec:results}
 \subsection{Correctness and insertion order}
@@ -651,14 +663,22 @@ that exercise its intended path, rather than judged only from aggregate
 throughput on a single favorable order sequence.
 
 \section{Conclusion}
-The value of this implementation is a compact, reusable realization of an
-established book design. Its hash indices, intrusive queues, and cached
-aggregates give common operations direct paths through the state, while its
-unbalanced price tree makes some costs sensitive to arrival order. The
-independent checks and controlled measurements make those statements
-inspectable and reproducible. A clear account of inherited ideas, behavioral
-contracts, and measured boundaries is a useful contribution without claiming
-a new matching policy or a universally faster engine.
+This book applies the operation-oriented design documented before the
+project began: use price ordering where ordering is necessary, and use
+indices, links, and cached state where a search can be avoided. The result
+is a compact implementation with sparse price storage, FIFO matching,
+direct cancellation, and inexpensive aggregate queries. Intrusive first-party
+nodes and a vendored price index make the representation inspectable in one
+checkout; the language bindings reuse the same matching core.
+
+Those properties explain the design's usefulness without a claim of universal
+superiority. The historical engines show why bounded arrays, arenas, and
+record reuse can be attractive under other constraints. Here, dynamic
+allocation and an unbalanced tree remain material costs. The archived checks
+and timings support the direct existing-level path and expose insertion-order
+sensitivity. They give a basis for choosing and improving this implementation
+while keeping its historical influences, current components, and measured
+revision distinct.
 
 \section*{Availability and Acknowledgments}
 The software and first-party report sources are available under the
@@ -689,6 +709,89 @@ benchmark execution once the LaTeX packages and checked-in evidence are present.
 \clearpage
 \onecolumn
 \appendix
+\section{Evaluation Protocol}\label{sec:protocol}
+\subsection{Independent state checking}
+The reference book is an arrival-ordered vector of value objects. It finds
+an eligible best order by scanning all live orders, preserving the first
+arrival when prices tie. It shares no tree, hash index, intrusive links, or
+matching helper with the implementation. Its purpose is an understandable
+semantic oracle; it is not a performance competitor.
+
+Twenty streams, seeded 1 through 20, each contain 10,000 generated event
+selections; this count includes no-ops and is not a count of state mutations.
+A specified xorshift64* generator supplies identifiers from 1 to 256, positive
+quantities from 1 to 50, and prices from 80 to 120. Event selection uses 50\%
+limit submissions, 15\% market submissions, 20\% cancellations, 14\% quantity
+reductions, and 1\% clears. Cancellation and reduction select an existing
+order when the book is nonempty; reductions are bounded by its live quantity.
+Selections on an empty book do nothing. Duplicate limit IDs can arise
+naturally. Modulo selection is deterministic and is not a model of market
+arrival statistics. These percentages are selection weights, not exact
+observed frequencies. Per-seed selection counts, duplicate limits, and empty
+cancellation/reduction selections are recorded in \path{checks.json}.
+
+After every generated event, the checker compares the complete live ID set,
+remaining quantity, side, and price of each live order, both best prices,
+side and total counts and volumes, and volume by side and count at every
+price in the generated domain. It also compares each order's predecessor,
+successor, containing level, and queue endpoints against the vector's arrival
+order. This checks FIFO directly even before a later fill exposes a changed
+residual identity. It does not inspect every tree or hash-table invariant.
+A comparison failure reports its seed and event index.
+Agreement on this finite set of traces is evidence of consistency, not a proof
+for all inputs. Zero-valued limits, integer overflow, invalid reductions,
+copying, exception safety, concurrency, and historical last-price fields are
+outside this generated check. This differential check exercises C++; it does
+not establish complete C/Python interface equivalence or exhaustive path
+coverage. The vector model can itself contain mistakes.
+
+\subsection{Timing protocol}
+There are 25 configurations and nine measured process runs per configuration,
+for 225 recorded observations. Each process performs one untimed warmup of
+the same workload before its measured run. The driver randomizes configuration
+order within each round using a fixed seed. The shuffled price permutation
+is fixed across repetitions, so ranges describe timing variation for that
+permutation, not variation over many random tree shapes. Fresh logical books
+do not imply cold caches or a fresh allocator: warmup, repeated batches, and
+untimed preparation can warm both. Existing-level pairs repeatedly address
+one price and ID, so they characterize a particularly hot update path.
+
+A steady monotonic clock measures elapsed wall time. The harness sums timed
+batch durations and divides by the number of stated operations. Each reported
+observation is therefore a batch average. Tables give the median and complete
+minimum--maximum range of the nine observations; ranges are neither confidence
+intervals nor request-latency percentiles. CPU affinity, power state, competing
+processes, and thermal conditions are not controlled. The publication makes
+no claims about differences smaller than the observed variation.
+
+\emph{New-level insertion} builds an initially empty buy book with one
+quantity-ten order at each price from 1 through $M$, using ascending,
+descending, or shuffled order. $M$ is 16, 128, 1,024, or 4,096. Every batch
+has a new book, and one observation contains 65,536 insertions in total.
+Permutation generation, construction of the empty book, validation, clearing,
+and destruction are excluded. Order-map allocation, level allocation, hash
+rehashing, and tree insertion occur inside timing.
+
+\emph{Existing-level updates} begin with 16, 256, or 4,096 shuffled levels,
+each with one quantity-ten anchor order. Each timed iteration adds a fresh
+quantity-one order at price one and cancels it, restoring the anchor state.
+The same ID is safe to reuse because the preceding cancellation removed it.
+There are 65,536 pairs per observation. A pair is the reporting unit, not an
+individual call. C++ and C use the same initial state and loop structure;
+the C wrapper additionally checks identifier existence during cancellation.
+Their difference includes wrapper behavior and compiler boundaries, not just
+a pure function-call overhead.
+
+\emph{Market sweeps} prepare either $k$ orders at one price or one order at
+each of $k$ shuffled price levels, with quantity ten per order. A single
+market buy empties the prepared sell book. Here $k$ is 1, 16, or 256, and
+65,536 resting orders are consumed per observation. Setup and final checks
+are excluded, but fill processing, index erasure, and level deallocation are
+included. The reporting unit is one market request. An empty timed interval
+is also measured as a clock-cost control; its cost is reported without
+subtraction from the workload measurements.
+
+\clearpage
 \section{Complete Timing Summary}\label{sec:measurements}
 Table~\ref{tab:measurements} retains every measured configuration. Values are
 nanoseconds per insertion for ascending, descending, and shuffled; per
@@ -717,6 +820,9 @@ The first command requires a new capture directory outside the checkout;
 it builds the study under \path{.build/report/}. The second regenerates the
 archived paper inputs without rerunning measurements. The final command needs
 \code{latexmk}, \code{pdflatex}, \code{bibtex}, and the packages named in the preamble.
+The first command evaluates the current checkout. To replay the archived
+inputs, first check out the original report commit \code{336b21688112}, as
+described in the accompanying README; all 22 recorded input hashes match it.
 \begin{verbatim}
 python3 docs/whitepaper/evaluate.py --output /tmp/lob-report-study
 python3 docs/whitepaper/evaluate.py --summarize docs/whitepaper/evidence

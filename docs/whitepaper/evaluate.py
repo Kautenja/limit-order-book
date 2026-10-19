@@ -33,9 +33,9 @@ def source_hashes():
     paths = list((ROOT / 'include').glob('*'))
     paths += [ROOT / 'src/limit_order_book_c.cpp',
               ROOT / 'benchmark/report/study.cpp', Path(__file__).resolve()]
-    for name in ('binary-search-tree', 'doubly-linked-list', 'robin-map'):
-        paths += list((ROOT / 'vendor' / name / 'include').rglob('*.h'))
-        paths += list((ROOT / 'vendor' / name / 'include').rglob('*.hpp'))
+    vendor = ROOT / 'vendor' / 'robin-map' / 'include'
+    paths += list(vendor.rglob('*.h'))
+    paths += list(vendor.rglob('*.hpp'))
     return {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest()
             for path in sorted(set(paths)) if path.is_file()}
 
@@ -94,8 +94,7 @@ def evaluate(output, repeats, events, seeds, budget):
         raise RuntimeError('This study driver supports macOS/Linux Clang or GCC.')
     compiler = shlex.split(os.environ.get('CXX', 'c++'))
     flags = ['-std=c++14', '-O3', '-DNDEBUG', '-Wall', '-Wextra', '-pedantic']
-    includes = ['-Iinclude'] + [f'-Ivendor/{name}/include' for name in
-                               ('binary-search-tree', 'doubly-linked-list', 'robin-map')]
+    includes = ['-Iinclude', '-Ivendor/robin-map/include']
     library = BUILD / ('liblob_report.dylib' if platform.system() == 'Darwin'
                        else 'liblob_report.so')
     executable = BUILD / 'study'

@@ -17,7 +17,7 @@
 cmake_minimum_required(VERSION 3.21...4.2)
 
 project(limit_order_book
-    VERSION 3.0.0
+    VERSION 3.1.0
     DESCRIPTION "A limit order book with a price-time priority matching policy"
     HOMEPAGE_URL "https://github.com/Kautenja/limit-order-book"
     LANGUAGES CXX
@@ -75,8 +75,6 @@ endif()
 
 # the vendored header-only dependencies that the public headers include
 set(LOB_VENDOR_INCLUDE_DIRS
-    "${PROJECT_SOURCE_DIR}/vendor/binary-search-tree/include"
-    "${PROJECT_SOURCE_DIR}/vendor/doubly-linked-list/include"
     "${PROJECT_SOURCE_DIR}/vendor/robin-map/include"
 )
 # the directory, relative to the install prefix, that holds every header so
@@ -251,12 +249,6 @@ if(LOB_INSTALL)
     # install the license for this project and each vendored dependency
     install(FILES "${PROJECT_SOURCE_DIR}/LICENSE" "${PROJECT_SOURCE_DIR}/LICENSING.md"
         DESTINATION "${CMAKE_INSTALL_DOCDIR}"
-    )
-    install(FILES "${PROJECT_SOURCE_DIR}/vendor/binary-search-tree/LICENSE"
-        DESTINATION "${CMAKE_INSTALL_DOCDIR}/licenses/binary-search-tree"
-    )
-    install(FILES "${PROJECT_SOURCE_DIR}/vendor/doubly-linked-list/LICENSE"
-        DESTINATION "${CMAKE_INSTALL_DOCDIR}/licenses/doubly-linked-list"
     )
     install(FILES "${PROJECT_SOURCE_DIR}/vendor/robin-map/LICENSE"
         DESTINATION "${CMAKE_INSTALL_DOCDIR}/licenses/robin-map"

@@ -52,6 +52,7 @@ sdist.exclude = [
     "limit_order_book/test/**",
     "main.sh",
     "requirements.txt",
+    "scripts/test_*.py",
     "specs/**",
     "test/**",
     "vendor/*/benchmark/**",

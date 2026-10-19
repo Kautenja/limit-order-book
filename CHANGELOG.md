@@ -5,6 +5,24 @@ Notable changes to `limit-order-book` are collected here. Entries before
 against the tagged sources and commit history. Dates through 2.0.0 are the
 PyPI upload dates, or the tag date for releases that were not uploaded.
 
+## 3.1.0 (2026-10-19)
+
+**Breaking changes:**
+
+-   Moved the adopted tree and list helpers from the global `BST` and `DLL`
+    namespaces into `LOB::BST` and `LOB::DLL`, without global compatibility
+    aliases. Direct C++ helper users must update their qualifiers; header
+    filenames, node layouts, and the book, C, and Python APIs are unchanged.
+    Replaced the standalone header guards with `LOB_BINARY_SEARCH_TREE_HPP_`
+    and `LOB_DOUBLY_LINKED_LIST_HPP_`.
+
+**Dependencies:**
+
+-   Updated robin-map to v1.3.0, retaining C++14 support and the installed
+    header set. Trimmed its vendored tree to upstream headers and the license,
+    with a pinned commit, SHA-256 manifest, offline integrity check, and
+    reproducible import tool. Rebuild C++ consumers with the updated headers.
+
 ## 3.0.0 (2026-10-18)
 
 **Breaking changes:**

@@ -100,6 +100,11 @@ jobs:
           PYTHON: python
         run: ./main.sh test-python
 
+      - name: Verify vendored dependency
+        run: |
+          python scripts/update_robin_map.py --check
+          python -m unittest discover -s scripts -p 'test_*.py'
+
       - name: Clean test build artifacts
         run: git clean -fdX
 

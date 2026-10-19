@@ -18,6 +18,10 @@ for installation, usage, and development commands.
     contracts, and validation requirements.
 -   [C++ Style Guide](development/style-guide-cpp.md): Conventions for the
     library, C API, tests, and benchmarks.
+-   [Data structures](development/data-structures.md): Local ownership,
+    compatibility, and validation of the intrusive tree and list.
+-   [Vendored dependencies](development/vendored-dependencies.md): Pinned
+    robin-map sources, reproducible updates, and integrity checks.
 -   [Python bindings](development/python-bindings.md): Cython ownership,
     conversions, builds, and repeatable performance measurements.
 -   [Report builds](development/technical-report.md): Local PDF output,

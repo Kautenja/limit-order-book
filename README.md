@@ -34,11 +34,16 @@ Its [LaTeX source](docs/whitepaper/main.tex) and raw measurements are included.
 
 ### C++
 
-The library is header-only and requires C++14. It depends on three header-only
-libraries that are vendored in [vendor/](vendor) and installed with it:
-`binary-search-tree`, `doubly-linked-list`, and `robin-map`. Every method
-below provides the `limit_order_book::limit_order_book` target, or the include
-path, so that this works:
+The library is header-only and requires C++14. Its binary search tree and
+doubly linked list are maintained in [include/](include) as part of this
+project, under the `LOB::BST` and `LOB::DLL` namespaces. See
+[Data structures](docs/development/data-structures.md) for direct helper usage.
+The remaining dependency, `robin-map` v1.3.0, is vendored as upstream headers
+and a license in [vendor/](vendor) and installed with it. Its commit and
+checksums are pinned; see [Vendored dependencies](docs/development/vendored-dependencies.md)
+for verification and updates. Every method below provides the
+`limit_order_book::limit_order_book` target, or the include path, so that this
+works:
 
 ```cpp
 #include "limit_order_book.hpp"
@@ -106,8 +111,8 @@ c++ -std=c++14 $(pkg-config --cflags limit_order_book) my_app.cpp
 
 #### Copying The Headers
 
-Copy [include/](include) and the `include/` directories of the three vendored
-dependencies into your project, and add all four to the include path.
+Copy [include/](include) and [vendor/robin-map/include/](vendor/robin-map/include)
+into your project, and add both to the include path.
 
 ### C
 
