@@ -1,5 +1,5 @@
 # MARK: Project Files
-# all C++ and Python build outputs, see SConstruct and pyproject.toml
+# all C++ and Python build outputs, see CMakeLists.txt, pyproject.toml, and main.sh
 .build/
 
 # MARK: Python gitignore
@@ -145,15 +145,6 @@ ENV/
 *.exe
 *.out
 *.app
-
-
-
-# MARK: scons Files
-# https://github.com/github/gitignore/blob/master/SCons.gitignore
-
-.sconsign.dblite
-.scon*
-config.log
 
 
 

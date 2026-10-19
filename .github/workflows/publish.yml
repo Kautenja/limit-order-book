@@ -35,18 +35,20 @@ jobs:
           python - <<'PY'
           import os
           import pathlib
-          import tomllib
+          import re
 
           ref_name = os.environ["REF_NAME"]
           ref_type = os.environ["REF_TYPE"]
           if ref_type != "tag":
               raise SystemExit("PyPI publishing must run from a release tag.")
 
-          version = tomllib.loads(pathlib.Path("pyproject.toml").read_text())["project"]["version"]
+          # the C++ project version in CMakeLists.txt is the package version
+          cmake = pathlib.Path("CMakeLists.txt").read_text()
+          version = re.search(r"project\([^)]*VERSION\s+([0-9][0-9.]*)", cmake).group(1)
           tag_version = ref_name[1:] if ref_name.startswith("v") else ref_name
           if tag_version != version:
               raise SystemExit(
-                  f"Release tag {ref_name!r} does not match pyproject.toml version {version!r}."
+                  f"Release tag {ref_name!r} does not match CMakeLists.txt version {version!r}."
               )
 
           with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:

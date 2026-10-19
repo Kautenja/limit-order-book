@@ -34,16 +34,16 @@ each C++ file.
 
 | Work                       | Required tools                                         |
 | -------------------------- | ------------------------------------------------------ |
-| C++ tests and benchmarks   | Git, `g++` with C++17 support, and SCons               |
-| Python package and library | Git, CPython 3.13 or 3.14, and a C++14 compiler        |
+| C++ tests and benchmarks   | Git, CMake 3.21 or later, and a C++14 compiler         |
+| Python package and library | The C++ tools above and CPython 3.13 or 3.14           |
 | Markdown documentation     | A text editor and Git; no native build required        |
 
-SCons always compiles with `g++`. On macOS, `g++` is Apple Clang unless a GNU
-compiler is installed and found first on `PATH`. The
-[CI workflow](.github/workflows/ci.yml) runs the Catch2 suites with GCC on
-Linux x64, and the Python suite with the platform compilers on Linux, macOS,
-and Windows. Windows builds need the Visual Studio C++ build tools; see
-[Usage Caveats](README.md#usage-caveats).
+CMake uses the platform's default compiler and fetches Catch2 with Git the
+first time the tests are configured. [main.sh](main.sh) is a Bash script; on
+Windows, run it from Git Bash. The [CI workflow](.github/workflows/ci.yml) runs
+the C++ suites, the package checks, and the Python suite with the platform
+compilers on Linux, macOS, and Windows. Windows builds need the Visual Studio
+C++ build tools; see [Usage Caveats](README.md#usage-caveats).
 
 ### Get The Source
 
@@ -61,35 +61,26 @@ commands from the repository root unless stated otherwise.
 
 ### Install For Development
 
-Create a virtual environment using a supported interpreter. On macOS or Linux:
+Create `.venv` with the development tools from
+[requirements.txt](requirements.txt):
 
 ```shell
-python3.13 -m venv .venv
-source .venv/bin/activate
+./main.sh install
 ```
 
-On Windows, use PowerShell:
-
-```powershell
-py -3.13 -m venv .venv
-.venv\Scripts\Activate.ps1
-```
-
-Python 3.14 can be used instead. With the environment active:
+`main.sh` uses `.venv` automatically when it exists; set `PYTHON` to choose
+another interpreter, such as `PYTHON=python3.14 ./main.sh install`. Then
+build everything and run both suites:
 
 ```shell
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
-python -m pip install --editable .
-python -c "from limit_order_book import LimitOrderBook; LimitOrderBook()"
+./main.sh test
 ```
 
-The editable install compiles the C API into
-`limit_order_book/lib_limit_order_book*` so tests run against the checkout.
-Repeat the editable install, or run `scons limit_order_book`, after changing
-C++ sources; editing them alone does not rebuild the shared library.
-[pyproject.toml](pyproject.toml) declares the package and its extension;
-[requirements.txt](requirements.txt) contains development tools.
+The CMake build compiles the C API into
+`limit_order_book/lib_limit_order_book*` so the Python suite runs against the
+checkout. Editable installs are not supported, because `ctypes` loads the
+library from the source package; rebuild with `./main.sh build` after
+changing C++ sources.
 
 ## Architecture
 
@@ -113,9 +104,13 @@ C++ sources; editing them alone does not rebuild the shared library.
 -   **[test](test), [limit_order_book/test](limit_order_book/test),
     [benchmark](benchmark), and [main](main):** Catch2 suites, the Python
     suite, Catch2 benchmarks, and small executables.
--   **[SConstruct](SConstruct), [makefile](makefile), and
-    [pyproject.toml](pyproject.toml):** The C++ build, the combined test
-    target, and the Python package configuration.
+-   **[CMakeLists.txt](CMakeLists.txt) and [cmake](cmake):** The C++ build,
+    install rules, and the CMake package and pkg-config templates. The
+    `project()` version is the version of both packages.
+-   **[test/package](test/package):** A consumer project that checks the
+    installed package and FetchContent.
+-   **[pyproject.toml](pyproject.toml) and [main.sh](main.sh):** The Python
+    package configuration and the development command wrapper.
 
 ### Compatibility And Invariants
 
@@ -139,10 +134,12 @@ Matching changes must preserve these invariants:
     best limit stay $O(1)$; adding a new limit stays $O(\log M)$ in the number
     of limits.
 
-SCons compiles with `-std=c++17`, but the Python extension uses the compiler
-default, which is C++14 for MSVC. Code in `include/` and `src/` must compile
-as C++14 for the Windows wheels. Wheels must stay portable, so never add
-`-march=native` or other host-tuned flags to `pyproject.toml`.
+The headers require C++14, and CMake builds every first-party target as C++14
+to keep them that way for consumers and the MSVC wheels. Wheels and installed
+packages must stay portable, so never add `-march=native` or other host-tuned
+flags to `CMakeLists.txt`. Keep `limit_order_book::limit_order_book`, the
+`LOB_*` options, and the install layout stable; downstream projects depend on
+them.
 
 Do not edit `vendor/`. Fixes to the owner-authored `binary-search-tree`,
 `doubly-linked-list`, and `cpptqdm` libraries belong in their upstream
@@ -156,19 +153,27 @@ Doxygen site.
 Run every suite with:
 
 ```shell
-make test
+./main.sh test
 ```
 
-That target runs the Catch2 suites, builds the shared library and copies it
-into `limit_order_book/`, and runs the Python suite.
+That command configures `.build/cmake/`, builds the tests, benchmarks,
+examples, and C API library, runs the Catch2 suite with `ctest`, and runs the
+Python suite.
 
 ### C++ Tests
 
-Build and run every Catch2 suite, or one suite:
+Build and run the Catch2 suite, or one test case through `ctest`:
 
 ```shell
-scons test
-scons test/test_limit_tree.cpp
+./main.sh test-cpp
+./main.sh test-cpp -R "send single order"
+```
+
+Check that downstream CMake projects can consume the library, both installed
+and through FetchContent:
+
+```shell
+./main.sh test-package
 ```
 
 Reproduce a bug with a failing test before fixing it when practical, and test
@@ -176,63 +181,65 @@ observable book state rather than mirroring implementation details.
 
 ### Python Tests
 
-After building the shared library with `scons` or the editable install, run:
+Build the C API library into the package and run the Python suite:
 
 ```shell
-python -m unittest discover .
+./main.sh test-python
 ```
 
 ### Benchmarks
 
-Build and run every benchmark, or one benchmark:
+Build and run every benchmark, or one benchmark by name:
 
 ```shell
-scons benchmark
-scons benchmark/benchmark_lob.cpp
+./main.sh benchmark
+./main.sh benchmark "Spam new Limits"
 ```
 
-SCons builds benchmarks with `-march=native`, so results describe the local
-host only. Compare matched before and after workloads with the same compiler
+The benchmarks build in the `Release` configuration without host-tuned flags.
+Compare matched before and after workloads with the same compiler
 and flags, repeated runs, and an effect larger than the run-to-run noise.
 Record the host, architecture, and compiler version with results. A passing
 build does not establish a speedup.
 
 ### Distribution Builds
 
-Build a source distribution and a wheel with:
+Build a source distribution and a wheel in `.build/dist/` with:
 
 ```shell
-python -m build --outdir .build/dist
+./main.sh deployment
 ```
 
-All build outputs go to the ignored `.build/` directory. To remove them and
-the shared library copied into the package, run:
+scikit-build-core drives the CMake build for the wheel. All build outputs go
+to the ignored `.build/` directory. To remove them and the shared library
+copied into the package, run:
 
 ```shell
-make clean
+./main.sh clean
 ```
 
 The CI workflow runs on pull requests, pushes to `master`, and tag pushes. It
-covers the Catch2 suites on Linux x64, and the Python suite and distribution
-builds for CPython 3.13 and 3.14 on Linux x64 and arm64, macOS x64 and arm64,
-and Windows x64. The benchmarks are not run in CI; include local results for
-changes that need them.
+covers the C++ suites and package checks, and the Python suite and
+distribution builds for CPython 3.13 and 3.14, on Linux x64 and arm64, macOS
+x64 and arm64, and Windows x64. The benchmarks are not run in CI; include
+local results for changes that need them.
 
 ### Choosing Validation
 
-| Change                       | Relevant validation                                         |
-| ---------------------------- | ----------------------------------------------------------- |
-| Markdown guidance            | Check links, paths, and commands; run `git diff --check`    |
-| Matching or data structures  | Run `make test`; benchmark before and after for hot paths   |
-| C API or Python bindings     | Run `make test`; check every C function's `ctypes` types    |
-| Build or packaging           | Run `make test` and build both distributions                |
-| Windows-sensitive C++        | Confirm the code compiles as C++14; rely on CI for MSVC     |
+| Change                      | Relevant validation                                          |
+| --------------------------- | ------------------------------------------------------------ |
+| Markdown guidance           | Check links, paths, and commands; run `git diff --check`     |
+| Matching or data structures | Run `./main.sh test`; benchmark hot paths before and after   |
+| C API or Python bindings    | Run `./main.sh test`; check every C function's `ctypes` type |
+| Build or packaging          | Run `./main.sh test`, `test-package`, and `deployment`       |
+| Windows-sensitive C++       | Confirm the code compiles as C++14; rely on CI for MSVC      |
 
 Do not claim Linux or Windows validation from a local macOS build.
 
 ## Prepare A Release
 
-Update `version` in [pyproject.toml](pyproject.toml), move the
+Update `VERSION` in the `project()` call of [CMakeLists.txt](CMakeLists.txt),
+move the
 [changelog](CHANGELOG.md)'s unreleased notes under a new version heading, and
 validate the intended release revision. Call out breaking changes to the C++,
 C, or Python interfaces explicitly. Preserve the established 2019 citation in

@@ -43,7 +43,7 @@ notice, followed by a blank line before the include guard or includes:
 
 -   New files use the year they are created. Do not bump the year on existing
     files as incidental cleanup.
--   `benchmark/benchmark_lob.cpp` and `main/dummy_matching.cpp` carry a short
+-   `main/dummy_matching.cpp` carries a short
     `// Copyright 2019 Christian Kauten` line. Replace it with the full header,
     keeping the original year, when a requested edit touches the file.
 -   `include/lib_lob.hpp` and `src/lib_lob.cpp` spell `EXPRESS` as
@@ -76,16 +76,20 @@ strongest signals are:
 
 ## Project Defaults
 
--   `include/` is a header-only library. Users copy it into their projects or
-    add it as a submodule, so new library code lives in headers and is marked
-    `inline` or templated. `src/lib_lob.cpp` only compiles the C API.
--   SCons builds with `-std=c++17`. The PyPI extension in `pyproject.toml`
-    uses the compiler default, which is C++14 for MSVC. Library code must
-    compile as C++14 for the Windows wheels, so avoid C++17-only features in
-    `include/` such as `if constexpr`, structured bindings, `std::optional`,
-    and inline variables. Tests, benchmarks, and `main/` may use C++17.
--   Code must compile without warnings under `-pedantic -Wall` with both
-    `g++` and Apple Clang.
+-   `include/` is a header-only library distributed through the
+    `limit_order_book::limit_order_book` CMake target, an installed package,
+    or a copy of the headers, so new library code lives in headers and is
+    marked `inline` or templated. `src/lib_lob.cpp` only compiles the C API.
+-   The headers require C++14, and `CMakeLists.txt` builds every first-party
+    target, including tests, benchmarks, and `main/`, as C++14. Avoid C++17
+    features such as `if constexpr`, structured bindings, `std::optional`,
+    and inline variables.
+-   Code must compile without warnings under `-Wall -pedantic` with GCC and
+    Clang, and under `/W3` with MSVC.
+-   A new public header must be added to the install rules only if it lives
+    outside `include/`; everything in `include/` is installed. A new vendored
+    dependency needs its include directory in `LOB_VENDOR_INCLUDE_DIRS` and
+    its license in the install rules.
 -   Use the `LOB` namespace for everything in `include/` except the C API.
 -   Use include guards named after the file, such as `LOB_LIMIT_TREE_HPP_`,
     matching the existing headers. Do not mix in `#pragma once`.
@@ -161,8 +165,9 @@ Names describe the market concept, not the implementation detail.
     directly.
 -   List local and vendor headers first, then standard headers, matching the
     existing files.
--   In tests, define `CATCH_CONFIG_MAIN` and include `catch.hpp` before the
-    project header.
+-   In tests, include `<catch2/catch_test_macros.hpp>` before the project
+    header. Catch2 v3 provides `main` through `Catch2::Catch2WithMain`, so do
+    not define `CATCH_CONFIG_MAIN`.
 -   `using namespace LOB;` is acceptable in tests, benchmarks, and `main/`.
     Never put `using namespace` in a header.
 
@@ -250,8 +255,9 @@ The book exists to be fast. Treat the hot path as the product.
 
 ## Tests And Benchmarks
 
--   Put tests in `test/test_<header>.cpp`. SCons builds each file in `test/`
-    as its own binary with the alias `test/<file>.cpp`.
+-   Put tests in `test/test_<header>.cpp`. CMake compiles every `.cpp` in
+    `test/` into one `limit_order_book_tests` binary, and `ctest` runs each
+    scenario as its own test, so scenario names must be unique across files.
 -   Write tests as Catch2 `SCENARIO`, `GIVEN`, `WHEN`, and `THEN` blocks that
     describe the market event: "a sell limit order crosses the best buy" is
     better than "limit works".
@@ -260,9 +266,9 @@ The book exists to be fast. Treat the hot path as the product.
 -   Cover empty books, a single order, several orders at one limit, several
     limits, crossing orders that partially and fully fill, cancels of the
     best and non-best orders, and extreme `Price` and `Quantity` values.
--   Put benchmarks in `benchmark/` with `CATCH_CONFIG_ENABLE_BENCHMARKING`
-    and `BENCHMARK_ADVANCED` with a `Chronometer`, so book setup stays outside
-    the measured region.
+-   Put benchmarks in `benchmark/`, include
+    `<catch2/benchmark/catch_benchmark.hpp>`, and use `BENCHMARK_ADVANCED`
+    with a `Chronometer`, so book setup stays outside the measured region.
 -   Compare benchmarks before and after a hot-path change with the same
     compiler, flags, and workload.
 
@@ -271,7 +277,7 @@ The book exists to be fast. Treat the hot path as the product.
 Before finishing a C++ change, check:
 
 -   The file starts with the purpose line and the MIT header.
--   Library code is in `LOB`, header-only, and compiles as C++14 and C++17.
+-   Library code is in `LOB`, header-only, and compiles as C++14.
 -   Signatures use the domain aliases and include units or meaning in names.
 -   Every new or changed declaration has `///` documentation, including side,
     complexity, failure behavior, and ownership where they apply.
@@ -280,4 +286,6 @@ Before finishing a C++ change, check:
     tests in both languages.
 -   Catch2 scenarios cover the changed behavior, and hot-path changes have
     before and after benchmark results.
+-   `./main.sh test-package` passes when the change touches `CMakeLists.txt`,
+    `cmake/`, or the set of public headers.
 -   No edits were made under `vendor/` or `docs/`.

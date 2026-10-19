@@ -32,8 +32,19 @@ dates, or the tag date for releases that were not uploaded.
     as C++14 for MSVC.
 -   Moved every build output under the ignored `.build/` directory and
     excluded the tests from the wheel.
--   Updated the vendored Catch2 to v2.13.10 so the C++ suites and benchmarks
-    compile on Apple Silicon.
+-   Replaced SCons, the makefile, `MANIFEST.in`, and setuptools with a CMake
+    build. The Python package builds through scikit-build-core, and
+    [main.sh](main.sh) wraps the development commands.
+-   Added a header-only `limit_order_book::limit_order_book` CMake target for
+    FetchContent and `add_subdirectory`, and `cmake --install` rules for the
+    headers, a `find_package` config package, and a pkg-config file. As a
+    subproject, the library builds no tests or shared library.
+-   Made the `project()` version in `CMakeLists.txt` the version of both the
+    C++ and Python packages.
+-   Replaced the vendored Catch2 with Catch2 v3.8.1 fetched by CMake, built
+    every first-party target as C++14, and combined the Catch2 suites into one
+    `ctest`-discovered binary. CI now runs the C++ suites and the package
+    checks on Linux, macOS, and Windows.
 
 **Documentation:**
 

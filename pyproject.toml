@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools>=77"]
-build-backend = "setuptools.build_meta"
+requires = ["scikit-build-core>=0.11"]
+build-backend = "scikit_build_core.build"
 
 [project]
 name = "limit_order_book"
-version = "2.0.0"
+dynamic = ["version"]
 description = "A Limit Order Book (LOB) implementation"
 readme = "README.md"
 requires-python = ">=3.13"
@@ -34,37 +34,45 @@ Homepage = "https://github.com/Kautenja/limit-order-book"
 Repository = "https://github.com/Kautenja/limit-order-book"
 Documentation = "https://kautenja.github.io/limit-order-book/"
 
-[tool.setuptools]
-zip-safe = false
-
-[tool.setuptools.packages.find]
-include = ["limit_order_book*"]
-exclude = ["limit_order_book.test*"]
-
-# The shared library that the Python package loads through ctypes. No
-# standard or optimization flags are set, so the compiler defaults apply:
-# C++17 for current GCC and Clang, C++14 for MSVC, and the optimization level
-# Python was built with. Wheels run on other machines, so never add
-# -march=native or other host-tuned flags here.
-[[tool.setuptools.ext-modules]]
-name = "limit_order_book.lib_limit_order_book"
-sources = ["src/lib_lob.cpp"]
-include-dirs = [
-    "include",
-    "vendor/binary-search-tree/include",
-    "vendor/cpptqdm/include",
-    "vendor/doubly-linked-list/include",
-    "vendor/hopscotch_map/include",
-    "vendor/robin-map/include",
-    "vendor/sparse-map/include",
+# CMakeLists.txt builds the C API shared library that the package loads
+# through ctypes and installs it into limit_order_book/. The C++ library is
+# the primary product, so its project version is the package version.
+[tool.scikit-build]
+minimum-version = "build-system.requires"
+build-dir = ".build/python/{wheel_tag}"
+wheel.packages = ["limit_order_book"]
+wheel.exclude = ["limit_order_book/test/**"]
+sdist.exclude = [
+    ".clang_complete",
+    ".gitattributes",
+    ".github/**",
+    ".gitignore",
+    "AGENTS.md",
+    "CONTRIBUTING.md",
+    "Doxyfile",
+    "benchmark/**",
+    "developer-manual/**",
+    "docs/**",
+    "doxygen/**",
+    "limit_order_book/test/**",
+    "main.sh",
+    "main/**",
+    "notes/**",
+    "requirements.txt",
+    "test/**",
+    "vendor/*/benchmark/**",
+    "vendor/*/test/**",
+    "vendor/*/tests/**",
+    "vendor/*/vendor/**",
+    "vendor/cpptqdm/**",
+    "vendor/hopscotch_map/**",
+    "vendor/sparse-map/**",
 ]
-language = "c++"
 
-# Keep setuptools intermediates under .build/ with the SCons outputs instead
-# of build/ in the repository root. The *.egg-info/ metadata stays in the
-# root, because setuptools requires its base directory to already exist.
-[tool.distutils.build]
-build-base = ".build/python"
+[tool.scikit-build.metadata.version]
+provider = "scikit_build_core.metadata.regex"
+input = "CMakeLists.txt"
+regex = 'project\([^)]*VERSION\s+(?P<value>[0-9][0-9.]*)'
 
 [tool.cibuildwheel]
 build = "cp313-* cp314-*"

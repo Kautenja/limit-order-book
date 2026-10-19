@@ -843,7 +843,7 @@ RECURSIVE              = YES
 # Note that relative paths are relative to the directory from which doxygen is
 # run.
 
-EXCLUDE                = vendor test notes SConstruct limit_order_book/test .build \
+EXCLUDE                = vendor test notes cmake limit_order_book/test .build \
                          developer-manual specs AGENTS.md CHANGELOG.md \
                          CONTRIBUTING.md LICENSING.md
 

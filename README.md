@@ -18,20 +18,91 @@
 [python-home]: https://python.org
 [license]: ./LICENSE
 
-This is an implementation of the limit order book with a price-time priority
-matching policy for reception of market data streams. There are APIs for C++,
-C, and Python.
+This is a header-only C++ implementation of the limit order book with a
+price-time priority matching policy for reception of market data streams. The
+C++ library is the primary product; a C API and a Python package built on it
+are also provided.
 
 ## Usage
 
 ### C++
 
-Simply add [include/*.hpp](include) to your C++ project either by copying
-directly or using git submodules.
+The library is header-only and requires C++14. It depends on three header-only
+libraries that are vendored in [vendor/](vendor) and installed with it:
+`binary-search-tree`, `doubly-linked-list`, and `robin-map`. Every method
+below provides the `limit_order_book::limit_order_book` target, or the include
+path, so that this works:
+
+```cpp
+#include "limit_order_book.hpp"
+
+int main() {
+    LOB::LimitOrderBook book;
+    book.limit(LOB::Side::Sell, 1, 100, 50);
+    book.limit(LOB::Side::Buy, 2, 40, 50);  // crosses and partially fills
+    return book.best_sell() == 50 ? 0 : 1;
+}
+```
+
+#### CMake FetchContent
+
+Add the library to a CMake project without installing it. Pin `GIT_TAG` to a
+release tag or commit:
+
+```cmake
+include(FetchContent)
+FetchContent_Declare(
+    limit_order_book
+    GIT_REPOSITORY https://github.com/Kautenja/limit-order-book.git
+    GIT_TAG master
+    GIT_SHALLOW TRUE
+)
+FetchContent_MakeAvailable(limit_order_book)
+
+target_link_libraries(my_app PRIVATE limit_order_book::limit_order_book)
+```
+
+As a subproject, the library builds no tests, benchmarks, or shared library.
+`add_subdirectory` on a copy of this repository works the same way.
+
+#### System Installation
+
+Install the headers, a CMake package, and a pkg-config file. This requires
+CMake 3.21 or later and a C++14 compiler:
+
+```shell
+git clone https://github.com/Kautenja/limit-order-book.git
+cd limit-order-book
+cmake -S . -B .build/cmake -DLOB_BUILD_TESTS=OFF
+cmake --install .build/cmake --prefix /usr/local
+```
+
+Use any prefix, such as `"${HOME}/.local"`, and `sudo` when the prefix needs
+it. The install puts every header in `include/limit_order_book/`, the CMake
+package in `share/cmake/limit_order_book/`, the pkg-config file in
+`share/pkgconfig/`, and the licenses in `share/doc/limit_order_book/`. Then
+use the package from CMake:
+
+```cmake
+find_package(limit_order_book 2 CONFIG REQUIRED)
+target_link_libraries(my_app PRIVATE limit_order_book::limit_order_book)
+```
+
+or from any build system through pkg-config:
+
+```shell
+c++ -std=c++14 $(pkg-config --cflags limit_order_book) my_app.cpp
+```
+
+#### Copying The Headers
+
+Copy [include/](include) and the `include/` directories of the three vendored
+dependencies into your project, and add all four to the include path.
 
 ### C
 
-A C-level API is defined in [include/lib_lob.hpp](include/lib_lob.hpp).
+A C-level API is defined in [include/lib_lob.hpp](include/lib_lob.hpp). It is
+compiled into the shared library that the Python package loads.
 
 ### Python
 
@@ -55,58 +126,66 @@ package provides these tools for free.
 
 ## Development
 
+[main.sh](main.sh) wraps the CMake and Python commands; run `./main.sh -h` for
+the full list. Development needs CMake 3.21 or later, a C++14 compiler, Git
+(CMake fetches Catch2 for the tests), and Python 3.13 or later. Set up a
+virtual environment with the build tools:
+
+```shell
+./main.sh install
+```
+
 ### Testing
 
-To run all the unit-test suites, run:
+To run the C++ and Python test suites, run:
 
 ```shell
-make test
+./main.sh test
 ```
 
-#### C++
-
-To run the C++ unit-test suite, run:
-
-```shell
-scons test
-```
-
-#### Python
-
-To run the Python unit-test suite, build the shared library into the package
-with `scons` or `pip install --editable .`, then run:
+To run them separately, run `./main.sh test-cpp` or `./main.sh test-python`.
+The C++ suite runs through `ctest`; the Python suite runs against the C API
+library that the CMake build copies into `limit_order_book/`. To check that
+the installed CMake package and FetchContent both work for a consumer
+project, run:
 
 ```shell
-python -m unittest discover .
-```
-
-All build outputs, including distributions from `python -m build --outdir
-.build/dist`, go to the ignored `.build/` directory. To remove them, run:
-
-```shell
-make clean
+./main.sh test-package
 ```
 
 ### Benchmarking
 
-#### C++
-
-To run the C++ benchmark code, run:
+To run the C++ benchmarks, run:
 
 ```shell
-scons benchmark
+./main.sh benchmark
+```
+
+Arguments after `benchmark` go to the Catch2 runner, such as a test name.
+
+### Build Outputs
+
+All build outputs go to the ignored `.build/` directory: the CMake build in
+`.build/cmake/`, Python builds in `.build/python/`, and distributions from
+`./main.sh deployment` in `.build/dist/`. To remove them, run:
+
+```shell
+./main.sh clean
 ```
 
 ### Releasing
 
-The [CI workflow](.github/workflows/ci.yml) runs the C++ suites on Linux x64
-and the Python suite and distribution builds for CPython 3.13 and 3.14 on
-Linux, macOS, and Windows. It runs on pull requests, pushes to `master`, and
+The [CI workflow](.github/workflows/ci.yml) runs the C++ suites and the
+installed-package and FetchContent checks on Linux, macOS, and Windows, and
+the Python suite and distribution builds for CPython 3.13 and 3.14 on the same
+platforms. It runs on pull requests, pushes to `master`, and
 tag pushes.
 
-To release, update `version` in [pyproject.toml](pyproject.toml), then push a
-tag that matches it, optionally prefixed with `v`. Tag CI creates or updates a
-GitHub release with the built distributions. Publish that release to start the
+To release, update `VERSION` in the `project()` call of
+[CMakeLists.txt](CMakeLists.txt), which sets both the C++ package and the
+Python package versions, then push a tag that matches it, optionally prefixed
+with `v`. Tag CI creates or updates a GitHub release with the built
+distributions. Publish that release to start the
 [Publish to PyPI](.github/workflows/publish.yml) workflow, which builds the
 sdist and wheels and uploads them through the `pypi` environment's trusted
 publisher. A release created by the CI workflow's token does not trigger

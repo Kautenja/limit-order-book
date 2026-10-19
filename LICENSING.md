@@ -44,18 +44,24 @@ with its code when copying or redistributing it.
 | `hopscotch_map`      | Alternative hash map, not included | MIT, Tessil                  |
 | `sparse-map`         | Alternative hash map, not included | MIT, Tessil                  |
 | `cpptqdm`            | Progress bars, not included        | MIT, Christian Kauten et al. |
-| `Catch2`             | Tests and benchmarks               | Boost Software License 1.0   |
 
-`binary-search-tree`, `doubly-linked-list`, and `robin-map` are compiled into
-the C API shared library, so wheels contain portions of them. Their MIT terms
-ask that their copyright and permission notices accompany substantial portions
-of the software. The other libraries are on the include path but are not
-included by any first-party source.
+`binary-search-tree`, `doubly-linked-list`, and `robin-map` are included by
+the public headers. `cmake --install` installs their headers beside the
+project headers and their license files under
+`share/doc/limit_order_book/licenses/`, and they are compiled into the C API
+shared library, so wheels contain portions of them. Their MIT terms ask that
+their copyright and permission notices accompany substantial portions of the
+software. The other libraries are not included by any first-party source and
+are not installed.
 
-The source distribution grafts `vendor/` with each library's license file and
-prunes `vendor/Catch2` and nested `vendor/*/vendor` directories, as declared
-in [MANIFEST.in](MANIFEST.in). Catch2 is used only to build the test and
-benchmark executables and is not part of either distribution.
+The source distribution includes the three used libraries with their license
+files and excludes the unused libraries and the nested `vendor/*/vendor`,
+test, and benchmark directories, as declared by `sdist.exclude` in
+[pyproject.toml](pyproject.toml).
+
+Catch2, under the Boost Software License 1.0, is not vendored. CMake fetches
+it from GitHub only to build the test and benchmark executables, and it is not
+part of any distribution or installation.
 
 ## Notes And Example Engines
 

@@ -1,10 +1,11 @@
 # Limit Order Book Agent Instructions
 
 `limit-order-book` is a header-only C++ limit order book with a price-time
-priority matching policy, a C API compiled into a shared library, and a Python
-package that binds the C API through `ctypes`. Preserve matching correctness,
-the complexity guarantees of the book operations, and parity between the C++,
-C, and Python interfaces.
+priority matching policy, distributed primarily as a CMake package. A C API is
+compiled into a shared library, and a Python package binds it through
+`ctypes`. Preserve matching correctness, the complexity guarantees of the book
+operations, the CMake package interface, and parity between the C++, C, and
+Python interfaces.
 
 ## Start Here
 
@@ -35,11 +36,18 @@ material, not dependencies.
     `ctypes` signatures; `limit_order_book.py` wraps them in a class.
 -   **`test/` and `limit_order_book/test/`:** Catch2 and `unittest` suites.
 -   **`benchmark/`:** Catch2 benchmarks for the C++ book.
--   **`main/`:** Small executables that drive the book, built by SCons.
--   **`.build/`:** Every build output, ignored by Git: SCons objects and
-    binaries in `.build/{src,test,benchmark,main}/`, the shared library in
-    `.build/lib/`, setuptools intermediates in `.build/python/`, and
-    distributions in `.build/dist/`. `make clean` removes it.
+-   **`main/`:** Small executables that drive the book, built with
+    `LOB_BUILD_EXAMPLES=ON`.
+-   **`CMakeLists.txt` and `cmake/`:** The C++ build, install rules, and the
+    CMake package and pkg-config templates. The `project()` version is the
+    version of both the C++ and Python packages.
+-   **`test/package/`:** A consumer project that checks `find_package` and
+    FetchContent.
+-   **`main.sh`:** The development command wrapper, modeled on nes-py's.
+-   **`.build/`:** Every build output, ignored by Git: the CMake build in
+    `.build/cmake/`, scikit-build-core builds in `.build/python/`, package
+    checks in `.build/prefix/` and `.build/package-*/`, and distributions in
+    `.build/dist/`. `./main.sh clean` removes it.
 -   **`vendor/`:** Third-party and owner-authored dependencies, committed
     in-tree. Treat them as read-only.
 -   **`developer-manual/`:** Durable rules for agents and maintainers.
@@ -102,52 +110,54 @@ changes, update `lib_lob.hpp`, the `argtypes` and `restype` declarations in
 `library.py`, the Python wrapper, and both test suites in the same change.
 `ctypes` types must match the C++ type widths exactly.
 
+Downstream C++ projects depend on the CMake interface, so treat it as public:
+the `limit_order_book::limit_order_book` target, the `LOB_*` options and their
+defaults, the install layout under `include/limit_order_book/`, and the
+package and pkg-config names. A FetchContent or `add_subdirectory` consumer
+must get only the header-only target: no tests, Catch2 download, or shared
+library. `./main.sh test-package` checks both consumer paths.
+
 ## Development And Validation
 
-The C++ build uses SCons with the system `g++`. The Python package and its
-extension are declared entirely in `pyproject.toml` and built by setuptools;
-there is no `setup.py`. From the repository root:
+CMake 3.21 or later builds the C++ code, and scikit-build-core drives the
+same `CMakeLists.txt` for the Python wheel. [main.sh](main.sh) wraps the
+common commands; run them from the repository root:
 
 ```shell
-make test
+./main.sh test
 ```
 
-That target runs the Catch2 suites, builds the shared library and copies it
-into `limit_order_book/`, and runs the Python suite. The individual stages
-are:
+That command configures `.build/cmake/`, builds the Catch2 tests, benchmarks,
+examples, and the C API library (copied into `limit_order_book/`), runs the
+Catch2 suite through `ctest`, and runs the Python suite. Other commands:
 
-```shell
-scons test
-scons limit_order_book
-python3 -m unittest discover .
-```
+-   **`./main.sh test-cpp`:** Build and run the Catch2 suite. Extra arguments
+    go to `ctest`, such as `-R "send single order"`.
+-   **`./main.sh test-python`:** Build the C API library and run the Python
+    suite.
+-   **`./main.sh test-package`:** Install into `.build/prefix/` and build
+    `test/package/` with `find_package` and with FetchContent of the checkout.
+-   **`./main.sh benchmark`:** Build and run the benchmarks. Extra arguments
+    go to the Catch2 runner.
+-   **`./main.sh deployment`:** Build the sdist and wheel in `.build/dist/`.
 
-Other SCons aliases:
+The Catch2 v3 dependency is fetched from GitHub by CMake on first configure,
+so the C++ tests need network access once.
 
--   **`scons test/test_limit_tree.cpp`:** Build and run one Catch2 suite.
--   **`scons benchmark`:** Build and run every benchmark, or one with
-    `scons benchmark/benchmark_lob.cpp`.
--   **`scons main`:** Build the executables in `main/`, or build and run one
-    with `scons main/dummy_matching.cpp`.
-
-Plain `scons` builds only the shared library into the package.
-
-**Important:** SCons compiles with `-std=c++17`. The PyPI extension sets no
-standard flag, so it uses the compiler default: C++17 for current GCC and
-Clang, but C++14 for MSVC. Code in `include/` and `src/` must compile as
-C++14 for the Windows wheels. Wheels must stay portable, so never add
-`-march=native` or other host-tuned flags to `pyproject.toml`.
+**Important:** CMake builds every first-party target as C++14, which is also
+the MSVC default used for the Windows wheels. Keep `include/` and `src/`
+C++14-clean. Wheels and installed packages must stay portable, so never add
+`-march=native` or other host-tuned flags to `CMakeLists.txt`.
 
 Validate changes by type:
 
--   **Matching or data structures:** `make test`, plus a benchmark run before
-    and after the change when the hot path is touched.
--   **C API or Python bindings:** `make test`, and confirm every C function has
-    matching `ctypes` declarations.
--   **Build or packaging:** `make test` and
-    `python3 -m build --outdir .build/dist`. Do not run
-    `make ship`, dispatch the publish workflow, or upload to PyPI unless
-    asked.
+-   **Matching or data structures:** `./main.sh test`, plus a benchmark run
+    before and after the change when the hot path is touched.
+-   **C API or Python bindings:** `./main.sh test`, and confirm every C
+    function has matching `ctypes` declarations.
+-   **Build or packaging:** `./main.sh test`, `./main.sh test-package`, and
+    `./main.sh deployment`. Do not run `./main.sh ship`, dispatch the publish
+    workflow, or upload to PyPI unless asked.
 -   **Documentation only:** Link, path, and command checks, `git diff --check`,
     and a review of the rendered Markdown. A C++ build is not required.
 

@@ -13,21 +13,37 @@ permissions:
 
 jobs:
   native-test:
-    name: C++ tests / Linux x64
-    runs-on: ubuntu-24.04
+    name: C++ / ${{ matrix.platform.name }}
+    runs-on: ${{ matrix.platform.runner }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - name: Linux x64
+            runner: ubuntu-24.04
+          - name: Linux arm64
+            runner: ubuntu-24.04-arm
+          - name: Windows x64
+            runner: windows-2022
+          - name: macOS x64
+            runner: macos-15-intel
+          - name: macOS arm64
+            runner: macos-15
+
+    defaults:
+      run:
+        shell: bash
 
     steps:
       - name: Check out source
         uses: actions/checkout@v6
 
-      - name: Install build tools
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y g++ scons
-          g++ --version
-
       - name: Run Catch2 suites
-        run: scons -j2 test
+        run: ./main.sh test-cpp
+
+      - name: Check the installed and FetchContent packages
+        run: ./main.sh test-package
 
   build-test:
     name: ${{ matrix.platform.name }} / Python ${{ matrix.python-version }}
@@ -69,10 +85,12 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
-          python -m pip install --editable .
 
       - name: Run tests
-        run: python -m unittest discover .
+        shell: bash
+        env:
+          PYTHON: python
+        run: ./main.sh test-python
 
       - name: Clean test build artifacts
         run: git clean -fdX

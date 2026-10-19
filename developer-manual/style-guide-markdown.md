@@ -127,9 +127,9 @@ Numeric columns:
 -   Omit `$` prompt markers from copyable commands.
 -   State the working directory and prerequisites when they are not the
     repository root and the tools in `README.md`.
--   Check commands against `makefile`, `SConstruct`, `pyproject.toml`, and
-    `.github/workflows/` before documenting them. Do not import commands from
-    other projects.
+-   Check commands against `main.sh`, `CMakeLists.txt`, `pyproject.toml`,
+    and `.github/workflows/` before documenting them. Do not import commands
+    from other projects.
 -   Put the command before its results in evidence sections.
 
 ## Links And Media
@@ -164,8 +164,8 @@ Before finishing a Markdown change, check:
 -   The document is in the right directory for its audience.
 -   The first paragraph says what the document is for.
 -   Headings, lists, fences, and tables follow this guide in the source view.
--   Commands match the current `makefile`, `SConstruct`, `pyproject.toml`,
-    and `.github/workflows/`.
+-   Commands match the current `main.sh`, `CMakeLists.txt`,
+    `pyproject.toml`, and `.github/workflows/`.
 -   Relative links and heading anchors resolve.
 -   The rendered Markdown looks right on GitHub.
 -   `git diff --check` passes. It checks whitespace only, not table alignment
