@@ -21,6 +21,9 @@ class LimitOrderBook:
         """
         Place a sell limit order with given quantity and price.
 
+        Existing IDs are ignored without matching or changing the resting order.
+        IDs can be reused after their orders are filled, cancelled, or cleared.
+
         Args:
             order_id: the ID for the order to add
             quantity: the quantity of shares in the limit order to place
@@ -34,7 +37,10 @@ class LimitOrderBook:
 
     def limit_buy(self, order_id, quantity, price):
         """
-        Place a sell limit order with given quantity and price.
+        Place a buy limit order with given quantity and price.
+
+        Existing IDs are ignored without matching or changing the resting order.
+        IDs can be reused after their orders are filled, cancelled, or cleared.
 
         Args:
             order_id: the ID for the order to add
@@ -49,7 +55,10 @@ class LimitOrderBook:
 
     def limit(self, side, order_id, quantity, price):
         """
-        Place a sell limit order with given quantity and price.
+        Place a limit order with given side, quantity, and price.
+
+        Existing IDs are ignored without matching or changing the resting order.
+        IDs can be reused after their orders are filled, cancelled, or cleared.
 
         Args:
             side: the side of the order to place

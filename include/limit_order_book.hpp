@@ -62,16 +62,20 @@ class LimitOrderBook {
 
     /// @brief Add a new sell limit order to the book.
     ///
+    /// Existing IDs are ignored without matching or changing the resting order.
+    /// An ID can be reused after its order is filled, cancelled, or cleared.
+    ///
     /// @param order_id the ID for the order
     /// @param quantity the number of shares to sell
     /// @param price the limit price for the order
     ///
     inline void limit_sell(UID order_id, Quantity quantity, Price price) {
         // put the order into the map
-        orders.emplace(std::piecewise_construct,
+        const auto result = orders.emplace(std::piecewise_construct,
             std::forward_as_tuple(order_id),
             std::forward_as_tuple(order_id, Side::Sell, quantity, price)
         );
+        if (!result.second) return;  // duplicate live ID
         if (buys.best != nullptr && price <= buys.best->key) {  // crosses
             // place a market order with the limit price
             buys.market(&orders.at(order_id), [&](UID uid) { orders.erase(uid); });
@@ -85,16 +89,20 @@ class LimitOrderBook {
 
     /// @brief Add a new buy limit order to the book.
     ///
+    /// Existing IDs are ignored without matching or changing the resting order.
+    /// An ID can be reused after its order is filled, cancelled, or cleared.
+    ///
     /// @param order_id the ID for the order
     /// @param quantity the number of shares to buy
     /// @param price the limit price for the order
     ///
     inline void limit_buy(UID order_id, Quantity quantity, Price price) {
         // put the order into the map
-        orders.emplace(std::piecewise_construct,
+        const auto result = orders.emplace(std::piecewise_construct,
             std::forward_as_tuple(order_id),
             std::forward_as_tuple(order_id, Side::Buy, quantity, price)
         );
+        if (!result.second) return;  // duplicate live ID
         if (sells.best != nullptr && price >= sells.best->key) {  // crosses
             // place a market order with the limit price
             sells.market(&orders.at(order_id), [&](UID uid) { orders.erase(uid); });
@@ -107,6 +115,9 @@ class LimitOrderBook {
     }
 
     /// @brief Add a new order to the book.
+    ///
+    /// Existing IDs are ignored without matching or changing the resting order.
+    /// An ID can be reused after its order is filled, cancelled, or cleared.
     ///
     /// @param side whether the order is a buy (true) or sell (false)
     /// @param order_id the ID for the order

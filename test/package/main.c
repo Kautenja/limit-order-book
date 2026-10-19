@@ -38,6 +38,32 @@ int main(void) {
     cancel(book, 2);  // unknown IDs are ignored
     cancel(book, 1);
     if (has(book, 1) || count(book) != 0) status = 1;
+    for (int side = 0; side < 2; ++side) {
+        limit(book, side, 3, 5, 100);
+        const LOB_Order* original = get(book, 3);
+        limit_buy(book, 3, 9, 101);
+        limit_sell(book, 3, 9, 99);
+        limit(book, side, 3, 5, 100);
+        if (get(book, 3) != original) status = 1;
+        if (count(book) != 1 || count_at(book, 100) != 1) status = 1;
+        if (volume(book) != 5 || volume_price(book, 100) != 5) status = 1;
+        if (best(book, side) != 100 || best(book, !side) != 0) status = 1;
+        limit(book, side, 7, 4, 100);
+        cancel(book, 3);
+        if (has(book, 3) || count(book) != 1) status = 1;
+        if (volume(book) != 4) status = 1;
+        cancel(book, 7);
+        if (count(book) != 0 || volume(book) != 0) status = 1;
+        if (best_buy(book) != 0 || best_sell(book) != 0) status = 1;
+        // Reuse removed IDs and verify that a duplicate retains FIFO priority.
+        limit(book, side, 3, 5, 100);
+        limit(book, side, 7, 4, 100);
+        limit(book, side, 3, 9, 101);
+        market(book, !side, 8, 6);
+        if (has(book, 3) || !has(book, 7)) status = 1;
+        if (count(book) != 1 || volume(book) != 3) status = 1;
+        clear(book);
+    }
     delete_(book);
     return status;
 }

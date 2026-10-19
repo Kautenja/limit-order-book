@@ -22,6 +22,7 @@
 //
 
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
 #include "limit_order_book.hpp"
 
 using namespace LOB;
@@ -41,6 +42,142 @@ SCENARIO("initialize LimitOrderBook") {
 // ---------------------------------------------------------------------------
 // MARK: limit
 // ---------------------------------------------------------------------------
+
+SCENARIO("duplicate live limit IDs preserve the resting FIFO", "[duplicate-id]") {
+    auto side = GENERATE(Side::Sell, Side::Buy);
+    auto duplicate_price = GENERATE(Price{100}, Price{101});
+    auto dispatch = GENERATE(false, true);
+    GIVEN("a single resting order") {
+        auto book = LimitOrderBook();
+        book.limit(side, 3, 5, 100);
+        auto original = &book.get(3);
+        WHEN("the same ID is submitted again on the same side") {
+            if (dispatch) book.limit(side, 3, 9, duplicate_price);
+            else if (side == Side::Buy) book.limit_buy(3, 9, duplicate_price);
+            else book.limit_sell(3, 9, duplicate_price);
+            THEN("the original order, links, and aggregates are unchanged") {
+                REQUIRE(&book.get(3) == original);
+                REQUIRE(original->quantity == 5);
+                REQUIRE(original->side == side);
+                REQUIRE(original->price == 100);
+                REQUIRE(original->prev == nullptr);
+                REQUIRE(original->next == nullptr);
+                REQUIRE(original->limit->order_head == original);
+                REQUIRE(original->limit->order_tail == original);
+                REQUIRE(original->limit->count == 1);
+                REQUIRE(original->limit->volume == 5);
+                REQUIRE(book.count() == 1);
+                REQUIRE(book.count_at(100) == 1);
+                REQUIRE(book.count_at(101) == 0);
+                REQUIRE(book.volume() == 5);
+                REQUIRE(book.volume(100) == 5);
+                REQUIRE(book.volume(101) == 0);
+                REQUIRE(book.count_buy() == (side == Side::Buy ? 1 : 0));
+                REQUIRE(book.count_sell() == (side == Side::Sell ? 1 : 0));
+                REQUIRE(book.volume_buy() == (side == Side::Buy ? 5 : 0));
+                REQUIRE(book.volume_sell() == (side == Side::Sell ? 5 : 0));
+                REQUIRE(book.best(side) == 100);
+                REQUIRE(book.best(!side) == 0);
+            }
+            THEN("a later order and the original can both be cancelled safely") {
+                book.limit(side, 7, 4, 100);
+                book.cancel(3);
+                REQUIRE_FALSE(book.has(3));
+                REQUIRE(book.get(7).prev == nullptr);
+                REQUIRE(book.get(7).next == nullptr);
+                REQUIRE(book.count_at(100) == 1);
+                REQUIRE(book.volume(100) == 4);
+                book.cancel(7);
+                REQUIRE_FALSE(book.has(7));
+                REQUIRE(book.count() == 0);
+                REQUIRE(book.volume() == 0);
+                REQUIRE(book.best_buy() == 0);
+                REQUIRE(book.best_sell() == 0);
+            }
+            THEN("the original still executes before a later order") {
+                book.limit(side, 7, 4, 100);
+                book.market(!side, 8, 6);
+                REQUIRE_FALSE(book.has(3));
+                REQUIRE(book.get(7).quantity == 3);
+                REQUIRE(book.count() == 1);
+                REQUIRE(book.volume() == 3);
+                REQUIRE(book.count_at(100) == 1);
+                REQUIRE(book.volume(100) == 3);
+                REQUIRE(book.best(side) == 100);
+                REQUIRE(book.best(!side) == 0);
+            }
+        }
+    }
+}
+
+SCENARIO("duplicate live limit IDs cannot cross or change sides", "[duplicate-id]") {
+    auto side = GENERATE(Side::Sell, Side::Buy);
+    auto duplicate_side = GENERATE(Side::Sell, Side::Buy);
+    auto duplicate_price = GENERATE(Price{50}, Price{100}, Price{200});
+    GIVEN("resting orders on both sides of the book") {
+        auto book = LimitOrderBook();
+        auto opposite_price = side == Side::Buy ? Price{200} : Price{50};
+        book.limit(side, 3, 5, 100);
+        book.limit(!side, 9, 6, opposite_price);
+        WHEN("a live ID is resubmitted, including at a crossing price") {
+            book.limit(duplicate_side, 3, 9, duplicate_price);
+            THEN("neither side trades or changes its resting orders") {
+                REQUIRE(book.get(3).side == side);
+                REQUIRE(book.get(3).price == 100);
+                REQUIRE(book.get(3).quantity == 5);
+                REQUIRE(book.get(9).quantity == 6);
+                REQUIRE(book.count() == 2);
+                REQUIRE(book.volume() == 11);
+                REQUIRE(book.count_buy() == 1);
+                REQUIRE(book.count_sell() == 1);
+                REQUIRE(book.count_at(100) == 1);
+                REQUIRE(book.count_at(opposite_price) == 1);
+                REQUIRE(book.volume(100) == 5);
+                REQUIRE(book.volume(opposite_price) == 6);
+                REQUIRE(book.volume_buy() == (side == Side::Buy ? 5 : 6));
+                REQUIRE(book.volume_sell() == (side == Side::Sell ? 5 : 6));
+                REQUIRE(book.best(side) == 100);
+                REQUIRE(book.best(!side) == opposite_price);
+            }
+        }
+    }
+}
+
+SCENARIO("limit IDs can be reused after leaving the book", "[duplicate-id]") {
+    auto side = GENERATE(Side::Sell, Side::Buy);
+    auto removal = GENERATE(0, 1, 2, 3);
+    CAPTURE(removal);
+    GIVEN("an order that is removed from the book") {
+        auto book = LimitOrderBook();
+        book.limit(side, 3, 5, 100);
+        if (removal == 0) {  // cancelled
+            book.cancel(3);
+        } else if (removal == 1) {  // resting order filled
+            book.market(!side, 8, 5);
+        } else if (removal == 2) {  // book cleared
+            book.clear();
+        } else {  // incoming order filled
+            book.cancel(3);
+            book.limit(!side, 8, 5, 100);
+            book.limit(side, 3, 5, 100);
+        }
+        REQUIRE_FALSE(book.has(3));
+        WHEN("the ID is reused on the opposite side") {
+            book.limit(!side, 3, 7, 101);
+            THEN("the new order rests with its own price and quantity") {
+                REQUIRE(book.get(3).side == !side);
+                REQUIRE(book.get(3).quantity == 7);
+                REQUIRE(book.get(3).price == 101);
+                REQUIRE(book.count() == 1);
+                REQUIRE(book.volume() == 7);
+                REQUIRE(book.count_at(101) == 1);
+                REQUIRE(book.volume(101) == 7);
+                REQUIRE(book.best(side) == 0);
+                REQUIRE(book.best(!side) == 101);
+            }
+        }
+    }
+}
 
 SCENARIO("send single order to LimitOrderBook") {
     GIVEN("an order book and a single sell order") {

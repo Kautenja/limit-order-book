@@ -86,8 +86,11 @@ LOB_C_API void clear(LOB_LimitOrderBook* book);
 
 /// @brief Add a sell limit order, which first executes against the buy side.
 ///
+/// Existing IDs are ignored without matching or changing the resting order.
+/// An ID can be reused after its order is filled, cancelled, or cleared.
+///
 /// @param book the book to add the order to
-/// @param uid the ID for the order, which must not already be in the book
+/// @param uid the ID for the order
 /// @param quantity the number of shares to sell
 /// @param price the limit price for the order
 ///
@@ -100,8 +103,11 @@ LOB_C_API void limit_sell(
 
 /// @brief Add a buy limit order, which first executes against the sell side.
 ///
+/// Existing IDs are ignored without matching or changing the resting order.
+/// An ID can be reused after its order is filled, cancelled, or cleared.
+///
 /// @param book the book to add the order to
-/// @param uid the ID for the order, which must not already be in the book
+/// @param uid the ID for the order
 /// @param quantity the number of shares to buy
 /// @param price the limit price for the order
 ///
@@ -114,9 +120,12 @@ LOB_C_API void limit_buy(
 
 /// @brief Add a limit order to the given side of the book.
 ///
+/// Existing IDs are ignored without matching or changing the resting order.
+/// An ID can be reused after its order is filled, cancelled, or cleared.
+///
 /// @param book the book to add the order to
 /// @param side whether the order is a buy (true) or sell (false)
-/// @param uid the ID for the order, which must not already be in the book
+/// @param uid the ID for the order
 /// @param quantity the number of shares to buy or sell
 /// @param price the limit price for the order
 ///
