@@ -282,6 +282,11 @@ package does not ship a header without its library.
 -   Put benchmarks in `benchmark/`, include
     `<catch2/benchmark/catch_benchmark.hpp>`, and use `BENCHMARK_ADVANCED`
     with a `Chronometer`, so book setup stays outside the measured region.
+-   For mutating workloads, use `measure_fresh_books` from
+    [benchmark/fresh_books.hpp](../../benchmark/fresh_books.hpp). It allocates
+    one empty book per `Chronometer::runs()` iteration and selects the book
+    by the callback's index. Construction and cleanup stay outside timing;
+    never reuse one mutated book across iterations or time its reset.
 -   Compare benchmarks before and after a hot-path change with the same
     compiler, flags, and workload.
 

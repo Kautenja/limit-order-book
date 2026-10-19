@@ -198,6 +198,10 @@ To run the C++ benchmarks, run:
 
 Arguments after `benchmark` go to the Catch2 runner, such as a test name.
 
+Each measured iteration uses an independent empty book, with book construction
+and cleanup outside the timed workload. Results from the earlier benchmarks
+that reused book state are not directly comparable.
+
 ### Build Outputs
 
 All build outputs go to the ignored `.build/` directory: the CMake build in

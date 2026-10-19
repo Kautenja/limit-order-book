@@ -32,6 +32,10 @@ dates, or the tag date for releases that were not uploaded.
 
 **Fixes:**
 
+-   Gave every C++ benchmark iteration an independent empty book, with
+    construction and cleanup outside timing. Repeated iterations previously
+    reused live order IDs in the insertion and cancellation benchmarks,
+    measuring ignored duplicates instead of the intended workload.
 -   Made `cancel` ignore unknown order IDs and `get` return `NULL` for them
     in the C API. Both previously threw `std::out_of_range` across the C
     boundary, which aborted the calling C program or Python process.
