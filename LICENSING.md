@@ -13,10 +13,10 @@ putting scope explanations elsewhere so its detector can match the standard
 text. Put project-specific explanations in this file.
 
 [pyproject.toml](pyproject.toml) and [CITATION.cff](CITATION.cff) declare the
-SPDX identifier `MIT`. The `license-files` setting includes both `LICENSE` and
-this guide in source and wheel distributions. License detection reports the
-repository's declaration; it does not establish the licensing history of every
-file in the repository.
+SPDX identifier `MIT`. The `license-files` setting includes `LICENSE`, this
+guide, and the retained vendored libraries' license files in source and wheel
+distributions. License detection reports the repository's declaration; it
+does not establish the licensing history of every file in the repository.
 
 ## Original Code And Documentation
 
@@ -42,20 +42,21 @@ with its code when copying or redistributing it.
 the public headers. `cmake --install` installs their headers beside the
 project headers and their license files under
 `share/doc/limit_order_book/licenses/`, and they are compiled into the C API
-shared library, so wheels contain portions of them. Their MIT terms ask that
-their copyright and permission notices accompany substantial portions of the
-software.
+shared library and Cython extension, so wheels contain portions of them.
+Their MIT terms ask that their copyright and permission notices accompany
+substantial portions of the software.
 
 The source distribution includes these libraries with their license files and
 excludes their nested `vendor`, test, and benchmark directories, as declared
 by `sdist.exclude` in [pyproject.toml](pyproject.toml).
 
 Catch2 is under the Boost Software License 1.0. CMake fetches Catch2 v3 from
-GitHub for the first-party tests and benchmarks. Older copies remain under
-`vendor/binary-search-tree/vendor/Catch2/` and
-`vendor/doubly-linked-list/vendor/Catch2/` for those libraries' standalone
-test harnesses. The first-party build does not use the nested copies, and no
-Catch2 copy is part of a distribution or installation.
+GitHub for the first-party tests and benchmarks. The older nested copies in
+`binary-search-tree` and `doubly-linked-list` have been pruned. Their retained
+standalone SCons test and benchmark harnesses expect those upstream
+dependencies; run them from the complete upstream repositories. This
+project's CMake build uses only the libraries' headers. No Catch2 copy is
+part of a distribution or installation.
 
 ## Notes And Example Engines
 

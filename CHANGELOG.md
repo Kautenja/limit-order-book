@@ -55,6 +55,11 @@ dates, or the tag date for releases that were not uploaded.
 
 **Build and packaging:**
 
+-   Pruned the unused nested Catch2 copies from `binary-search-tree` and
+    `doubly-linked-list`. First-party tests and benchmarks continue to use
+    Catch2 v3 fetched by CMake; standalone vendored test harnesses require
+    the complete upstream repositories.
+-   Included the retained vendored libraries' license files in wheel metadata.
 -   Removed the unused `cpptqdm`, `hopscotch_map`, and `sparse-map` vendored
     libraries, obsolete packaging exclusions, unused benchmark includes,
     commented-out Python code, and dangling diagram references.
