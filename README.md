@@ -1,22 +1,25 @@
 # Limit Order Book
 
-[![build-status][]][build-server]
-[![PackageVersion][pypi-version]][pypi-home]
-[![PythonVersion][python-version]][python-home]
-[![Stable][pypi-status]][pypi-home]
-[![Format][pypi-format]][pypi-home]
-[![License][pypi-license]][license]
+[![CI workflow][build-badge]][build-server]
+[![C++14][cpp-version]][build-config]
+[![CMake 3.21+][cmake-version]][build-config]
+[![PyPI version][pypi-version]][pypi-home]
+[![Python 3.13+][python-version]][python-config]
+[![Development status: beta][project-status]][python-config]
+[![License: MIT][license-badge]][license]
 
-[build-status]: https://github.com/Kautenja/limit-order-book/actions/workflows/ci.yml/badge.svg
-[build-server]: https://github.com/Kautenja/limit-order-book/actions/workflows/ci.yml
-[pypi-version]: https://badge.fury.io/py/limit-order-book.svg
-[pypi-license]: https://img.shields.io/pypi/l/limit-order-book.svg
-[pypi-status]: https://img.shields.io/pypi/status/limit-order-book.svg
-[pypi-format]: https://img.shields.io/pypi/format/limit-order-book.svg
-[pypi-home]: https://badge.fury.io/py/limit-order-book
-[python-version]: https://img.shields.io/pypi/pyversions/limit-order-book.svg
-[python-home]: https://python.org
-[license]: ./LICENSE
+[build-badge]: https://img.shields.io/badge/CI-GitHub%20Actions-blue
+[build-server]: https://github.com/Kautenja/limit-order-book/actions?query=workflow%3ACI
+[cpp-version]: https://img.shields.io/badge/C%2B%2B-14-blue
+[cmake-version]: https://img.shields.io/badge/CMake-3.21%2B-blue
+[build-config]: CMakeLists.txt
+[pypi-version]: https://img.shields.io/pypi/v/limit-order-book.svg
+[pypi-home]: https://pypi.org/project/limit-order-book/
+[python-version]: https://img.shields.io/badge/Python-3.13%2B-blue
+[python-config]: pyproject.toml
+[project-status]: https://img.shields.io/badge/status-beta-yellow
+[license-badge]: https://img.shields.io/badge/license-MIT-blue
+[license]: LICENSE
 
 This is a header-only C++ implementation of the limit order book with a
 price-time priority matching policy for reception of market data streams. The
