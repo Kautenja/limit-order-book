@@ -39,8 +39,8 @@ removes the report directory and the root build directory.
 ## Shared Project Citation
 
 The software and report are one cited work. The top-level
-[CITATION.bib](../../CITATION.bib) owns the `limit-order-book` entry, including
-its title, author, 2019 citation year, and repository URL. The report reads
+[CITATION.bib](../../CITATION.bib) owns the `kauten-limit-order-book-2019` entry,
+including its title, author, 2019 citation year, and repository URL. The report reads
 that entry directly through BibTeX; its
 [references.bib](../whitepaper/references.bib) contains only prior work.
 Do not create a separate report citation or copy the project entry there.

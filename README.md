@@ -290,7 +290,7 @@ commit used in your research, and the report revision and evidence manifest
 when referring to measurements.
 
 ```bibtex
-@misc{limit-order-book,
+@misc{kauten-limit-order-book-2019,
   author = {Christian Kauten},
   howpublished = {GitHub},
   title = {{L}imit {O}rder {B}ook: A Price-Time Priority Matching Engine for {C++}, {C}, and {P}ython},

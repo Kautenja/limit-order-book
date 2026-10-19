@@ -94,7 +94,7 @@ price. These cases make an implementation account useful even when the
 underlying matching policy and container choices are established.
 
 The \emph{limit-order-book} library provides a price-time priority book for
-one instrument~\cite{limit-order-book}. Incoming limit orders first match eligible
+one instrument~\cite{kauten-limit-order-book-2019}. Incoming limit orders first match eligible
 opposing orders and then rest any remainder. Market orders consume eligible
 liquidity without resting. The core is a header-only C++14 library; an opaque
 C interface and a native Python wrapper expose selected operations. The code
@@ -662,13 +662,13 @@ a new matching policy or a universally faster engine.
 
 \section*{Availability and Acknowledgments}
 The software and first-party report sources are available under the
-repository's MIT terms~\cite{limit-order-book}. Vendored components retain their own
+repository's MIT terms~\cite{kauten-limit-order-book-2019}. Vendored components retain their own
 notices; imported research and example engines retain their original
 attribution. The report's visual layout follows the author's RackNES and
 Fourier technical reports. This is a repository manuscript, with no assigned
 DOI, claimed peer review, or publication acceptance.
 
-Use the project's shared citation~\cite{limit-order-book} for both the software
+Use the project's shared citation~\cite{kauten-limit-order-book-2019} for both the software
 and this report. The canonical entry is in the top-level \path{CITATION.bib}.
 Its 2019 year identifies the project citation; the report revision date on
 the title page identifies this document's state. When citing measurements,

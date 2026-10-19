@@ -148,8 +148,10 @@ rendered pages were removed after final evidence selection and verification.
 ## Shared Citation Update
 
 Completed October 18, 2026 at the author's request. The report and software
-now use the existing top-level `CITATION.bib` entry, without changing its key,
-author, title, year, or URL. The separate report entry was removed. The
+now use the existing top-level `CITATION.bib` entry, preserving its author,
+title, year, and URL. At the author's request, its key is now
+`kauten-limit-order-book-2019` throughout the BibTeX, README, and report.
+The separate report entry was removed. The
 report's title and PDF metadata match the canonical title, while its 2026
 date is explicitly a report revision. Both READMEs and `CITATION.cff` direct
 readers to the same work. The seven prior-work references remain in
@@ -165,10 +167,15 @@ Validation:
 -   `env openout_any=p make -C docs/whitepaper` passed from a clean report
     build, reproducing Ubuntu's output restriction locally. This corrected
     the initial Actions failure when BibTeX ran outside the hidden directory.
+-   The shared-bibliography build passed on Ubuntu at `cc5d437`:
+    [Actions run 39196343786](https://github.com/Kautenja/limit-order-book/actions/runs/39196343786).
+    The subsequent citation-key rename also rebuilt locally without warnings;
+    all three project references resolve and all eight rendered pages remain
+    pixel-identical to the reviewed PDF.
 -   The desktop LaTeX compiler also succeeded with the repository root as
     the project and `docs/whitepaper/main.tex` as its main document.
--   All eight rendered pages were reviewed. The canonical BibTeX is unchanged,
-    its README copy is identical, and this update changes none of the 22
+-   All eight rendered pages were reviewed. The canonical citation fields are
+    preserved, its README copy is identical, and this update changes none of the 22
     hashed evaluation inputs. The PDF and CFF titles also match the BibTeX.
 -   Relative documentation links and Pandoc-rendered Markdown structure were
     checked. `git diff --check` passed. No library code or study data changed,

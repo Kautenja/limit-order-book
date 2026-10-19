@@ -14,9 +14,11 @@ other matching engines.
 
 ## Read And Build
 
-[main.tex](main.tex) is the canonical LaTeX source. Open this directory in
-the Codex LaTeX editor, or install `latexmk`, `pdflatex`, `bibtex`, and the
-packages in the preamble, then run from the repository root:
+[main.tex](main.tex) is the canonical LaTeX source. In the Codex LaTeX editor,
+use the repository root as the project and `docs/whitepaper/main.tex` as the
+main document so the shared bibliography is included. For a command-line
+build, install `latexmk`, `pdflatex`, `bibtex`, and the packages in the
+preamble, then run from the repository root:
 
 ```shell
 make -C docs/whitepaper
