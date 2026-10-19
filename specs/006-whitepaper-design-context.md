@@ -99,3 +99,12 @@ C++/Python/package suites were not rerun for this documentation-only change.
 The replay is a macOS check, not Linux or Windows validation. Historical
 engines were inspected, not benchmarked. Temporary replay and preview outputs
 are removed after review; the final PDF remains in the ignored report build.
+
+The report changes were committed and pushed as `b73f183` on
+`2026-10-19-updates`. `gh run watch 39201142411 --interval 30 --exit-status`
+confirmed that the Ubuntu 24.04 report build passed and uploaded its PDF:
+[Actions run 39201142411](https://github.com/Kautenja/limit-order-book/actions/runs/39201142411).
+The release-attachment job correctly skipped the branch push. This validates
+the report build on Ubuntu, not the library's Linux behavior. The working tree
+was clean after the push; this final evidence note is a separate documentation
+commit.
