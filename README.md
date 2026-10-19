@@ -279,16 +279,15 @@ gh workflow run publish.yml --ref <tag>
 
 ## Citation
 
-Please cite `limit-order-book` if you use it in your research.
-
-For the implementation analysis and measurements, use the
-[technical report citation](docs/whitepaper/CITATION.bib). The software citation
-below identifies the library itself.
+Please use the same `limit-order-book` citation for the software and its
+[technical report](docs/whitepaper/README.md), including the implementation
+analysis and measurements. They are one project with one preferred citation.
 
 Download [CITATION.bib](CITATION.bib) or copy the BibTeX entry below.
 [CITATION.cff](CITATION.cff) provides the same preferred citation for GitHub's
 **Cite this repository** feature. Please also identify the software version or
-commit used in your research.
+commit used in your research, and the report revision and evidence manifest
+when referring to measurements.
 
 ```bibtex
 @misc{limit-order-book,

@@ -8,6 +8,7 @@ name: Technical report
     branches-ignore:
       - master
     paths:
+      - 'CITATION.bib'
       - 'docs/whitepaper/**'
       - '.github/workflows/report.yml'
       - '.github/workflows/ci.yml'

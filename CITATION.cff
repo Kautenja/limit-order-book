@@ -1,7 +1,8 @@
 cff-version: 1.2.0
 message: >-
-  If you use limit-order-book in your research, please cite the preferred
-  citation below and identify the software version or commit used.
+  Cite the software and its technical report using the same preferred
+  citation below. Identify the software version or commit used, and the
+  report revision and evidence manifest when referring to measurements.
 type: software
 title: "Limit Order Book: A Price-Time Priority Matching Engine for C++, C, and Python"
 abstract: >-

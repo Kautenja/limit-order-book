@@ -7,6 +7,7 @@ LATEXMK ?= latexmk
 all:
 	mkdir -p "$(BUILD)"
 	$(LATEXMK) -pdf -interaction=nonstopmode -halt-on-error -file-line-error \
+		-bibtexfudge- \
 		-pdflatex='pdflatex -no-shell-escape %O %S' \
 		-jobname=limit-order-book -outdir="$(BUILD)" main.tex
 

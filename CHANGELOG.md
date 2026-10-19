@@ -99,6 +99,9 @@ dates, or the tag date for releases that were not uploaded.
 -   Added `AGENTS.md`, the C++ and Markdown style guides, `CONTRIBUTING.md`,
     and `LICENSING.md`, and shipped `LICENSING.md` in both distributions.
 -   Added `CITATION.bib`, `CITATION.cff`, and a README citation section.
+-   Unified the technical report and software under the existing top-level
+    2019 citation. The report now reads that BibTeX entry directly and shares
+    its title; the separate report citation was removed.
 -   Removed the `Doxyfile`, the Doxygen theme, and the generated `docs/` site,
     and retired the GitHub Pages documentation URL. The header comments are
     the API reference.

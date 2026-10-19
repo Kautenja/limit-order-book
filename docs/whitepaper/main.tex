@@ -24,11 +24,12 @@
 \usepackage{needspace}
 \usepackage{balance}
 \usepackage{url}
+\usepackage[numbers]{natbib}
 \definecolor{ink}{HTML}{214E70}
 \definecolor{accent}{HTML}{B85C38}
 \definecolor{pale}{HTML}{F3F5F7}
 \usepackage[colorlinks=true,linkcolor=ink,citecolor=ink,urlcolor=ink]{hyperref}
-\hypersetup{pdftitle={Limit Order Book: Design and Evaluation of a Price-Time Priority Matching Library},pdfauthor={Christian Kauten},pdfsubject={Technical report, manuscript version 1},pdfkeywords={limit order book, price-time priority, matching, C++, C, Python, reproducible evaluation}}
+\hypersetup{pdftitle={Limit Order Book: A Price-Time Priority Matching Engine for C++, C, and Python},pdfauthor={Christian Kauten},pdfsubject={Project technical report; revision October 18, 2026},pdfkeywords={limit order book, price-time priority, matching, C++, C, Python, reproducible evaluation}}
 \setlength{\columnsep}{0.25in}
 \setlength{\headheight}{14pt}
 \setlength{\emergencystretch}{1.5em}
@@ -47,9 +48,9 @@
 \newcommand{\studyrows}{\@@input evidence/table-rows.tex }
 \makeatother
 \input{evidence/results.tex}
-\title{\textbf{Limit Order Book: Design and Evaluation\\of a Price-Time Priority Matching Library}}
+\title{\textbf{Limit Order Book: A Price-Time Priority\\Matching Engine for C++, C, and Python}}
 \author{Christian Kauten}
-\date{October 18, 2026\quad /\quad Technical report, manuscript version 1}
+\date{Technical report revision: October 18, 2026}
 
 \begin{document}
 \twocolumn[\maketitle
@@ -93,7 +94,7 @@ price. These cases make an implementation account useful even when the
 underlying matching policy and container choices are established.
 
 The \emph{limit-order-book} library provides a price-time priority book for
-one instrument~\cite{software}. Incoming limit orders first match eligible
+one instrument~\cite{limit-order-book}. Incoming limit orders first match eligible
 opposing orders and then rest any remainder. Market orders consume eligible
 liquidity without resting. The core is a header-only C++14 library; an opaque
 C interface and a native Python wrapper expose selected operations. The code
@@ -661,11 +662,17 @@ a new matching policy or a universally faster engine.
 
 \section*{Availability and Acknowledgments}
 The software and first-party report sources are available under the
-repository's MIT terms~\cite{software}. Vendored components retain their own
+repository's MIT terms~\cite{limit-order-book}. Vendored components retain their own
 notices; imported research and example engines retain their original
 attribution. The report's visual layout follows the author's RackNES and
 Fourier technical reports. This is a repository manuscript, with no assigned
 DOI, claimed peer review, or publication acceptance.
+
+Use the project's shared citation~\cite{limit-order-book} for both the software
+and this report. The canonical entry is in the top-level \path{CITATION.bib}.
+Its 2019 year identifies the project citation; the report revision date on
+the title page identifies this document's state. When citing measurements,
+also identify the evaluated source revision and accompanying evidence manifest.
 
 The accompanying README gives exact build and study commands. The raw CSV,
 per-seed check results, environment metadata, and SHA-256 manifest are under
@@ -673,56 +680,11 @@ per-seed check results, environment metadata, and SHA-256 manifest are under
 and plot inputs used by this manuscript. The PDF build needs no network or
 benchmark execution once the LaTeX packages and checked-in evidence are present.
 
-\begin{thebibliography}{9}
+\begingroup
 \raggedright
-\bibitem{software}
-C. Kauten, ``Limit Order Book: A Price-Time Priority Matching Engine for C++,
-C, and Python,'' software repository, 2019--2026.
-\url{https://github.com/Kautenja/limit-order-book}.
-
-\bibitem{howtohft}
-howtohft, ``How to Build a Fast Limit Order Book,'' \emph{How to HFT},
-February 15, 2011. Original article:
-\url{http://howtohft.wordpress.com/2011/02/15/how-to-build-a-fast-limit-order-book/}.
-Consulted through the repository's attributed transcription,
-\path{docs/references/lob.md}; its linked archive is recorded in
-\path{docs/whitepaper/sources.md}.
-
-\bibitem{bst}
-C. Kauten, ``binary-search-tree,'' software repository, 2019.
-\url{https://github.com/Kautenja/binary-search-tree}.
-Evaluated vendored source identified in the evidence manifest.
-
-\bibitem{dll}
-C. Kauten, ``doubly-linked-list,'' software repository, 2019.
-\url{https://github.com/Kautenja/doubly-linked-list}.
-Evaluated vendored source identified in the evidence manifest.
-
-\bibitem{robin}
-Tessil and contributors, ``robin-map: C++ implementation of a fast hash map
-and hash set using Robin Hood hashing,'' software repository.
-\url{https://github.com/Tessil/robin-map}.
-Evaluated vendored source identified in the evidence manifest.
-
-\bibitem{cython}
-The Cython developers, ``Using C++ in Cython,'' \emph{Cython User Guide}.
-\url{https://docs.cython.org/en/latest/src/userguide/wrapping_CPlusPlus.html}.
-Accessed October 18, 2026.
-
-\bibitem{quantcup}
-voyager, ``QuantCup 1: Price-Time Matching Engine,'' C source, undated local
-copy. Author credit appears in the source header. Inspected artifact:
-\path{docs/references/engines/engine.c}. File identity and source locations
-are recorded in \path{docs/whitepaper/sources.md}.
-
-\bibitem{island}
-J. Levine, \emph{Island2}, version 2.40, FoxPro source with a 1996 copyright
-notice. Inspected artifact: \path{docs/references/engines/island.prg}.
-Release context: ``Island ECN 10th Birthday Source Code Release!,''
-\url{https://www.josh.com/notes/island-ecn-10th-birthday/},
-accessed October 18, 2026. The release page describes a December 15, 2003
-snapshot; byte identity with the local copy was not verified.
-\end{thebibliography}
+\bibliographystyle{unsrtnat}
+\bibliography{../../CITATION,references}
+\endgroup
 
 \clearpage
 \onecolumn
@@ -754,7 +716,7 @@ Run from the repository root with Python 3 and a C++14 Clang or GCC compiler.
 The first command requires a new capture directory outside the checkout;
 it builds the study under \path{.build/report/}. The second regenerates the
 archived paper inputs without rerunning measurements. The final command needs
-\code{latexmk}, \code{pdflatex}, and the packages named in the preamble.
+\code{latexmk}, \code{pdflatex}, \code{bibtex}, and the packages named in the preamble.
 \begin{verbatim}
 python3 docs/whitepaper/evaluate.py --output /tmp/lob-report-study
 python3 docs/whitepaper/evaluate.py --summarize docs/whitepaper/evidence

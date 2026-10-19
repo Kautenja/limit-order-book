@@ -1,9 +1,11 @@
 # Limit Order Book Technical Report
 
-**Limit Order Book: Design and Evaluation of a Price-Time Priority Matching
-Library**, by Christian Kauten. Technical report, manuscript version 1,
-October 18, 2026. This is a repository manuscript, without an assigned DOI,
-peer-review claim, or publication acceptance.
+**Limit Order Book: A Price-Time Priority Matching Engine for C++, C, and
+Python**, by Christian Kauten. Technical report revision: October 18, 2026.
+The report and software share the project's [2019 citation](../../CITATION.bib).
+The revision date identifies this document, not a separate cited work. This
+is a repository manuscript, without an assigned DOI, peer-review claim, or
+publication acceptance.
 
 The report explains the inherited design, matching semantics, data ownership,
 actual complexity, language interfaces, and a reproducible study. It does not
@@ -13,8 +15,8 @@ other matching engines.
 ## Read And Build
 
 [main.tex](main.tex) is the canonical LaTeX source. Open this directory in
-the Codex LaTeX editor, or install `latexmk`, `pdflatex`, and the packages in
-the preamble, then run from the repository root:
+the Codex LaTeX editor, or install `latexmk`, `pdflatex`, `bibtex`, and the
+packages in the preamble, then run from the repository root:
 
 ```shell
 make -C docs/whitepaper
@@ -36,7 +38,9 @@ as the `limit-order-book-report` Actions artifact. See the
 
 The source uses the two-column layout, 10-point type, 0.75-inch margins,
 running headers, and restrained blue and orange palette of the RackNES and
-Fourier reports. The bibliography and architecture diagram are in the
+Fourier reports. BibTeX reads the project's entry directly from
+[../../CITATION.bib](../../CITATION.bib) and prior-work entries from
+[references.bib](references.bib). The architecture diagram is in the
 manuscript. Numerical macros and plot data are generated from the raw CSV.
 
 ## Reproduce The Study
@@ -153,9 +157,11 @@ including the availability limits of the archived How to HFT article. It also
 identifies the QuantCup source credited to voyager and the Island2 source
 credited to Joshua Levine, with source-specific comparisons and provenance
 limits. Neither engine is an evaluated baseline.
-[CITATION.bib](CITATION.bib) identifies the report. When citing a measured
-implementation, also identify the source revision and evidence manifest used.
-The software's existing citation remains available in the root README.
+Use the top-level [CITATION.bib](../../CITATION.bib) for both the software and
+this report. [CITATION.cff](../../CITATION.cff) and the
+[root README](../../README.md#citation) provide the same preferred citation.
+When citing a measured implementation, also identify the source revision,
+report revision, and evidence manifest used.
 
 The [MIT License](../../LICENSE) covers first-party sources and this report;
 vendored components and imported references retain their own attribution and

@@ -15,8 +15,10 @@ make -C docs/whitepaper
 
 The output is `docs/whitepaper/.build/limit-order-book.pdf`. The Makefile is
 the shared build entry point for local development and GitHub Actions. It
-uses `latexmk` and `pdflatex`, disables shell escape, and reads checked-in
-evidence without rerunning benchmarks or downloading research.
+uses `latexmk`, `pdflatex`, and `bibtex`, disables shell escape, and reads
+checked-in evidence without rerunning benchmarks or downloading research.
+The `-bibtexfudge-` option keeps BibTeX in the source directory so that
+`../../CITATION.bib` resolves correctly while outputs stay in `.build/`.
 
 On Ubuntu 24.04, the workflow installs these packages:
 
@@ -32,6 +34,21 @@ manuscript's preamble. Do not
 commit PDFs or auxiliary files: `.build/` is ignored at every depth.
 `make -C docs/whitepaper clean` removes report outputs; `./main.sh clean`
 removes the report directory and the root build directory.
+
+## Shared Project Citation
+
+The software and report are one cited work. The top-level
+[CITATION.bib](../../CITATION.bib) owns the `limit-order-book` entry, including
+its title, author, 2019 citation year, and repository URL. The report reads
+that entry directly through BibTeX; its
+[references.bib](../whitepaper/references.bib) contains only prior work.
+Do not create a separate report citation or copy the project entry there.
+
+Keep the report title and PDF metadata, both READMEs, and
+[CITATION.cff](../../CITATION.cff) aligned with that entry. A report revision
+date identifies the document's state and does not replace the project citation
+year. Preserve the evaluated source revision and evidence manifests when
+updating presentation or citation metadata.
 
 ## Release Workflow
 

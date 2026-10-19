@@ -144,3 +144,31 @@ source review; attribution uses the repository's linked transcription.
 Levine's release page was accessible. Historical engines were inspected as
 source material, not executed. Temporary captures, review probes, and
 rendered pages were removed after final evidence selection and verification.
+
+## Shared Citation Update
+
+Completed October 18, 2026 at the author's request. The report and software
+now use the existing top-level `CITATION.bib` entry, without changing its key,
+author, title, year, or URL. The separate report entry was removed. The
+report's title and PDF metadata match the canonical title, while its 2026
+date is explicitly a report revision. Both READMEs and `CITATION.cff` direct
+readers to the same work. The seven prior-work references remain in
+`docs/whitepaper/references.bib`, with the original provenance qualifications.
+
+Validation:
+
+-   `make -C docs/whitepaper clean` followed by `make -C docs/whitepaper`
+    built eight pages with no final LaTeX or BibTeX warnings. BibTeX's log
+    confirms it reads `../../CITATION.bib` and `references.bib` directly.
+    The Makefile keeps BibTeX in the source directory to resolve that path.
+-   The desktop LaTeX compiler also succeeded with the repository root as
+    the project and `docs/whitepaper/main.tex` as its main document.
+-   All eight rendered pages were reviewed. The canonical BibTeX is unchanged,
+    its README copy is identical, and this update changes none of the 22
+    hashed evaluation inputs. The PDF and CFF titles also match the BibTeX.
+-   Relative documentation links and Pandoc-rendered Markdown structure were
+    checked. `git diff --check` passed. No library code or study data changed,
+    so native tests and measurements were not rerun for this citation update.
+
+The report workflow also watches top-level `CITATION.bib` changes so a future
+canonical citation edit triggers the branch PDF build.
