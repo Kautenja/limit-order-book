@@ -16,8 +16,9 @@
 #     unittest            Alias for test
 #     test-cpp            Build and run the Catch2 test suite with ctest
 #     test-python         Build the C API library and run the Python suite
-#     test-package        Install into .build/prefix and build the consumer
-#                         project with find_package and with FetchContent
+#     test-package        Install the headers and C API library into
+#                         .build/prefix and build the C++ and C consumers
+#                         with find_package and with FetchContent
 #     benchmark           Build and run the Catch2 benchmarks
 #     install-cpp         Install the headers and CMake package; pass extra
 #                         args to `cmake --install`, e.g., --prefix /opt/lob
@@ -144,24 +145,36 @@ run_test_python() {
 
 run_test_package() {
   local prefix="${BUILD_ROOT}/prefix"
-  run_configure
-  rm -rf "${prefix}"
-  cmake --install "${BUILD_DIR}" --config "${BUILD_TYPE}" --prefix "${prefix}"
-
-  # consume the installed package with find_package
-  cmake -S test/package -B "${BUILD_ROOT}/package-find" \
-    -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" \
-    -DCMAKE_PREFIX_PATH="${prefix}"
-  cmake --build "${BUILD_ROOT}/package-find" --config "${BUILD_TYPE}"
-  ctest --test-dir "${BUILD_ROOT}/package-find" --build-config "${BUILD_TYPE}" --output-on-failure
-
-  # consume this checkout with FetchContent
-  cmake -S test/package -B "${BUILD_ROOT}/package-fetch" \
-    -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" \
-    -DLOB_PACKAGE_TEST_FETCHCONTENT=ON \
+  local build_dir="${BUILD_ROOT}/package-build"
+  local fetch_args=(
+    -DLOB_PACKAGE_TEST_FETCHCONTENT=ON
     -DFETCHCONTENT_SOURCE_DIR_LIMIT_ORDER_BOOK="${SCRIPT_DIR}"
-  cmake --build "${BUILD_ROOT}/package-fetch" --config "${BUILD_TYPE}"
-  ctest --test-dir "${BUILD_ROOT}/package-fetch" --build-config "${BUILD_TYPE}" --output-on-failure
+  )
+  # install the header-only package and the C API library from a build tree
+  # that skips the tests, which `./main.sh test` covers
+  cmake -S . -B "${build_dir}" \
+    -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" \
+    -DLOB_BUILD_TESTS=OFF \
+    -DLOB_BUILD_PYTHON_LIBRARY=OFF \
+    -DLOB_BUILD_C_LIBRARY=ON
+  cmake --build "${build_dir}" --config "${BUILD_TYPE}"
+  rm -rf "${prefix}"
+  cmake --install "${build_dir}" --config "${BUILD_TYPE}" --prefix "${prefix}"
+
+  # consume the installed C++ and C packages with find_package
+  run_package_consumer package-find -DCMAKE_PREFIX_PATH="${prefix}" -DLOB_PACKAGE_TEST_C=ON
+  # consume this checkout with FetchContent, header-only and with the C API
+  run_package_consumer package-fetch "${fetch_args[@]}"
+  run_package_consumer package-fetch-c "${fetch_args[@]}" -DLOB_PACKAGE_TEST_C=ON
+}
+
+# Configure, build, and test test/package in .build/<name> with extra args.
+run_package_consumer() {
+  local build_dir="${BUILD_ROOT}/$1"
+  shift
+  cmake -S test/package -B "${build_dir}" -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" "$@"
+  cmake --build "${build_dir}" --config "${BUILD_TYPE}"
+  ctest --test-dir "${build_dir}" --build-config "${BUILD_TYPE}" --output-on-failure
 }
 
 run_benchmark() {

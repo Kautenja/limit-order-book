@@ -29,9 +29,10 @@ material, not dependencies.
 
 -   **`include/`:** The C++ library. `structures.hpp` defines `Order`, `Limit`,
     and the domain types; `limit_tree.hpp` defines one side of the book;
-    `limit_order_book.hpp` combines both sides; `lib_lob.hpp` is the C API.
--   **`src/lib_lob.cpp`:** The translation unit that compiles the C API into
-    the shared library.
+    `limit_order_book.hpp` combines both sides; `lib_lob.h` is the C API.
+-   **`src/lib_lob.cpp`:** The definitions of the C API, compiled into the
+    shared library that C programs (`LOB_BUILD_C_LIBRARY=ON`) and the Python
+    package load.
 -   **`limit_order_book/`:** The Python package. `library.py` declares the
     `ctypes` signatures; `limit_order_book.py` wraps them in a class.
 -   **`test/` and `limit_order_book/test/`:** Catch2 and `unittest` suites.
@@ -41,8 +42,8 @@ material, not dependencies.
 -   **`CMakeLists.txt` and `cmake/`:** The C++ build, install rules, and the
     CMake package and pkg-config templates. The `project()` version is the
     version of both the C++ and Python packages.
--   **`test/package/`:** A consumer project that checks `find_package` and
-    FetchContent.
+-   **`test/package/`:** C++ and C consumer projects that check
+    `find_package` and FetchContent.
 -   **`main.sh`:** The development command wrapper, modeled on nes-py's.
 -   **`.build/`:** Every build output, ignored by Git: the CMake build in
     `.build/cmake/`, scikit-build-core builds in `.build/python/`, package
@@ -81,7 +82,8 @@ below it:
 3.  `limit_order_book.hpp`: `LimitOrderBook` owns both trees and the
     order-ID-to-order map, and crosses incoming limit orders against the
     opposite side.
-4.  `lib_lob.hpp`: `extern "C"` functions that mirror `LimitOrderBook`.
+4.  `lib_lob.h` and `src/lib_lob.cpp`: C functions on an opaque handle that
+    mirror `LimitOrderBook`.
 5.  `limit_order_book/`: `ctypes` declarations and the Python class.
 
 Preserve these matching invariants:
@@ -101,16 +103,19 @@ Preserve these matching invariants:
 Preserve the public interface. Renaming or removing a C++ method, C function,
 or Python method is a breaking change for users who copy `include/` or
 install from PyPI; call it out and get agreement first. When the C API
-changes, update `lib_lob.hpp`, the `argtypes` and `restype` declarations in
-`library.py`, the Python wrapper, and both test suites in the same change.
-`ctypes` types must match the C++ type widths exactly.
+changes, update `lib_lob.h`, `src/lib_lob.cpp`, the `argtypes` and `restype`
+declarations in `library.py`, the Python wrapper, the Python suite, and the C
+consumer in `test/package/` in the same change. `ctypes` types must match the
+C++ type widths exactly.
 
 Downstream C++ projects depend on the CMake interface, so treat it as public:
-the `limit_order_book::limit_order_book` target, the `LOB_*` options and their
-defaults, the install layout under `include/limit_order_book/`, and the
-package and pkg-config names. A FetchContent or `add_subdirectory` consumer
-must get only the header-only target: no tests, Catch2 download, or shared
-library. `./main.sh test-package` checks both consumer paths.
+the `limit_order_book::limit_order_book` and `limit_order_book::c` targets,
+the `LOB_*` options and their defaults, the install layout under
+`include/limit_order_book/`, and the package and pkg-config names. By
+default, a FetchContent or `add_subdirectory` consumer must get only the
+header-only target: no tests, Catch2 download, or shared library; it gets
+`limit_order_book::c` only with `LOB_BUILD_C_LIBRARY=ON`.
+`./main.sh test-package` checks both consumer paths from C++ and C.
 
 ## Development And Validation
 
@@ -130,8 +135,9 @@ Catch2 suite through `ctest`, and runs the Python suite. Other commands:
     go to `ctest`, such as `-R "send single order"`.
 -   **`./main.sh test-python`:** Build the C API library and run the Python
     suite.
--   **`./main.sh test-package`:** Install into `.build/prefix/` and build
-    `test/package/` with `find_package` and with FetchContent of the checkout.
+-   **`./main.sh test-package`:** Install the headers and the C API library
+    into `.build/prefix/` and build `test/package/` with `find_package` and
+    with FetchContent of the checkout.
 -   **`./main.sh benchmark`:** Build and run the benchmarks. Extra arguments
     go to the Catch2 runner.
 -   **`./main.sh deployment`:** Build the sdist and wheel in `.build/dist/`.

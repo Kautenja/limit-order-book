@@ -101,8 +101,37 @@ dependencies into your project, and add all four to the include path.
 
 ### C
 
-A C-level API is defined in [include/lib_lob.hpp](include/lib_lob.hpp). It is
-compiled into the shared library that the Python package loads.
+The C API in [include/lib_lob.h](include/lib_lob.h) is a C99 header that
+wraps the book in an opaque `LOB_LimitOrderBook` handle. The same shared
+library backs the Python package. Build and install it with
+`LOB_BUILD_C_LIBRARY=ON`:
+
+```shell
+cmake -S . -B .build/cmake -DLOB_BUILD_TESTS=OFF -DLOB_BUILD_C_LIBRARY=ON
+cmake --build .build/cmake
+cmake --install .build/cmake --prefix /usr/local
+```
+
+The install adds `lib_lob.h` to `include/limit_order_book/`, the
+`liblimit_order_book` shared library to `lib/`, and a
+`limit_order_book_c.pc` pkg-config file to `lib/pkgconfig/`. Because the
+package now holds a compiled library, the CMake package moves to
+`lib/cmake/limit_order_book/`. Link the `limit_order_book::c` target:
+
+```cmake
+find_package(limit_order_book 2 CONFIG REQUIRED COMPONENTS c)
+target_link_libraries(my_app PRIVATE limit_order_book::c)
+```
+
+or use pkg-config:
+
+```shell
+cc $(pkg-config --cflags limit_order_book_c) my_app.c \
+    $(pkg-config --libs limit_order_book_c)
+```
+
+A FetchContent or `add_subdirectory` consumer gets `limit_order_book::c` by
+setting `LOB_BUILD_C_LIBRARY` to `ON` before adding the project.
 
 ### Python
 

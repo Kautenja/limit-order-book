@@ -7,6 +7,10 @@
 # -   find_package(limit_order_book CONFIG) after `cmake --install`
 # -   pkg-config with limit_order_book.pc after `cmake --install`
 #
+# With LOB_BUILD_C_LIBRARY=ON, the C API in include/lib_lob.h is also built
+# as a shared library, exported as limit_order_book::c, and described by
+# limit_order_book_c.pc.
+#
 # The project version is the single source of truth for the C++ package and
 # the Python distribution; pyproject.toml reads it from this file.
 
@@ -49,6 +53,11 @@ option(
     LOB_BUILD_PYTHON_LIBRARY
     "Build the C API shared library that the Python package loads"
     ${LOB_DEFAULT_BUILD_PYTHON_LIBRARY}
+)
+option(
+    LOB_BUILD_C_LIBRARY
+    "Build and install the C API shared library as limit_order_book::c"
+    OFF
 )
 option(
     LOB_INSTALL
@@ -102,27 +111,52 @@ endfunction()
 
 # MARK: C API Shared Library
 
-if(LOB_BUILD_PYTHON_LIBRARY)
-    # the library is loaded through ctypes, so it is a plain shared library
-    # named lib_limit_order_book on every platform, not a Python extension
+# one shared library serves both C consumers and the Python package, which
+# loads it through ctypes under the name lib_limit_order_book
+if(LOB_BUILD_C_LIBRARY OR LOB_BUILD_PYTHON_LIBRARY)
     add_library(limit_order_book_c SHARED "${PROJECT_SOURCE_DIR}/src/lib_lob.cpp")
+    add_library(limit_order_book::c ALIAS limit_order_book_c)
     lob_configure_target(limit_order_book_c)
-    set_target_properties(limit_order_book_c PROPERTIES
-        PREFIX ""
-        OUTPUT_NAME lib_limit_order_book
+    target_include_directories(limit_order_book_c PUBLIC
+        "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>"
+        "$<INSTALL_INTERFACE:${LOB_INSTALL_INCLUDEDIR}>"
     )
-    if(LOB_IS_PYTHON_BUILD)
-        install(TARGETS limit_order_book_c
-            LIBRARY DESTINATION limit_order_book
-            RUNTIME DESTINATION limit_order_book
+    # lib_lob.h exports the C functions; hide every other symbol
+    target_compile_definitions(limit_order_book_c PRIVATE LOB_C_BUILDING_LIBRARY)
+    set_target_properties(limit_order_book_c PROPERTIES
+        EXPORT_NAME c
+        CXX_VISIBILITY_PRESET hidden
+        VISIBILITY_INLINES_HIDDEN ON
+    )
+    if(LOB_BUILD_C_LIBRARY)
+        # a conventional, versioned library: liblimit_order_book.so.2 or
+        # limit_order_book.dll
+        set_target_properties(limit_order_book_c PROPERTIES
+            OUTPUT_NAME limit_order_book
+            VERSION "${PROJECT_VERSION}"
+            SOVERSION "${PROJECT_VERSION_MAJOR}"
         )
     else()
+        # a plain library named lib_limit_order_book on every platform
+        set_target_properties(limit_order_book_c PROPERTIES
+            PREFIX ""
+            OUTPUT_NAME lib_limit_order_book
+        )
+    endif()
+    # the file name that limit_order_book/library.py loads
+    set(LOB_PYTHON_LIBRARY_NAME "lib_limit_order_book${CMAKE_SHARED_LIBRARY_SUFFIX}")
+    if(LOB_BUILD_PYTHON_LIBRARY AND LOB_IS_PYTHON_BUILD)
+        install(FILES "$<TARGET_FILE:limit_order_book_c>"
+            DESTINATION limit_order_book
+            RENAME "${LOB_PYTHON_LIBRARY_NAME}"
+        )
+    elseif(LOB_BUILD_PYTHON_LIBRARY)
         # copy the library into the source package so that
         # `python -m unittest discover .` runs against the fresh build
         add_custom_command(TARGET limit_order_book_c POST_BUILD
             COMMAND "${CMAKE_COMMAND}" -E copy_if_different
                 "$<TARGET_FILE:limit_order_book_c>"
-                "${PROJECT_SOURCE_DIR}/limit_order_book/"
+                "${PROJECT_SOURCE_DIR}/limit_order_book/${LOB_PYTHON_LIBRARY_NAME}"
             COMMENT "Copying the C API library into the Python package"
             VERBATIM
         )
@@ -177,8 +211,15 @@ endif()
 
 if(LOB_INSTALL)
     include(CMakePackageConfigHelpers)
-    # the directory for the arch-independent CMake package files
-    set(LOB_INSTALL_CMAKEDIR "${CMAKE_INSTALL_DATADIR}/cmake/limit_order_book")
+    # the directory for the CMake package files, which are arch-independent
+    # unless the package includes the C API shared library
+    if(LOB_BUILD_C_LIBRARY)
+        set(LOB_INSTALL_CMAKEDIR "${CMAKE_INSTALL_LIBDIR}/cmake/limit_order_book")
+        set(LOB_PACKAGE_ARCH_INDEPENDENT "")
+    else()
+        set(LOB_INSTALL_CMAKEDIR "${CMAKE_INSTALL_DATADIR}/cmake/limit_order_book")
+        set(LOB_PACKAGE_ARCH_INDEPENDENT ARCH_INDEPENDENT)
+    endif()
     # the directory for the arch-independent pkg-config file
     set(LOB_INSTALL_PKGCONFIGDIR "${CMAKE_INSTALL_DATADIR}/pkgconfig")
 
@@ -211,6 +252,13 @@ if(LOB_INSTALL)
 
     # export the header-only target as limit_order_book::limit_order_book
     install(TARGETS limit_order_book EXPORT limit_order_book_targets)
+    # export the C API library as limit_order_book::c, with its C header
+    if(LOB_BUILD_C_LIBRARY)
+        install(TARGETS limit_order_book_c EXPORT limit_order_book_targets)
+        install(FILES "${PROJECT_SOURCE_DIR}/include/lib_lob.h"
+            DESTINATION "${LOB_INSTALL_INCLUDEDIR}"
+        )
+    endif()
     install(EXPORT limit_order_book_targets
         FILE limit_order_bookTargets.cmake
         NAMESPACE limit_order_book::
@@ -224,7 +272,7 @@ if(LOB_INSTALL)
     write_basic_package_version_file(
         "${PROJECT_BINARY_DIR}/limit_order_bookConfigVersion.cmake"
         COMPATIBILITY SameMajorVersion
-        ARCH_INDEPENDENT
+        ${LOB_PACKAGE_ARCH_INDEPENDENT}
     )
     install(FILES
         "${PROJECT_BINARY_DIR}/limit_order_bookConfig.cmake"
@@ -246,4 +294,20 @@ if(LOB_INSTALL)
     install(FILES "${PROJECT_BINARY_DIR}/limit_order_book.pc"
         DESTINATION "${LOB_INSTALL_PKGCONFIGDIR}"
     )
+    # the C API library is arch-specific, so its pkg-config file is too
+    if(LOB_BUILD_C_LIBRARY)
+        set(LOB_INSTALL_PKGCONFIGDIR_C "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+        file(RELATIVE_PATH LOB_PKGCONFIG_C_TO_PREFIX
+            "/prefix/${LOB_INSTALL_PKGCONFIGDIR_C}" "/prefix"
+        )
+        string(REGEX REPLACE "/$" "" LOB_PKGCONFIG_C_TO_PREFIX "${LOB_PKGCONFIG_C_TO_PREFIX}")
+        configure_file(
+            "${PROJECT_SOURCE_DIR}/cmake/limit_order_book_c.pc.in"
+            "${PROJECT_BINARY_DIR}/limit_order_book_c.pc"
+            @ONLY
+        )
+        install(FILES "${PROJECT_BINARY_DIR}/limit_order_book_c.pc"
+            DESTINATION "${LOB_INSTALL_PKGCONFIGDIR_C}"
+        )
+    endif()
 endif()

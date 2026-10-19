@@ -95,9 +95,10 @@ changing C++ sources.
 -   **[include/limit_order_book.hpp](include/limit_order_book.hpp):**
     `LimitOrderBook`, which owns both trees and the order map and crosses
     incoming orders against the opposite side.
--   **[include/lib_lob.hpp](include/lib_lob.hpp) and
-    [src/lib_lob.cpp](src/lib_lob.cpp):** The `extern "C"` API and the
-    translation unit that compiles it into the shared library.
+-   **[include/lib_lob.h](include/lib_lob.h) and
+    [src/lib_lob.cpp](src/lib_lob.cpp):** The C API header, with
+    declarations only, and the translation unit that defines it in the shared
+    library.
 -   **[limit_order_book/library.py](limit_order_book/library.py) and
     [limit_order_book/limit_order_book.py](limit_order_book/limit_order_book.py):**
     The `ctypes` declarations and the Python class that wraps them.
@@ -108,14 +109,14 @@ changing C++ sources.
     install rules, and the CMake package and pkg-config templates. The
     `project()` version is the version of both packages.
 -   **[test/package](test/package):** A consumer project that checks the
-    installed package and FetchContent.
+    installed package and FetchContent from C++ and from C.
 -   **[pyproject.toml](pyproject.toml) and [main.sh](main.sh):** The Python
     package configuration and the development command wrapper.
 
 ### Compatibility And Invariants
 
 The C++, C, and Python interfaces mirror each other. When the C API changes,
-update `lib_lob.hpp`, the `argtypes` and `restype` declarations in
+update `lib_lob.h` and `src/lib_lob.cpp`, the `argtypes` and `restype` declarations in
 `library.py`, the Python wrapper, and both test suites in the same change.
 `ctypes` types must match the C++ type widths exactly. Renaming or removing a
 C++ method, C function, or Python method is a breaking change for users who

@@ -1,0 +1,10 @@
+prefix=${pcfiledir}/@LOB_PKGCONFIG_C_TO_PREFIX@
+includedir=${prefix}/@LOB_INSTALL_INCLUDEDIR@
+libdir=${prefix}/@CMAKE_INSTALL_LIBDIR@
+
+Name: limit_order_book_c
+Description: The C API to the limit order book
+URL: @PROJECT_HOMEPAGE_URL@
+Version: @PROJECT_VERSION@
+Cflags: -I${includedir}
+Libs: -L${libdir} -llimit_order_book

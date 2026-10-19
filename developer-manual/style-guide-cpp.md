@@ -46,8 +46,6 @@ notice, followed by a blank line before the include guard or includes:
 -   `main/dummy_matching.cpp` carries a short
     `// Copyright 2019 Christian Kauten` line. Replace it with the full header,
     keeping the original year, when a requested edit touches the file.
--   `include/lib_lob.hpp` and `src/lib_lob.cpp` spell `EXPRESS` as
-    `EXTERNRESS`. Correct it when a requested edit touches either file.
 -   Never add this header to `vendor/` or `notes/`.
 
 ## Style Fingerprint
@@ -79,7 +77,7 @@ strongest signals are:
 -   `include/` is a header-only library distributed through the
     `limit_order_book::limit_order_book` CMake target, an installed package,
     or a copy of the headers, so new library code lives in headers and is
-    marked `inline` or templated. `src/lib_lob.cpp` only compiles the C API.
+    marked `inline` or templated. `src/lib_lob.cpp` defines the C API.
 -   The headers require C++14, and `CMakeLists.txt` builds every first-party
     target, including tests, benchmarks, and `main/`, as C++14. Avoid C++17
     features such as `if constexpr`, structured bindings, `std::optional`,
@@ -93,7 +91,8 @@ strongest signals are:
 -   Use the `LOB` namespace for everything in `include/` except the C API.
 -   Use include guards named after the file, such as `LOB_LIMIT_TREE_HPP_`,
     matching the existing headers. Do not mix in `#pragma once`.
--   Use `.hpp` for headers and `.cpp` for translation units.
+-   Use `.hpp` for headers and `.cpp` for translation units. The C API
+    header, `lib_lob.h`, is the one `.h` file.
 -   Prefer cohesive files over line-count limits. The book and tree headers
     are 300-400 lines; that is comfortable. Around 600-700 lines, ask whether
     the file still owns one data structure.
@@ -117,8 +116,9 @@ Names describe the market concept, not the implementation detail.
 -   **Paired operations:** a `_sell` and `_buy` method for each side, plus a
     side-dispatching method without a suffix, such as `limit_sell`,
     `limit_buy`, and `limit`.
--   **Macros:** `UPPER_SNAKE_CASE`, such as `EXTERN`, and `#undef` them at the
-    end of the header that defines them.
+-   **Macros:** `UPPER_SNAKE_CASE` with a `LOB_` prefix, such as
+    `LOB_C_API`, and `#undef` them at the end of the header that defines
+    them.
 
 ## Formatting
 
@@ -140,12 +140,12 @@ Names describe the market concept, not the implementation detail.
     and the closing `)` at the declaration's indentation:
 
     ```cpp
-    EXTERN void limit_sell(
-        LOB::LimitOrderBook* book,
-        LOB::UID uid,
-        LOB::Quantity quantity,
-        LOB::Price price
-    ) { book->limit_sell(uid, quantity, price); }
+    void limit_sell(
+        LOB_LimitOrderBook* book,
+        LOB_UID uid,
+        LOB_Quantity quantity,
+        LOB_Price price
+    ) { book->book.limit_sell(uid, quantity, price); }
     ```
 
 -   Attach `*` and `&` to the type: `Limit* limit`, `const Order& get(...)`.
@@ -236,22 +236,33 @@ The book exists to be fast. Treat the hot path as the product.
 
 ## C API
 
-`include/lib_lob.hpp` is the boundary that Python and C users see.
+`include/lib_lob.h` is the boundary that Python and C users see. It is
+installed only with `LOB_BUILD_C_LIBRARY=ON`, so the header-only package
+does not ship a header without its library.
 
--   Wrap functions in `extern "C"` and mark each with `EXTERN`.
+-   Keep the header valid C99 and C++14: `<stdint.h>` and `<stdbool.h>`
+    types, `(void)` for empty parameter lists, and an
+    `#ifdef __cplusplus` `extern "C"` guard. Never include a C++ header from
+    it.
+-   Declare functions in the header and define them in `src/lib_lob.cpp`.
+    Mark each declaration with `LOB_C_API`, which exports it from the shared
+    library. The library hides every other symbol.
 -   Mirror `LimitOrderBook` methods by name. Name functions that collide with
     keywords with a trailing underscore: `new_` and `delete_`.
--   Pass the book as the first parameter, `LOB::LimitOrderBook* book`.
--   Use fixed-width types through the `LOB` aliases. Never pass references,
-    templates, or standard library types across the boundary.
--   Do not let new functions throw across the boundary. An exception that
-    escapes an `extern "C"` function called from `ctypes` aborts Python. Some
-    existing functions can throw on unknown IDs; document that, and do not
-    copy the pattern.
+-   Pass the book as the first parameter through the opaque handle,
+    `LOB_LimitOrderBook* book`. The handle wraps the C++ book in
+    `src/lib_lob.cpp`; C code never sees `LOB::` types.
+-   Use the `LOB_` C aliases (`LOB_UID`, `LOB_Price`, and so on).
+    `src/lib_lob.cpp` asserts that each matches its C++ alias. Never pass
+    references, templates, or standard library types across the boundary.
+-   Never let an exception cross the boundary: it aborts a C program or
+    Python. Check preconditions in the definition instead, as `get` returns
+    `NULL` and `cancel` ignores unknown IDs.
 -   Every C function needs a matching `argtypes` and `restype` declaration in
     `limit_order_book/library.py`, a method in
-    `limit_order_book/limit_order_book.py`, and tests in both languages. The
-    `ctypes` type must have the same width as the C++ alias.
+    `limit_order_book/limit_order_book.py`, Python tests, and coverage in the
+    C consumer in `test/package/main.c`. The `ctypes` type must have the same
+    width as the C alias.
 
 ## Tests And Benchmarks
 

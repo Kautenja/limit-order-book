@@ -1,9 +1,19 @@
 # The CMake package configuration for the header-only limit_order_book
 # library. Link against limit_order_book::limit_order_book after
 # find_package(limit_order_book CONFIG REQUIRED).
+#
+# Packages installed with LOB_BUILD_C_LIBRARY=ON also provide the C API
+# shared library as limit_order_book::c; require it with
+# find_package(limit_order_book CONFIG REQUIRED COMPONENTS c).
 
 @PACKAGE_INIT@
 
 include("${CMAKE_CURRENT_LIST_DIR}/limit_order_bookTargets.cmake")
+
+if(TARGET limit_order_book::c)
+    set(limit_order_book_c_FOUND TRUE)
+else()
+    set(limit_order_book_c_FOUND FALSE)
+endif()
 
 check_required_components(limit_order_book)

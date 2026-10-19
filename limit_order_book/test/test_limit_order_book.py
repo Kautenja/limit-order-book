@@ -197,6 +197,18 @@ class ShouldCancelBuyLimitOrder(TestCase):
         self.assertEqual(0, book.count_buy())
         self.assertEqual(0, book.count())
 
+
+class ShouldIgnoreCancelOfUnknownOrder(TestCase):
+    def test(self):
+        book = limit_order_book.LimitOrderBook()
+        book.limit_sell(1, 100, 50)
+        book.cancel(2)
+        self.assertTrue(book.has(1))
+        self.assertFalse(book.has(2))
+        self.assertEqual(50, book.best_sell())
+        self.assertEqual(100, book.volume_sell())
+        self.assertEqual(1, book.count())
+
 #
 # MARK: market
 #

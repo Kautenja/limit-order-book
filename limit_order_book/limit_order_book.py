@@ -95,7 +95,7 @@ class LimitOrderBook:
         Cancel an order with given order ID.
 
         Args:
-            order_id: the ID of the order to cancel
+            order_id: the ID of the order to cancel; unknown IDs are ignored
 
         Returns:
             None

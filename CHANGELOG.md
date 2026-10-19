@@ -12,9 +12,26 @@ dates, or the tag date for releases that were not uploaded.
 -   Raised the minimum Python version to 3.13. Wheels are published for
     CPython 3.13 and 3.14 on Linux x64 and arm64, macOS x64 and arm64, and
     Windows x64.
+-   Replaced the C++-only `include/lib_lob.hpp` with the C99 header
+    `include/lib_lob.h`, which declares the C API on an opaque
+    `LOB_LimitOrderBook` handle and `LOB_` fixed-width aliases.
+    `src/lib_lob.cpp` now holds the definitions, so the header can be
+    included from any number of C or C++ translation units. The function
+    names and ABI are unchanged, but C++ code that called them with a
+    `LOB::LimitOrderBook*` must use the handle from `new_`.
+
+**Features:**
+
+-   Added the `LOB_BUILD_C_LIBRARY` CMake option, which builds and installs
+    the C API as the versioned `liblimit_order_book` shared library, exported
+    as `limit_order_book::c` (`find_package` component `c`) and described by
+    `limit_order_book_c.pc`.
 
 **Fixes:**
 
+-   Made `cancel` ignore unknown order IDs and `get` return `NULL` for them
+    in the C API. Both previously threw `std::out_of_range` across the C
+    boundary, which aborted the calling C program or Python process.
 -   Fixed the Python `ctypes` declaration of `Volume` to match the C++
     `uint64_t` width. The `volume`, `volume_sell`, and `volume_buy` methods
     previously truncated volumes above $2^{32} - 1$.
@@ -32,6 +49,9 @@ dates, or the tag date for releases that were not uploaded.
     as C++14 for MSVC.
 -   Moved every build output under the ignored `.build/` directory and
     excluded the tests from the wheel.
+-   Removed the Windows-only `PyInit_lib_limit_order_book` stub, which
+    setuptools needed to link the library as an extension; CMake builds a
+    plain shared library.
 -   Replaced SCons, the makefile, `MANIFEST.in`, and setuptools with a CMake
     build. The Python package builds through scikit-build-core, and
     [main.sh](main.sh) wraps the development commands.
