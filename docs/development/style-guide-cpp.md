@@ -88,10 +88,9 @@ strongest signals are:
     outside `include/`; everything in `include/` is installed. A new vendored
     dependency needs its include directory in `LOB_VENDOR_INCLUDE_DIRS` and
     its license in the install rules.
--   Use the `LOB` namespace for new code in `include/` except the C API.
-    The adopted data structures retain their existing `BST` and `DLL`
-    namespaces and include guards for source compatibility; see
-    [Data structures](data-structures.md).
+-   Use the `LOB` namespace for everything in `include/` except the C API.
+    The intrusive helpers use the nested `LOB::BST` and `LOB::DLL` namespaces;
+    see [Data structures](data-structures.md).
 -   Use include guards named after the file, such as `LOB_LIMIT_TREE_HPP_`,
     matching the existing headers. Do not mix in `#pragma once`.
 -   Use `.hpp` for headers and `.cpp` for translation units. The C API
@@ -223,8 +222,8 @@ The book exists to be fast. Treat the hot path as the product.
 
 -   Keep add-at-existing-limit, cancel, and execute-at-best $O(1)$ and new
     limits $O(\log M)$. Document any operation that cannot meet that.
--   Keep the intrusive layout: `Order` derives from `DLL::Node` and `Limit`
-    from `BST::Node<Price>`. Do not replace them with standard containers of
+-   Keep the intrusive layout: `Order` derives from `LOB::DLL::Node` and `Limit`
+    from `LOB::BST::Node<Price>`. Do not replace them with standard containers of
     values without benchmark evidence.
 -   Do not reorder or resize `Order` and `Limit` fields, or remove
     `Limit::_padding`, without benchmark evidence. Their layout is part of

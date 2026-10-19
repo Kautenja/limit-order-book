@@ -36,7 +36,9 @@ Its [LaTeX source](docs/whitepaper/main.tex) and raw measurements are included.
 
 The library is header-only and requires C++14. Its binary search tree and
 doubly linked list are maintained in [include/](include) as part of this
-project. The remaining runtime dependency, `robin-map`, is vendored in
+project, under the `LOB::BST` and `LOB::DLL` namespaces. See
+[Data structures](docs/development/data-structures.md) for direct helper usage.
+The remaining runtime dependency, `robin-map`, is vendored in
 [vendor/](vendor) and installed with it. Every method below provides the
 `limit_order_book::limit_order_book` target, or the include path, so that this
 works:

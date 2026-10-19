@@ -14,10 +14,11 @@ search tree and doubly linked list, under the project's MIT license.
 -   Integrate their tests with Catch2 v3 and preserve useful tree benchmarks.
 -   Remove the two vendor trees and their standalone build configuration.
 -   Update installation, contribution rules, and report source references.
+-   Nest the adopted helpers under `LOB` and use project-prefixed header guards.
 
 ## Non-Goals
 
--   Change algorithms, node layout, C/C++/Python APIs, or CMake targets/options.
+-   Change algorithms, node layout, book/C/Python APIs, or CMake targets/options.
 -   Change `robin-map`, rewrite historical measurements, or claim a speedup.
 -   Delete remote repositories, tag, or publish packages.
 
@@ -25,7 +26,9 @@ search tree and doubly linked list, under the project's MIT license.
 
 -   The two data structures build from first-party headers with no dependency
     on their former repositories or vendor paths.
--   Existing `BST`/`DLL` names and installed header names remain available.
+-   The helpers use `LOB::BST` and `LOB::DLL`, with project-prefixed guards and
+    unchanged installed header names. Direct helper callers have migration
+    guidance; no global compatibility aliases remain.
 -   Imported tree and list tests run in the normal C++ test suite.
 -   C++, Python, installed-package, FetchContent, and distribution checks pass.
 -   Current documentation describes local ownership; archived evidence retains
@@ -58,8 +61,8 @@ vendored first-party files byte for byte:
 
 ## Completion Evidence
 
-Completed on 2026-10-19, on macOS arm64 with Apple Clang 21.0.0 and CPython
-3.14.2. No Linux or Windows run was performed locally.
+Initial import completed on 2026-10-19, on macOS arm64 with Apple Clang 21.0.0
+and CPython 3.14.2. No Linux or Windows run was performed locally.
 
 -   Imported both headers from the fetched snapshots. After removing comments
     and whitespace, their code matches upstream exactly. Existing names,
@@ -131,3 +134,52 @@ Temporary clones, captures, previews, and the wheel-test environment were
 removed. No package publication or remote repository deletion was performed.
 On 2026-10-19, the user requested committing and pushing the completed
 migration on the current `2026-10-19-updates` branch.
+
+### Namespace Integration
+
+Requested on 2026-10-19 after the initial import was committed and pushed as
+`456f59f`. The user explicitly requested integrating names and conventions
+with the project. The helper namespaces become `LOB::BST` and `LOB::DLL`;
+guards become `LOB_BINARY_SEARCH_TREE_HPP_` and `LOB_DOUBLY_LINKED_LIST_HPP_`.
+This intentionally changes direct C++ helper qualifiers without compatibility
+aliases. Algorithms, helper signatures, node layouts, and book/C/Python APIs
+are preserved. Tests and benchmark labels use the project-qualified names.
+
+The package consumer simulates unrelated global `BST`/`DLL` types and the old
+header-guard macros, then includes both helpers directly and checks their
+inheritance relationship with `Order` and `Limit`. This verifies namespace
+and guard isolation through the installed and FetchContent interfaces.
+
+Validation commands for this follow-up:
+
+```shell
+./main.sh benchmark 'Spam new Limits,Spam new Orders' --benchmark-samples 10 --benchmark-resamples 1000
+./main.sh test
+./main.sh test-package
+./main.sh deployment
+git diff --check
+```
+
+Namespace integration completed on 2026-10-19 on the same macOS arm64 host:
+
+-   `./main.sh test` passed all 98 C++ cases and 28 Python cases, with no
+    compiler warnings. Both helper namespaces' contents are byte-identical
+    to the initial import; only their enclosing namespace, namespace comments,
+    and guards changed.
+-   `./main.sh test-package` passed all five installed-package and FetchContent
+    C++/C checks, including the new namespace and header-guard collision checks.
+-   The benchmark command above passed before and after the change using the
+    same compiler and Release flags. These two workloads exercise new tree
+    limits and existing-level order queues. No performance claim is made.
+-   Automatic approval review for `./main.sh deployment` again failed twice
+    because its model was at capacity; neither command executed. The same
+    offline distribution command documented above successfully built the
+    source archive and a macOS arm64 CPython 3.14 wheel from it. The source
+    archive contains the current namespaced headers byte for byte.
+-   Installed that wheel into `/tmp/lob-namespace-wheel-env` using
+    `--no-index --no-deps`; its interpreter ran `-I test/package/python.py` and passed all
+    28 Python tests. The isolated deployment build and Linux/Windows runs
+    remain unverified.
+-   Checked 33 relative documentation paths, visually reviewed the rendered
+    ownership guide, and passed `git diff --check`. Temporary benchmark logs,
+    previews, and the wheel-test environment were removed.

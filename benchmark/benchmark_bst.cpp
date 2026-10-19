@@ -105,10 +105,10 @@ using Catch::Benchmark::Chronometer;
 using LOB::Benchmark::measure_trees;
 
 // ---------------------------------------------------------------------------
-// MARK: BST::insert
+// MARK: LOB::BST::insert
 // ---------------------------------------------------------------------------
 
-TEST_CASE("BST::insert nodes with strictly increasing key", "[bst-benchmark]") {
+TEST_CASE("LOB::BST::insert nodes with strictly increasing key", "[bst-benchmark]") {
     for (int count : {10, 100, 1000, 10000}) {
         BENCHMARK_ADVANCED(std::to_string(count) + " nodes")(Chronometer timer) {
             measure_trees(timer, count, false, false);
@@ -116,7 +116,7 @@ TEST_CASE("BST::insert nodes with strictly increasing key", "[bst-benchmark]") {
     }
 }
 
-TEST_CASE("BST::insert nodes with random key", "[bst-benchmark]") {
+TEST_CASE("LOB::BST::insert nodes with random key", "[bst-benchmark]") {
     for (int count : {10, 100, 1000, 10000, 100000}) {
         BENCHMARK_ADVANCED(std::to_string(count) + " nodes")(Chronometer timer) {
             measure_trees(timer, count, true, false);
@@ -125,10 +125,10 @@ TEST_CASE("BST::insert nodes with random key", "[bst-benchmark]") {
 }
 
 // ---------------------------------------------------------------------------
-// MARK: BST::remove
+// MARK: LOB::BST::remove
 // ---------------------------------------------------------------------------
 
-TEST_CASE("BST::remove nodes in random order", "[bst-benchmark]") {
+TEST_CASE("LOB::BST::remove nodes in random order", "[bst-benchmark]") {
     for (int count : {10, 100, 1000, 10000, 100000}) {
         BENCHMARK_ADVANCED(std::to_string(count) + " nodes")(Chronometer timer) {
             measure_trees(timer, count, true, true);

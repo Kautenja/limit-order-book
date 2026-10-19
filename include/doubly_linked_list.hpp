@@ -21,9 +21,13 @@
 // SOFTWARE.
 //
 
-#ifndef DOUBLY_LINKED_LIST_HPP
-#define DOUBLY_LINKED_LIST_HPP
+#ifndef LOB_DOUBLY_LINKED_LIST_HPP_
+#define LOB_DOUBLY_LINKED_LIST_HPP_
 
+/// @brief Components of the limit order book.
+namespace LOB {
+
+/// @brief Intrusive doubly linked list nodes and pointer operations.
 namespace DLL {
 
 /// @brief An intrusive list node whose links borrow caller-owned nodes.
@@ -111,5 +115,6 @@ inline int count(Node* head) {
 }
 
 }  // namespace DLL
+}  // namespace LOB
 
-#endif  // DOUBLY_LINKED_LIST_HPP
+#endif  // LOB_DOUBLY_LINKED_LIST_HPP_

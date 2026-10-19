@@ -21,9 +21,13 @@
 // SOFTWARE.
 //
 
-#ifndef BINARY_SEARCH_TREE_HPP
-#define BINARY_SEARCH_TREE_HPP
+#ifndef LOB_BINARY_SEARCH_TREE_HPP_
+#define LOB_BINARY_SEARCH_TREE_HPP_
 
+/// @brief Components of the limit order book.
+namespace LOB {
+
+/// @brief Intrusive binary search tree nodes and pointer operations.
 namespace BST {
 
 /// @brief An intrusive binary search tree node with a comparable key.
@@ -198,5 +202,6 @@ inline Node<Key>* min(Node<Key>* root) {
 }
 
 }  // namespace BST
+}  // namespace LOB
 
-#endif  // BINARY_SEARCH_TREE_HPP
+#endif  // LOB_BINARY_SEARCH_TREE_HPP_

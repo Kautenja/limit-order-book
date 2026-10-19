@@ -25,27 +25,27 @@
 #include "doubly_linked_list.hpp"
 
 // ---------------------------------------------------------------------------
-// MARK: DLL::push_back
+// MARK: LOB::DLL::push_back
 // ---------------------------------------------------------------------------
 
-SCENARIO("DLL: nodes are pushed onto the queue") {
+SCENARIO("LOB::DLL: nodes are pushed onto the queue") {
     GIVEN("a series of node pointers") {
-        DLL::Node node1_storage{};
+        LOB::DLL::Node node1_storage{};
         auto node1 = &node1_storage;
-        DLL::Node node2_storage{};
+        LOB::DLL::Node node2_storage{};
         auto node2 = &node2_storage;
-        DLL::Node node3_storage{};
+        LOB::DLL::Node node3_storage{};
         auto node3 = &node3_storage;
-        DLL::Node* head = nullptr;
+        LOB::DLL::Node* head = nullptr;
         WHEN("node1 is pushed onto head") {
-            DLL::push_back(&head, node1);
+            LOB::DLL::push_back(&head, node1);
             THEN("head is set to node 1") {
                 REQUIRE(head == node1);
             }
         }
         WHEN("node2 is pushed onto node1") {
-            DLL::push_back(&head, node1);
-            DLL::push_back(&head, node2);
+            LOB::DLL::push_back(&head, node1);
+            LOB::DLL::push_back(&head, node2);
             THEN("head is set to node 1") {
                 REQUIRE(head == node1);
                 REQUIRE(node1->next == node2);
@@ -55,9 +55,9 @@ SCENARIO("DLL: nodes are pushed onto the queue") {
             }
         }
         WHEN("node3 is pushed onto node2") {
-            DLL::push_back(&head, node1);
-            DLL::push_back(&head, node2);
-            DLL::push_back(&head, node3);
+            LOB::DLL::push_back(&head, node1);
+            LOB::DLL::push_back(&head, node2);
+            LOB::DLL::push_back(&head, node3);
             THEN("head is set to node 1") {
                 REQUIRE(head == node1);
                 REQUIRE(node1->next == node2);
@@ -72,21 +72,21 @@ SCENARIO("DLL: nodes are pushed onto the queue") {
 }
 
 // ---------------------------------------------------------------------------
-// MARK: DLL::append
+// MARK: LOB::DLL::append
 // ---------------------------------------------------------------------------
 
-SCENARIO("DLL: nodes are appended to the queue") {
+SCENARIO("LOB::DLL: nodes are appended to the queue") {
     GIVEN("a series of node pointers") {
-        DLL::Node node1_storage{};
+        LOB::DLL::Node node1_storage{};
         auto node1 = &node1_storage;
-        DLL::Node node2_storage{};
+        LOB::DLL::Node node2_storage{};
         auto node2 = &node2_storage;
-        DLL::Node node3_storage{};
+        LOB::DLL::Node node3_storage{};
         auto node3 = &node3_storage;
-        DLL::Node* tail = nullptr;
+        LOB::DLL::Node* tail = nullptr;
         WHEN("node2 is appended to node1") {
-            DLL::push_back(&tail, node1);
-            DLL::append(&tail, node2);
+            LOB::DLL::push_back(&tail, node1);
+            LOB::DLL::append(&tail, node2);
             THEN("tail is set to node 1") {
                 REQUIRE(tail == node2);
                 REQUIRE(node1->next == node2);
@@ -96,9 +96,9 @@ SCENARIO("DLL: nodes are appended to the queue") {
             }
         }
         WHEN("node3 is appended to node2") {
-            DLL::push_back(&tail, node1);
-            DLL::append(&tail, node2);
-            DLL::append(&tail, node3);
+            LOB::DLL::push_back(&tail, node1);
+            LOB::DLL::append(&tail, node2);
+            LOB::DLL::append(&tail, node3);
             THEN("tail is set to node 1") {
                 REQUIRE(tail == node3);
                 REQUIRE(node1->next == node2);
@@ -113,37 +113,37 @@ SCENARIO("DLL: nodes are appended to the queue") {
 }
 
 // ---------------------------------------------------------------------------
-// MARK: DLL::remove
+// MARK: LOB::DLL::remove
 // ---------------------------------------------------------------------------
 
-TEST_CASE("DLL: remove a single node") {
-    DLL::Node node1_storage{};
+TEST_CASE("LOB::DLL: remove a single node") {
+    LOB::DLL::Node node1_storage{};
     auto node1 = &node1_storage;
-    DLL::Node* head = nullptr;
-    DLL::Node* tail = node1;
-    DLL::push_back(&head, node1);
-    DLL::remove(&head, &tail, node1);
+    LOB::DLL::Node* head = nullptr;
+    LOB::DLL::Node* tail = node1;
+    LOB::DLL::push_back(&head, node1);
+    LOB::DLL::remove(&head, &tail, node1);
     REQUIRE(head == nullptr);
     REQUIRE(tail == nullptr);
     REQUIRE(node1->next == nullptr);
     REQUIRE(node1->prev == nullptr);
 }
 
-SCENARIO("DLL: nodes are pushed onto the queue then removed") {
+SCENARIO("LOB::DLL: nodes are pushed onto the queue then removed") {
     GIVEN("a series of node pointers") {
-        DLL::Node node1_storage{};
+        LOB::DLL::Node node1_storage{};
         auto node1 = &node1_storage;
-        DLL::Node node2_storage{};
+        LOB::DLL::Node node2_storage{};
         auto node2 = &node2_storage;
-        DLL::Node node3_storage{};
+        LOB::DLL::Node node3_storage{};
         auto node3 = &node3_storage;
-        DLL::Node* head = nullptr;
-        DLL::Node* tail = node3;
-        DLL::push_back(&head, node1);
-        DLL::push_back(&head, node2);
-        DLL::push_back(&head, node3);
+        LOB::DLL::Node* head = nullptr;
+        LOB::DLL::Node* tail = node3;
+        LOB::DLL::push_back(&head, node1);
+        LOB::DLL::push_back(&head, node2);
+        LOB::DLL::push_back(&head, node3);
         WHEN("node1 is removed") {
-            DLL::remove(&head, &tail, node1);
+            LOB::DLL::remove(&head, &tail, node1);
             THEN("node2 is head") {
                 REQUIRE(head == node2);
             }
@@ -160,7 +160,7 @@ SCENARIO("DLL: nodes are pushed onto the queue then removed") {
             }
         }
         WHEN("node2 is removed") {
-            DLL::remove(&head, &tail, node2);
+            LOB::DLL::remove(&head, &tail, node2);
             THEN("node1 is head") {
                 REQUIRE(head == node1);
             }
@@ -177,7 +177,7 @@ SCENARIO("DLL: nodes are pushed onto the queue then removed") {
             }
         }
         WHEN("node3 is removed") {
-            DLL::remove(&head, &tail, node3);
+            LOB::DLL::remove(&head, &tail, node3);
             THEN("node1 is head") {
                 REQUIRE(head == node1);
             }
@@ -197,35 +197,35 @@ SCENARIO("DLL: nodes are pushed onto the queue then removed") {
 }
 
 // ---------------------------------------------------------------------------
-// MARK: DLL::is_empty
+// MARK: LOB::DLL::is_empty
 // ---------------------------------------------------------------------------
 
-TEST_CASE("DLL: return the correct emptiness flag") {
-    DLL::Node node1_storage{};
+TEST_CASE("LOB::DLL: return the correct emptiness flag") {
+    LOB::DLL::Node node1_storage{};
     auto node1 = &node1_storage;
-    DLL::Node* head = nullptr;
-    REQUIRE(DLL::is_empty(head));
-    DLL::push_back(&head, node1);
-    REQUIRE_FALSE(DLL::is_empty(head));
+    LOB::DLL::Node* head = nullptr;
+    REQUIRE(LOB::DLL::is_empty(head));
+    LOB::DLL::push_back(&head, node1);
+    REQUIRE_FALSE(LOB::DLL::is_empty(head));
 }
 
 // ---------------------------------------------------------------------------
-// MARK: DLL::count
+// MARK: LOB::DLL::count
 // ---------------------------------------------------------------------------
 
-TEST_CASE("DLL: return the correct size") {
-    DLL::Node node1_storage{};
+TEST_CASE("LOB::DLL: return the correct size") {
+    LOB::DLL::Node node1_storage{};
     auto node1 = &node1_storage;
-    DLL::Node node2_storage{};
+    LOB::DLL::Node node2_storage{};
     auto node2 = &node2_storage;
-    DLL::Node node3_storage{};
+    LOB::DLL::Node node3_storage{};
     auto node3 = &node3_storage;
-    DLL::Node* head = nullptr;
-    REQUIRE(DLL::count(head) == 0);
-    DLL::push_back(&head, node1);
-    REQUIRE(DLL::count(head) == 1);
-    DLL::push_back(&head, node2);
-    REQUIRE(DLL::count(head) == 2);
-    DLL::push_back(&head, node3);
-    REQUIRE(DLL::count(head) == 3);
+    LOB::DLL::Node* head = nullptr;
+    REQUIRE(LOB::DLL::count(head) == 0);
+    LOB::DLL::push_back(&head, node1);
+    REQUIRE(LOB::DLL::count(head) == 1);
+    LOB::DLL::push_back(&head, node2);
+    REQUIRE(LOB::DLL::count(head) == 2);
+    LOB::DLL::push_back(&head, node3);
+    REQUIRE(LOB::DLL::count(head) == 3);
 }

@@ -8,15 +8,21 @@ standalone repositories are no longer dependencies or maintenance targets.
 ## Source And Compatibility
 
 -   [binary_search_tree.hpp](../../include/binary_search_tree.hpp) provides
-    `BST::Node`, insertion, removal, and minimum/maximum traversal.
+    `LOB::BST::Node`, insertion, removal, and minimum/maximum traversal.
 -   [doubly_linked_list.hpp](../../include/doubly_linked_list.hpp) provides
-    `DLL::Node` and intrusive queue operations.
+    `LOB::DLL::Node` and intrusive queue operations.
 
-Keep these header names, include guards, namespaces, signatures, and node
-layouts compatible. `Order` derives from `DLL::Node`, and `Limit` derives from
-`BST::Node<Price>`; consumers can observe the inherited fields and types.
-The existing global namespaces are a compatibility exception to the C++
-style guide's `LOB` convention. The nodes borrow pointers; callers own storage.
+The helpers live under `LOB`, using the nested `BST` and `DLL` namespaces to
+separate their node types and operations. Their guards are
+`LOB_BINARY_SEARCH_TREE_HPP_` and `LOB_DOUBLY_LINKED_LIST_HPP_`, following the
+same convention as the other library headers. The nodes borrow pointers;
+callers own storage.
+
+Direct C++ callers must use `LOB::BST::` and `LOB::DLL::` in place of the former
+global `BST::` and `DLL::` names. There are no global compatibility aliases.
+Header filenames, helper signatures, and node layouts are preserved.
+`LOB::Order` derives from `LOB::DLL::Node`, and `LOB::Limit` derives from
+`LOB::BST::Node<LOB::Price>`. The book, C, and Python interfaces are unchanged.
 
 This ownership change does not rebalance the tree. Tree traversal and general
 insertion/removal cost $O(H)$ in tree height, which can reach $O(M)$ for $M$

@@ -21,7 +21,32 @@
 // SOFTWARE.
 //
 
+// Simulate unrelated consumer headers using the old standalone names and guards.
+#define BINARY_SEARCH_TREE_HPP
+#define DOUBLY_LINKED_LIST_HPP
+
+namespace BST {
+/// @brief An unrelated consumer's tree type.
+struct Node;
+}  // namespace BST
+
+namespace DLL {
+/// @brief An unrelated consumer's list type.
+struct Node;
+}  // namespace DLL
+
+#include "binary_search_tree.hpp"
+#include "doubly_linked_list.hpp"
 #include "limit_order_book.hpp"
+#include <type_traits>
+
+#undef BINARY_SEARCH_TREE_HPP
+#undef DOUBLY_LINKED_LIST_HPP
+
+static_assert(std::is_base_of<LOB::BST::Node<LOB::Price>, LOB::Limit>::value,
+    "Limits must use the project's tree node");
+static_assert(std::is_base_of<LOB::DLL::Node, LOB::Order>::value,
+    "Orders must use the project's list node");
 
 int main() {
     LOB::LimitOrderBook book;
