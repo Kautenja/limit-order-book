@@ -1,7 +1,7 @@
 # Report Build And Release Artifact
 
 Created: 2026-10-18
-Status: IN PROGRESS
+Status: COMPLETE
 
 ## Goal
 
@@ -80,5 +80,13 @@ The first Ubuntu Actions run found a missing `binhex.tex` dependency in
 `newtxtext`. The workflow and guide now explicitly include
 `texlive-plain-generic`; `actionlint` passes after this correction.
 
+The corrected workflow passed on Ubuntu 24.04 at commit `7dcddf2`:
+[Actions run 39195349031](https://github.com/Kautenja/limit-order-book/actions/runs/39195349031).
+The downloaded `limit-order-book-report` artifact contains an eight-page PDF;
+the final LaTeX pass has no unresolved warnings or overfull/underfull boxes.
+All eight pages match the local PDF's normalized extracted text.
+The release-upload job correctly skipped the branch-push event. The build
+and dependency changes were committed and pushed to `2026-10-18-updates`.
+
 The release paths were inspected without creating a tag, release, or PyPI
-publication. Successful GitHub-hosted validation remains to be recorded.
+publication. Actual release attachment remains unexercised until a release.
