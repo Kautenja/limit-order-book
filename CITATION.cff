@@ -7,8 +7,8 @@ title: "Limit Order Book: A Price-Time Priority Matching Engine for C++, C, and 
 abstract: >-
   limit-order-book is a header-only C++ limit order book with a price-time
   priority matching policy for reception of market data streams, a C API
-  compiled into a shared library, and a Python package that binds the C API
-  through ctypes.
+  compiled into a shared library, and a Python package that binds C++ directly
+  through Cython.
 authors:
   - family-names: Kauten
     given-names: Christian

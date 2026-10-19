@@ -70,9 +70,9 @@ For example:
 
 ```markdown
 -   **`include/`:** The header-only C++ library.
--   **`limit_order_book/`:** The Python package and its `ctypes` bindings.
+-   **`limit_order_book/`:** The Python package and its Cython bindings.
 
-1.  Build the shared library.
+1.  Build the Cython extension.
 2.  Run the Python suite.
 ```
 
@@ -99,10 +99,10 @@ a monospaced editor and render as ordinary GitHub tables.
 Text columns:
 
 ```markdown
-| C++ Alias  | Width     | `ctypes` Type     |
-| ---------- | --------- | ----------------- |
-| `UID`      | 64 bits   | `ctypes.c_uint64` |
-| `Quantity` | 32 bits   | `ctypes.c_uint32` |
+| C++ Alias  | Width   | Cython Type |
+| ---------- | ------- | ----------- |
+| `UID`      | 64 bits | `uint64_t`  |
+| `Quantity` | 32 bits | `uint32_t`  |
 ```
 
 Numeric columns:

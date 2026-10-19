@@ -1,5 +1,5 @@
 # The CMake build for the header-only C++ limit order book, its Catch2 tests
-# and benchmarks, and the C API shared library loaded by the Python package.
+# and benchmarks, the C API shared library, and the Cython Python extension.
 #
 # Consumers can use the library in three ways:
 #
@@ -51,7 +51,7 @@ option(LOB_BUILD_BENCHMARKS "Build the Catch2 benchmarks" OFF)
 option(LOB_BUILD_EXAMPLES "Deprecated compatibility option; has no effect" OFF)
 option(
     LOB_BUILD_PYTHON_LIBRARY
-    "Build the C API shared library that the Python package loads"
+    "Build the Cython extension for the Python package"
     ${LOB_DEFAULT_BUILD_PYTHON_LIBRARY}
 )
 option(
@@ -111,9 +111,8 @@ endfunction()
 
 # MARK: C API Shared Library
 
-# one shared library serves both C consumers and the Python package, which
-# loads it through ctypes under the name lib_limit_order_book
-if(LOB_BUILD_C_LIBRARY OR LOB_BUILD_PYTHON_LIBRARY)
+# the standalone C API is independent of the Python extension
+if(LOB_BUILD_C_LIBRARY)
     add_library(limit_order_book_c SHARED
         "${PROJECT_SOURCE_DIR}/src/limit_order_book_c.cpp"
     )
@@ -130,36 +129,58 @@ if(LOB_BUILD_C_LIBRARY OR LOB_BUILD_PYTHON_LIBRARY)
         CXX_VISIBILITY_PRESET hidden
         VISIBILITY_INLINES_HIDDEN ON
     )
-    if(LOB_BUILD_C_LIBRARY)
-        # a conventional, versioned library: liblimit_order_book.so.2 or
-        # limit_order_book.dll
-        set_target_properties(limit_order_book_c PROPERTIES
-            OUTPUT_NAME limit_order_book
-            VERSION "${PROJECT_VERSION}"
-            SOVERSION "${PROJECT_VERSION_MAJOR}"
-        )
-    else()
-        # a plain library named lib_limit_order_book on every platform
-        set_target_properties(limit_order_book_c PROPERTIES
-            PREFIX ""
-            OUTPUT_NAME lib_limit_order_book
+    set_target_properties(limit_order_book_c PROPERTIES
+        OUTPUT_NAME limit_order_book
+        VERSION "${PROJECT_VERSION}"
+        SOVERSION "${PROJECT_VERSION_MAJOR}"
+    )
+endif()
+
+# MARK: Cython Python Extension
+
+if(LOB_BUILD_PYTHON_LIBRARY)
+    find_package(Python 3.13 COMPONENTS Interpreter Development.Module REQUIRED)
+    execute_process(
+        COMMAND "${Python_EXECUTABLE}" -c
+            "import Cython; assert int(Cython.__version__.split('.')[0]) == 3"
+        RESULT_VARIABLE LOB_CYTHON_STATUS
+        ERROR_QUIET
+    )
+    if(NOT LOB_CYTHON_STATUS EQUAL 0)
+        message(FATAL_ERROR
+            "Cython 3 is required; install requirements.txt with ${Python_EXECUTABLE}"
         )
     endif()
-    # the file name that limit_order_book/library.py loads
-    set(LOB_PYTHON_LIBRARY_NAME "lib_limit_order_book${CMAKE_SHARED_LIBRARY_SUFFIX}")
-    if(LOB_BUILD_PYTHON_LIBRARY AND LOB_IS_PYTHON_BUILD)
-        install(FILES "$<TARGET_FILE:limit_order_book_c>"
-            DESTINATION limit_order_book
-            RENAME "${LOB_PYTHON_LIBRARY_NAME}"
-        )
-    elseif(LOB_BUILD_PYTHON_LIBRARY)
-        # copy the library into the source package so that
-        # `python -m unittest discover .` runs against the fresh build
-        add_custom_command(TARGET limit_order_book_c POST_BUILD
+    set(LOB_CYTHON_SOURCE "${PROJECT_SOURCE_DIR}/limit_order_book/_native.pyx")
+    set(LOB_GENERATED_SOURCE "${PROJECT_BINARY_DIR}/generated/_native.cpp")
+    add_custom_command(
+        OUTPUT "${LOB_GENERATED_SOURCE}"
+        COMMAND "${CMAKE_COMMAND}" -E make_directory "${PROJECT_BINARY_DIR}/generated"
+        COMMAND "${Python_EXECUTABLE}" -m cython --cplus -3
+            --module-name limit_order_book._native
+            -o "${LOB_GENERATED_SOURCE}" "${LOB_CYTHON_SOURCE}"
+        DEPENDS "${LOB_CYTHON_SOURCE}"
+            "${PROJECT_SOURCE_DIR}/limit_order_book/_book.pxd"
+        COMMENT "Cythonizing limit_order_book._native"
+        VERBATIM
+    )
+    Python_add_library(limit_order_book_native MODULE WITH_SOABI
+        "${LOB_GENERATED_SOURCE}"
+    )
+    lob_configure_target(limit_order_book_native)
+    set_target_properties(limit_order_book_native PROPERTIES
+        OUTPUT_NAME _native
+        CXX_VISIBILITY_PRESET hidden
+        VISIBILITY_INLINES_HIDDEN ON
+    )
+    if(LOB_IS_PYTHON_BUILD)
+        install(TARGETS limit_order_book_native DESTINATION limit_order_book)
+    else()
+        add_custom_command(TARGET limit_order_book_native POST_BUILD
             COMMAND "${CMAKE_COMMAND}" -E copy_if_different
-                "$<TARGET_FILE:limit_order_book_c>"
-                "${PROJECT_SOURCE_DIR}/limit_order_book/${LOB_PYTHON_LIBRARY_NAME}"
-            COMMENT "Copying the C API library into the Python package"
+                "$<TARGET_FILE:limit_order_book_native>"
+                "${PROJECT_SOURCE_DIR}/limit_order_book/$<TARGET_FILE_NAME:limit_order_book_native>"
+            COMMENT "Copying the Cython extension into the Python package"
             VERBATIM
         )
     endif()

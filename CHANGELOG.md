@@ -9,6 +9,11 @@ dates, or the tag date for releases that were not uploaded.
 
 **Breaking changes:**
 
+-   Removed the low-level `limit_order_book.library` ctypes loader. Use the
+    public `LimitOrderBook` class; its imports, methods, and integer wrapping
+    are preserved. Invalid integer arguments now raise `TypeError` instead
+    of `ctypes.ArgumentError`.
+
 -   Raised the minimum Python version to 3.13. Wheels are published for
     CPython 3.13 and 3.14 on Linux x64 and arm64, macOS x64 and arm64, and
     Windows x64.
@@ -24,6 +29,11 @@ dates, or the tag date for releases that were not uploaded.
     must update their includes to `#include "limit_order_book_c.h"`.
 
 **Features:**
+
+-   Replaced Python ctypes calls with a Cython extension that calls C++
+    directly. Wheels no longer need a separate C API shared library.
+-   Added `./main.sh benchmark-python` for repeatable public Python API
+    measurements and before/after comparisons.
 
 -   Added the `LOB_BUILD_C_LIBRARY` CMake option, which builds and installs
     the C API as the versioned `liblimit_order_book` shared library, exported

@@ -236,7 +236,7 @@ The book exists to be fast. Treat the hot path as the product.
 
 ## C API
 
-`include/limit_order_book_c.h` is the boundary that Python and C users see.
+`include/limit_order_book_c.h` is the boundary that C users see.
 It is installed only with `LOB_BUILD_C_LIBRARY=ON`, so the header-only
 package does not ship a header without its library.
 
@@ -257,14 +257,12 @@ package does not ship a header without its library.
     `src/limit_order_book_c.cpp` asserts that each matches its C++ alias.
     Never pass references, templates, or standard library types across the
     boundary.
--   Never let an exception cross the boundary: it aborts a C program or
-    Python. Check preconditions in the definition instead, as `get` returns
+-   Never let an exception cross the boundary: it can abort a C program.
+    Check preconditions in the definition instead, as `get` returns
     `NULL` and `cancel` ignores unknown IDs.
--   Every C function needs a matching `argtypes` and `restype` declaration in
-    `limit_order_book/library.py`, a method in
-    `limit_order_book/limit_order_book.py`, Python tests, and coverage in the
-    C consumer in `test/package/main.c`. The `ctypes` type must have the same
-    width as the C alias.
+-   Cover C functions in `test/package/main.c`. Python independently calls
+    C++ through Cython; keep equivalent operations and fixed-width types
+    consistent with [Python bindings](python-bindings.md).
 
 ## Tests And Benchmarks
 
@@ -295,8 +293,8 @@ Before finishing a C++ change, check:
 -   Every new or changed declaration has `///` documentation, including side,
     complexity, failure behavior, and ownership where they apply.
 -   The matching invariants in [AGENTS.md](../../AGENTS.md) still hold.
--   C API changes have matching `ctypes` declarations, Python methods, and
-    tests in both languages.
+-   C API changes have consumer coverage and keep equivalent Python methods
+    and tests consistent.
 -   Catch2 scenarios cover the changed behavior, and hot-path changes have
     before and after benchmark results.
 -   `./main.sh test-package` passes when the change touches `CMakeLists.txt`,

@@ -35,7 +35,8 @@ if(LOB_PACKAGE_TEST_FETCHCONTENT)
     endif()
     FetchContent_MakeAvailable(limit_order_book)
     # a FetchContent consumer gets only the targets it asks for
-    set(unwanted_targets limit_order_book_tests)
+    set(unwanted_targets limit_order_book_tests limit_order_book_benchmarks
+        limit_order_book_native)
     if(NOT LOB_PACKAGE_TEST_C)
         list(APPEND unwanted_targets limit_order_book_c)
     endif()

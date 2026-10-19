@@ -1,4 +1,4 @@
-// A C API to the limit order book for C programs and Python's ctypes.
+// A C API to the limit order book for C programs.
 //
 // Copyright (c) 2020 Christian Kauten
 //

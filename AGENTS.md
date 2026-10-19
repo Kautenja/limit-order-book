@@ -2,10 +2,10 @@
 
 `limit-order-book` is a header-only C++ limit order book with a price-time
 priority matching policy, distributed primarily as a CMake package. A C API is
-compiled into a shared library, and a Python package binds it through
-`ctypes`. Preserve matching correctness, the complexity guarantees of the book
-operations, the CMake package interface, and parity between the C++, C, and
-Python interfaces.
+compiled into a shared library, and a Python package binds C++ directly
+through Cython. Preserve matching correctness, the complexity guarantees of
+the book operations, the CMake package interface, and parity between the C++,
+C, and Python interfaces.
 
 ## Start Here
 
@@ -33,12 +33,12 @@ material, not dependencies.
     `limit_order_book.hpp` combines both sides; `limit_order_book_c.h` is
     the C API.
 -   **`src/limit_order_book_c.cpp`:** The definitions of the C API, compiled
-    into the shared library that C programs (`LOB_BUILD_C_LIBRARY=ON`) and
-    the Python package load.
--   **`limit_order_book/`:** The Python package. `library.py` declares the
-    `ctypes` signatures; `limit_order_book.py` wraps them in a class.
+    into the shared library that C programs use (`LOB_BUILD_C_LIBRARY=ON`).
+-   **`limit_order_book/`:** The Python package. `_book.pxd` declares the C++
+    types; `_native.pyx` owns the book and implements its methods.
+    `limit_order_book.py` preserves the public Python class.
 -   **`test/` and `limit_order_book/test/`:** Catch2 and `unittest` suites.
--   **`benchmark/`:** Catch2 benchmarks for the C++ book.
+-   **`benchmark/`:** Catch2 benchmarks and a Python interface benchmark.
 -   **`CMakeLists.txt` and `cmake/`:** The C++ build, install rules, and the
     CMake package and pkg-config templates. The `project()` version is the
     version of both the C++ and Python packages.
@@ -73,8 +73,7 @@ material, not dependencies.
 
 ## Architecture And Contracts
 
-The library is layered, and each layer must stay consistent with the one
-below it:
+The library has a shared C++ core and separate C and Python bindings:
 
 1.  `structures.hpp`: `Order` is a doubly-linked-list node; `Limit` is a
     binary-search-tree node that owns a FIFO queue of orders at one price.
@@ -85,7 +84,8 @@ below it:
     opposite side.
 4.  `limit_order_book_c.h` and `src/limit_order_book_c.cpp`: C functions on
     an opaque handle that mirror `LimitOrderBook`.
-5.  `limit_order_book/`: `ctypes` declarations and the Python class.
+5.  `limit_order_book/`: Cython declarations and bindings to the C++ book,
+    exposed through the Python class.
 
 Preserve these matching invariants:
 
@@ -104,10 +104,10 @@ Preserve these matching invariants:
 Preserve the public interface. Renaming or removing a C++ method, C function,
 or Python method is a breaking change for users who copy `include/` or
 install from PyPI; call it out and get agreement first. When the C API
-changes, update `limit_order_book_c.h`, `src/limit_order_book_c.cpp`, the
-`argtypes` and `restype` declarations in `library.py`, the Python wrapper,
-the Python suite, and the C consumer in `test/package/` in the same change.
-`ctypes` types must match the C++ type widths exactly.
+changes, update `limit_order_book_c.h`, `src/limit_order_book_c.cpp`, and the
+C consumer in `test/package/` together. Keep equivalent Python operations
+and tests consistent. Cython declarations must match the C++ type widths
+exactly; see [Python bindings](docs/development/python-bindings.md).
 
 Downstream C++ projects depend on the CMake interface, so treat it as public:
 the `limit_order_book::limit_order_book` and `limit_order_book::c` targets,
@@ -129,18 +129,20 @@ common commands; run them from the repository root:
 ```
 
 That command configures `.build/cmake/`, builds the Catch2 tests, benchmarks,
-and the C API library (copied into `limit_order_book/`), runs the Catch2 suite
-through `ctest`, and runs the Python suite. Other commands:
+and the Cython extension (copied into `limit_order_book/`), runs the Catch2
+suite through `ctest`, and runs the Python suite. Other commands:
 
 -   **`./main.sh test-cpp`:** Build and run the Catch2 suite. Extra arguments
     go to `ctest`, such as `-R "send single order"`.
--   **`./main.sh test-python`:** Build the C API library and run the Python
+-   **`./main.sh test-python`:** Build the Cython extension and run the Python
     suite.
 -   **`./main.sh test-package`:** Install the headers and the C API library
     into `.build/prefix/` and build `test/package/` with `find_package` and
     with FetchContent of the checkout.
 -   **`./main.sh benchmark`:** Build and run the benchmarks. Extra arguments
     go to the Catch2 runner.
+-   **`./main.sh benchmark-python`:** Build the Cython extension and benchmark
+    public Python calls. Extra arguments go to the Python runner.
 -   **`./main.sh deployment`:** Build the sdist and wheel in `.build/dist/`.
 
 The Catch2 v3 dependency is fetched from GitHub by CMake on first configure,
@@ -155,8 +157,8 @@ Validate changes by type:
 
 -   **Matching or data structures:** `./main.sh test`, plus a benchmark run
     before and after the change when the hot path is touched.
--   **C API or Python bindings:** `./main.sh test`, and confirm every C
-    function has matching `ctypes` declarations.
+-   **C API or Python bindings:** `./main.sh test`, and confirm binding types
+    match C++ widths. Benchmark Python before and after binding changes.
 -   **Build or packaging:** `./main.sh test`, `./main.sh test-package`, and
     `./main.sh deployment`. Do not run `./main.sh ship`, dispatch the publish
     workflow, or upload to PyPI unless asked.

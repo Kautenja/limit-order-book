@@ -76,11 +76,11 @@ build everything and run both suites:
 ./main.sh test
 ```
 
-The CMake build compiles the C API into
-`limit_order_book/lib_limit_order_book*` so the Python suite runs against the
-checkout. Editable installs are not supported, because `ctypes` loads the
-library from the source package; rebuild with `./main.sh build` after
-changing C++ sources.
+The CMake build copies the Cython extension into `limit_order_book/_native*`
+so the Python suite runs against the checkout. Rebuild with
+`./main.sh test-python` after changing C++ headers or Cython sources. See
+[Python bindings](docs/development/python-bindings.md) for ownership,
+conversion, and build requirements.
 
 ## Architecture
 
@@ -99,12 +99,13 @@ changing C++ sources.
     [src/limit_order_book_c.cpp](src/limit_order_book_c.cpp):** The C API
     header, with declarations only, and the translation unit that defines it
     in the shared library.
--   **[limit_order_book/library.py](limit_order_book/library.py) and
-    [limit_order_book/limit_order_book.py](limit_order_book/limit_order_book.py):**
-    The `ctypes` declarations and the Python class that wraps them.
+-   **[limit_order_book/_book.pxd](limit_order_book/_book.pxd) and
+    [limit_order_book/_native.pyx](limit_order_book/_native.pyx):** Cython
+    declarations and methods that call the C++ book directly.
+    `limit_order_book.py` preserves the public Python class.
 -   **[test](test), [limit_order_book/test](limit_order_book/test),
     and [benchmark](benchmark):** Catch2 suites, the Python suite, and Catch2
-    benchmarks.
+    benchmarks, plus the Python interface benchmark.
 -   **[CMakeLists.txt](CMakeLists.txt) and [cmake](cmake):** The C++ build,
     install rules, and the CMake package and pkg-config templates. The
     `project()` version is the version of both packages.
@@ -115,13 +116,13 @@ changing C++ sources.
 
 ### Compatibility And Invariants
 
-The C++, C, and Python interfaces mirror each other. When the C API changes,
-update `limit_order_book_c.h` and `src/limit_order_book_c.cpp`, the `argtypes`
-and `restype` declarations in `library.py`, the Python wrapper, and both test
-suites in the same change.
-`ctypes` types must match the C++ type widths exactly. Renaming or removing a
-C++ method, C function, or Python method is a breaking change for users who
-copy `include/` or install from PyPI; discuss it in an issue first.
+The C and Python interfaces independently wrap the C++ book. When the C API
+changes, update `limit_order_book_c.h`, `src/limit_order_book_c.cpp`, and the
+C consumer tests together. Keep equivalent Python operations and tests
+consistent. Cython declarations must match the C++ type widths exactly.
+Renaming or removing a C++ method, C function, or Python method is a breaking
+change for users who copy `include/` or install from PyPI; discuss it in an
+issue first.
 
 Matching changes must preserve these invariants:
 
@@ -157,8 +158,8 @@ Run every suite with:
 ./main.sh test
 ```
 
-That command configures `.build/cmake/`, builds the tests, benchmarks, and C
-API library, runs the Catch2 suite with `ctest`, and runs the Python suite.
+That command configures `.build/cmake/`, builds the tests, benchmarks, and
+Cython extension, runs the Catch2 suite with `ctest`, and runs the Python suite.
 
 ### C++ Tests
 
@@ -181,7 +182,7 @@ observable book state rather than mirroring implementation details.
 
 ### Python Tests
 
-Build the C API library into the package and run the Python suite:
+Build the Cython extension into the package and run the Python suite:
 
 ```shell
 ./main.sh test-python
@@ -194,6 +195,12 @@ Build and run every benchmark, or one benchmark by name:
 ```shell
 ./main.sh benchmark
 ./main.sh benchmark "Spam new Limits"
+```
+
+Measure the public Python interface with repeated samples:
+
+```shell
+./main.sh benchmark-python --loops 100000 --repeats 9 --output /tmp/lob-python.json
 ```
 
 The benchmarks build in the `Release` configuration without host-tuned flags.
@@ -211,7 +218,7 @@ Build a source distribution and a wheel in `.build/dist/` with:
 ```
 
 scikit-build-core drives the CMake build for the wheel. All build outputs go
-to the ignored `.build/` directory. To remove them and the shared library
+to the ignored `.build/` directory. To remove them and the Cython extension
 copied into the package, run:
 
 ```shell
@@ -226,13 +233,13 @@ local results for changes that need them.
 
 ### Choosing Validation
 
-| Change                      | Relevant validation                                          |
-| --------------------------- | ------------------------------------------------------------ |
-| Markdown guidance           | Check links, paths, and commands; run `git diff --check`     |
-| Matching or data structures | Run `./main.sh test`; benchmark hot paths before and after   |
-| C API or Python bindings    | Run `./main.sh test`; check every C function's `ctypes` type |
-| Build or packaging          | Run `./main.sh test`, `test-package`, and `deployment`       |
-| Windows-sensitive C++       | Confirm the code compiles as C++14; rely on CI for MSVC      |
+| Change                      | Relevant validation                                             |
+| --------------------------- | --------------------------------------------------------------- |
+| Markdown guidance           | Check links, paths, and commands; run `git diff --check`        |
+| Matching or data structures | Run `./main.sh test`; benchmark hot paths before and after      |
+| C API or Python bindings    | Run `./main.sh test`; check binding widths and benchmark Python |
+| Build or packaging          | Run `./main.sh test`, `test-package`, and `deployment`          |
+| Windows-sensitive C++       | Confirm the code compiles as C++14; rely on CI for MSVC         |
 
 Do not claim Linux or Windows validation from a local macOS build.
 
