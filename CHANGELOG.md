@@ -41,6 +41,9 @@ dates, or the tag date for releases that were not uploaded.
 
 **Build and packaging:**
 
+-   Removed the unused `cpptqdm`, `hopscotch_map`, and `sparse-map` vendored
+    libraries, obsolete packaging exclusions, unused benchmark includes,
+    commented-out Python code, and dangling diagram references.
 -   Removed the dummy matching executable and its build wiring. The
     `LOB_BUILD_EXAMPLES` option remains accepted as a deprecated no-op,
     with its default unchanged at `OFF`.

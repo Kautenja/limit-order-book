@@ -32,14 +32,11 @@ The libraries in `vendor/` are committed in-tree and retain their own licenses.
 The root license does not replace their terms. Keep each library's license file
 with its code when copying or redistributing it.
 
-| Library              | Use                                | License                      |
-| -------------------- | ---------------------------------- | ---------------------------- |
-| `binary-search-tree` | Limit tree nodes                   | MIT, Christian Kauten        |
-| `doubly-linked-list` | Order queue at each limit          | MIT, Christian Kauten        |
-| `robin-map`          | Price-to-limit hash map            | MIT, Tessil                  |
-| `hopscotch_map`      | Alternative hash map, not included | MIT, Tessil                  |
-| `sparse-map`         | Alternative hash map, not included | MIT, Tessil                  |
-| `cpptqdm`            | Progress bars, not included        | MIT, Christian Kauten et al. |
+| Library              | Use                       | License               |
+| -------------------- | ------------------------- | --------------------- |
+| `binary-search-tree` | Limit tree nodes          | MIT, Christian Kauten |
+| `doubly-linked-list` | Order queue at each limit | MIT, Christian Kauten |
+| `robin-map`          | Price-to-limit hash map   | MIT, Tessil           |
 
 `binary-search-tree`, `doubly-linked-list`, and `robin-map` are included by
 the public headers. `cmake --install` installs their headers beside the
@@ -47,17 +44,18 @@ project headers and their license files under
 `share/doc/limit_order_book/licenses/`, and they are compiled into the C API
 shared library, so wheels contain portions of them. Their MIT terms ask that
 their copyright and permission notices accompany substantial portions of the
-software. The other libraries are not included by any first-party source and
-are not installed.
+software.
 
-The source distribution includes the three used libraries with their license
-files and excludes the unused libraries and the nested `vendor/*/vendor`,
-test, and benchmark directories, as declared by `sdist.exclude` in
-[pyproject.toml](pyproject.toml).
+The source distribution includes these libraries with their license files and
+excludes their nested `vendor`, test, and benchmark directories, as declared
+by `sdist.exclude` in [pyproject.toml](pyproject.toml).
 
-Catch2, under the Boost Software License 1.0, is not vendored. CMake fetches
-it from GitHub only to build the test and benchmark executables, and it is not
-part of any distribution or installation.
+Catch2 is under the Boost Software License 1.0. CMake fetches Catch2 v3 from
+GitHub for the first-party tests and benchmarks. Older copies remain under
+`vendor/binary-search-tree/vendor/Catch2/` and
+`vendor/doubly-linked-list/vendor/Catch2/` for those libraries' standalone
+test harnesses. The first-party build does not use the nested copies, and no
+Catch2 copy is part of a distribution or installation.
 
 ## Notes And Example Engines
 

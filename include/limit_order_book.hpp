@@ -36,9 +36,6 @@ namespace LOB {
 typedef std::unordered_map<UID, Order> UIDOrderMap;
 
 /// @brief An order book for managing Limit / Order objects in a continuous double auction.
-/// @details
-/// \image html img/limit-order-book.svg "Abstract Domain Model of the Limit Order Book"
-/// \image latex img/limit-order-book.pdf "Abstract Domain Model of the Limit Order Book"
 ///
 class LimitOrderBook {
  private:

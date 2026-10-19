@@ -42,7 +42,6 @@ build-dir = ".build/python/{wheel_tag}"
 wheel.packages = ["limit_order_book"]
 wheel.exclude = ["limit_order_book/test/**"]
 sdist.exclude = [
-    ".clang_complete",
     ".gitattributes",
     ".github/**",
     ".gitignore",
@@ -58,9 +57,6 @@ sdist.exclude = [
     "vendor/*/test/**",
     "vendor/*/tests/**",
     "vendor/*/vendor/**",
-    "vendor/cpptqdm/**",
-    "vendor/hopscotch_map/**",
-    "vendor/sparse-map/**",
 ]
 
 [tool.scikit-build.metadata.version]

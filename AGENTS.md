@@ -62,8 +62,8 @@ material, not dependencies.
 -   Implement one coherent requested change at a time. Read the nearby code
     and tests first. Avoid unrelated reformatting, dependency upgrades, or
     new build infrastructure.
--   Do not edit `vendor/`. Fixes to the owner-authored `binary-search-tree`,
-    `doubly-linked-list`, and `cpptqdm` libraries belong in their upstream
+-   Do not edit `vendor/`. Fixes to the owner-authored `binary-search-tree`
+    and `doubly-linked-list` libraries belong in their upstream
     repositories; ask before changing a vendored copy here.
 -   Reserve `.build/` for build outputs. Put scratch files, experiments, and
     benchmark captures outside the repository, and remove them when the task

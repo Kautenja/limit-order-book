@@ -143,8 +143,8 @@ flags to `CMakeLists.txt`. Keep `limit_order_book::limit_order_book`, the
 `LOB_*` options, and the install layout stable; downstream projects depend on
 them.
 
-Do not edit `vendor/`. Fixes to the owner-authored `binary-search-tree`,
-`doubly-linked-list`, and `cpptqdm` libraries belong in their upstream
+Do not edit `vendor/`. Fixes to the owner-authored `binary-search-tree`
+and `doubly-linked-list` libraries belong in their upstream
 repositories.
 
 ## Development And Testing

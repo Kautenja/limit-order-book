@@ -85,20 +85,6 @@ class LimitOrderBook:
         """
         return Library.functions.has(self._book, order_id)
 
-    # def get(self, order_id):
-    #     """
-    #     Return a pointer to the order with given ID.
-    #
-    #     Args:
-    #         order_id: the ID of the order to get
-    #
-    #     Returns:
-    #         an order object wrapped around the pointer
-    #
-    #     """
-    #     # pointer = Library.functions.get(self._book, order_id)
-    #     raise NotImplementedError
-
     def cancel(self, order_id):
         """
         Cancel an order with given order ID.
