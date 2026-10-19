@@ -49,9 +49,11 @@ shared library and Cython extension, so wheels contain portions of it.
 Its MIT terms ask that its copyright and permission notice accompany
 substantial portions of the software.
 
-The source distribution includes `robin-map` with its license file and
-excludes its nested `vendor`, test, and benchmark directories, as declared
-by `sdist.exclude` in [pyproject.toml](pyproject.toml).
+The source distribution includes only the four upstream headers and license
+under `vendor/robin-map/`, plus the sibling version and checksum manifest
+[vendor/robin-map.json](vendor/robin-map.json). See
+[Vendored dependencies](docs/development/vendored-dependencies.md) for
+provenance, integrity checks, and the update procedure.
 
 Catch2 is under the Boost Software License 1.0. CMake fetches Catch2 v3 from
 GitHub for the first-party tests and benchmarks, including the tree and list

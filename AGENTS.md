@@ -52,8 +52,8 @@ material, not dependencies.
     `.build/dist/`. The report uses `docs/whitepaper/.build/` instead;
     `./main.sh clean` removes both. See the
     [report build guide](docs/development/technical-report.md).
--   **`vendor/`:** Third-party dependencies, committed in-tree. Treat them as
-    read-only.
+-   **`vendor/`:** Third-party dependencies and provenance manifests, committed
+    in-tree. Treat upstream sources as read-only outside intentional updates.
 -   **`docs/`:** Documentation, indexed in [docs/README.md](docs/README.md).
     `docs/development/` holds durable rules for agents and maintainers;
     `docs/references/` holds imported research notes and example engines.
@@ -65,7 +65,9 @@ material, not dependencies.
 -   Implement one coherent requested change at a time. Read the nearby code
     and tests first. Avoid unrelated reformatting, dependency upgrades, or
     new build infrastructure.
--   Do not edit `vendor/`. The binary search tree and doubly linked list are
+-   Do not hand-edit vendored sources. Intentional dependency updates follow
+    [Vendored dependencies](docs/development/vendored-dependencies.md).
+    The binary search tree and doubly linked list are
     first-party code in `include/`; see
     [Data structures](docs/development/data-structures.md) for ownership and
     compatibility rules.

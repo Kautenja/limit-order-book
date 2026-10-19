@@ -9,6 +9,10 @@
 # Preserve the original CRLF line endings of the imported Island ECN source.
 /docs/references/engines/island.prg -text
 
+# Keep vendored blobs byte-identical to their upstream checksum manifest,
+# including Windows checkouts configured with core.autocrlf=true.
+/vendor/robin-map/** -text
+
 # Keep the C++ library and Python package classified consistently, including
 # tests and benchmarks.
 *.cpp linguist-language=C++

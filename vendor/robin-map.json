@@ -1,0 +1,12 @@
+{
+  "repository": "https://github.com/Tessil/robin-map.git",
+  "version": "1.3.0",
+  "commit": "188c45569cc2a5dd768077c193830b51d33a5020",
+  "files": {
+    "LICENSE": "11f2c685ba565a31aef1219f63a7a8845602c97bff70016b9e3278dfe51a2ec5",
+    "include/tsl/robin_growth_policy.h": "e0698fb2350d47ed5664af3457431dcabc3004b1a034038ae704cab04bef200b",
+    "include/tsl/robin_hash.h": "1065186b57b984a0fff646c9f7817692fcfe3ece936dc3551392e1e0e90b2f29",
+    "include/tsl/robin_map.h": "23bf96fe93dc5aea9b1e002d0df1cb91fa24cccbfa74ce0573f44bba865d20ab",
+    "include/tsl/robin_set.h": "1cfb73344b604c60cec68e21c67796945985f0924d79b145f151d717704c7f54"
+  }
+}

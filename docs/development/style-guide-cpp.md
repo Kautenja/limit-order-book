@@ -306,4 +306,5 @@ Before finishing a C++ change, check:
     before and after benchmark results.
 -   `./main.sh test-package` passes when the change touches `CMakeLists.txt`,
     `cmake/`, or the set of public headers.
--   No edits were made under `vendor/`.
+-   Vendored sources are unchanged unless this is an intentional dependency
+    update following [Vendored dependencies](vendored-dependencies.md).

@@ -27,6 +27,68 @@
 
 using namespace LOB;
 
+SCENARIO("colliding price levels retain FIFO through growth and deletion", "[price-map]") {
+    auto side = GENERATE(Side::Sell, Side::Buy);
+    const Side taking_side = side == Side::Sell ? Side::Buy : Side::Sell;
+    const UID levels = 256;
+    auto book = LimitOrderBook();
+    // Identical low bits exercise collision chains in the price hash map.
+    book.limit(side, 1, 3, Price{1} << 20);
+    book.limit(side, 2, 5, Price{1} << 20);
+    const Order* anchor = &book.get(2);
+    const Limit* anchor_limit = anchor->limit;
+    for (UID index = 1; index < levels; ++index) {
+        Price price = (index + 1) << 20;
+        book.limit(side, index * 3 + 1, 3, price);
+        book.limit(side, index * 3 + 2, 5, price);
+    }
+    REQUIRE(&book.get(2) == anchor);
+    REQUIRE(book.get(2).limit == anchor_limit);
+    REQUIRE(book.count() == levels * 2);
+    REQUIRE(book.volume() == levels * 8);
+
+    // Remove and recreate alternating levels; keep the other level nodes alive.
+    for (UID index = 0; index < levels; ++index) {
+        Price price = (index + 1) << 20;
+        book.cancel(index * 3 + 1);
+        if (index % 2) {
+            book.cancel(index * 3 + 2);
+            REQUIRE(book.count_at(price) == 0);
+            REQUIRE(book.volume(price) == 0);
+            book.limit(side, index * 3 + 1, 3, price);
+            book.limit(side, index * 3 + 2, 5, price);
+        }
+        REQUIRE(book.count_at(price) == (index % 2 ? 2 : 1));
+        REQUIRE(book.volume(price) == (index % 2 ? 8 : 5));
+    }
+    REQUIRE(&book.get(2) == anchor);
+    REQUIRE(book.get(2).limit == anchor_limit);
+    Volume remaining_volume = levels / 2 * 13;
+    Count remaining_count = levels / 2 * 3;
+    REQUIRE(book.volume() == remaining_volume);
+    REQUIRE(book.count() == remaining_count);
+
+    for (UID step = 0; step < levels; ++step) {
+        UID index = side == Side::Sell ? step : levels - 1 - step;
+        Price price = (index + 1) << 20;
+        REQUIRE((side == Side::Sell ? book.best_sell() : book.best_buy()) == price);
+        book.market(taking_side, levels * 3 + 1, 3);
+        REQUIRE_FALSE(book.has(index * 3 + 1));
+        REQUIRE(book.get(index * 3 + 2).quantity == (index % 2 ? 5 : 2));
+        book.market(taking_side, levels * 3 + 1, index % 2 ? 5 : 2);
+        REQUIRE_FALSE(book.has(index * 3 + 2));
+        REQUIRE(book.count_at(price) == 0);
+        REQUIRE(book.volume(price) == 0);
+        remaining_volume -= index % 2 ? 8 : 5;
+        remaining_count -= index % 2 ? 2 : 1;
+        REQUIRE(book.volume() == remaining_volume);
+        REQUIRE(book.count() == remaining_count);
+    }
+    REQUIRE(book.best_buy() == 0);
+    REQUIRE(book.best_sell() == 0);
+    book.clear();
+}
+
 // ---------------------------------------------------------------------------
 // MARK: constructor
 // ---------------------------------------------------------------------------
