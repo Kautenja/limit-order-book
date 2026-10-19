@@ -31,7 +31,8 @@ material, not dependencies.
 -   **`include/`:** The C++ library. `structures.hpp` defines `Order`, `Limit`,
     and the domain types; `limit_tree.hpp` defines one side of the book;
     `limit_order_book.hpp` combines both sides; `limit_order_book_c.h` is
-    the C API.
+    the C API. `binary_search_tree.hpp` and `doubly_linked_list.hpp` own the
+    intrusive node operations used by the book.
 -   **`src/limit_order_book_c.cpp`:** The definitions of the C API, compiled
     into the shared library that C programs use (`LOB_BUILD_C_LIBRARY=ON`).
 -   **`limit_order_book/`:** The Python package. `_book.pxd` declares the C++
@@ -51,8 +52,8 @@ material, not dependencies.
     `.build/dist/`. The report uses `docs/whitepaper/.build/` instead;
     `./main.sh clean` removes both. See the
     [report build guide](docs/development/technical-report.md).
--   **`vendor/`:** Third-party and owner-authored dependencies, committed
-    in-tree. Treat them as read-only.
+-   **`vendor/`:** Third-party dependencies, committed in-tree. Treat them as
+    read-only.
 -   **`docs/`:** Documentation, indexed in [docs/README.md](docs/README.md).
     `docs/development/` holds durable rules for agents and maintainers;
     `docs/references/` holds imported research notes and example engines.
@@ -64,9 +65,10 @@ material, not dependencies.
 -   Implement one coherent requested change at a time. Read the nearby code
     and tests first. Avoid unrelated reformatting, dependency upgrades, or
     new build infrastructure.
--   Do not edit `vendor/`. Fixes to the owner-authored `binary-search-tree`
-    and `doubly-linked-list` libraries belong in their upstream
-    repositories; ask before changing a vendored copy here.
+-   Do not edit `vendor/`. The binary search tree and doubly linked list are
+    first-party code in `include/`; see
+    [Data structures](docs/development/data-structures.md) for ownership and
+    compatibility rules.
 -   Reserve the root `.build/` for native and Python outputs, and
     `docs/whitepaper/.build/` for report outputs. Put scratch files, experiments, and
     benchmark captures outside the repository, and remove them when the task

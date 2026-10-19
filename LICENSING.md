@@ -26,37 +26,36 @@ C++ headers in `include/`, the C API in `src/`, the Python package in
 and the documentation. The C++ sources carry the MIT notice in their headers;
 preserve those notices when copying `include/` into another project.
 
+The binary search tree and doubly linked list, including their tests and
+benchmarks, are maintained as first-party code under this same license.
+Their headers are `include/binary_search_tree.hpp` and
+`include/doubly_linked_list.hpp`; no separate license files are needed for
+these components.
+
 ## Vendored Dependencies
 
 The libraries in `vendor/` are committed in-tree and retain their own licenses.
 The root license does not replace their terms. Keep each library's license file
 with its code when copying or redistributing it.
 
-| Library              | Use                       | License               |
-| -------------------- | ------------------------- | --------------------- |
-| `binary-search-tree` | Limit tree nodes          | MIT, Christian Kauten |
-| `doubly-linked-list` | Order queue at each limit | MIT, Christian Kauten |
-| `robin-map`          | Price-to-limit hash map   | MIT, Tessil           |
+| Library     | Use                     | License     |
+| ----------- | ----------------------- | ----------- |
+| `robin-map` | Price-to-limit hash map | MIT, Tessil |
 
-`binary-search-tree`, `doubly-linked-list`, and `robin-map` are included by
-the public headers. `cmake --install` installs their headers beside the
-project headers and their license files under
-`share/doc/limit_order_book/licenses/`, and they are compiled into the C API
-shared library and Cython extension, so wheels contain portions of them.
-Their MIT terms ask that their copyright and permission notices accompany
+`robin-map` is included by the public headers. `cmake --install` installs its
+headers beside the project headers and its license file under
+`share/doc/limit_order_book/licenses/robin-map/`. It is compiled into the C API
+shared library and Cython extension, so wheels contain portions of it.
+Its MIT terms ask that its copyright and permission notice accompany
 substantial portions of the software.
 
-The source distribution includes these libraries with their license files and
-excludes their nested `vendor`, test, and benchmark directories, as declared
+The source distribution includes `robin-map` with its license file and
+excludes its nested `vendor`, test, and benchmark directories, as declared
 by `sdist.exclude` in [pyproject.toml](pyproject.toml).
 
 Catch2 is under the Boost Software License 1.0. CMake fetches Catch2 v3 from
-GitHub for the first-party tests and benchmarks. The older nested copies in
-`binary-search-tree` and `doubly-linked-list` have been pruned. Their retained
-standalone SCons test and benchmark harnesses expect those upstream
-dependencies; run them from the complete upstream repositories. This
-project's CMake build uses only the libraries' headers. No Catch2 copy is
-part of a distribution or installation.
+GitHub for the first-party tests and benchmarks, including the tree and list
+tests. No Catch2 copy is part of a distribution or installation.
 
 ## Notes And Example Engines
 

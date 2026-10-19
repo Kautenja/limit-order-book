@@ -1,19 +1,38 @@
 // Test cases for the binary search tree module.
-// Copyright 2019 Christian Kauten
+//
+// Copyright (c) 2019 Christian Kauten
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 //
 
-#include "catch.hpp"
+#include <catch2/catch_test_macros.hpp>
 #include "binary_search_tree.hpp"
 
-//
+// ---------------------------------------------------------------------------
 // MARK: constructor
-//
+// ---------------------------------------------------------------------------
 
-TEST_CASE("initialize BST::Node with default constructor") {
-    REQUIRE_NOTHROW(new BST::Node<double>);
+TEST_CASE("BST: initialize BST::Node with default constructor") {
+    REQUIRE_NOTHROW(BST::Node<double>{});
 }
 
-TEST_CASE("BST::Node with default constructor has default key") {
+TEST_CASE("BST: BST::Node with default constructor has default key") {
     BST::Node<double> tree;
     REQUIRE(0 == tree.key);
     REQUIRE(nullptr == tree.parent);
@@ -21,11 +40,11 @@ TEST_CASE("BST::Node with default constructor has default key") {
     REQUIRE(nullptr == tree.right);
 }
 
-TEST_CASE("initialize BST::Node with key constructor") {
-    REQUIRE_NOTHROW(new BST::Node<double>, 4);
+TEST_CASE("BST: initialize BST::Node with key constructor") {
+    REQUIRE_NOTHROW(BST::Node<double>{4});
 }
 
-TEST_CASE("BST::Node with key constructor has key") {
+TEST_CASE("BST: BST::Node with key constructor has key") {
     auto tree = BST::Node<double>(4);
     REQUIRE(4 == tree.key);
     REQUIRE(nullptr == tree.parent);
@@ -33,16 +52,19 @@ TEST_CASE("BST::Node with key constructor has key") {
     REQUIRE(nullptr == tree.right);
 }
 
-//
+// ---------------------------------------------------------------------------
 // MARK: BST::insert
-//
+// ---------------------------------------------------------------------------
 
-SCENARIO("insert node with same key") {
+SCENARIO("BST: insert node with same key") {
     GIVEN("a series of binary search tree nodes") {
         double key = 1;
-        auto node1 = new BST::Node<double>(key);
-        auto node2 = new BST::Node<double>(key);
-        auto node3 = new BST::Node<double>(key);
+        BST::Node<double> node1_storage{key};
+        auto node1 = &node1_storage;
+        BST::Node<double> node2_storage{key};
+        auto node2 = &node2_storage;
+        BST::Node<double> node3_storage{key};
+        auto node3 = &node3_storage;
         REQUIRE(BST::max(node1) == node1);
         REQUIRE(BST::min(node1) == node1);
         WHEN("node1 is inserted into nullptr") {
@@ -85,11 +107,14 @@ SCENARIO("insert node with same key") {
     }
 }
 
-SCENARIO("insert node with greater key") {
+SCENARIO("BST: insert node with greater key") {
     GIVEN("a series of binary search tree nodes") {
-        auto node1 = new BST::Node<double>(1);
-        auto node2 = new BST::Node<double>(2);
-        auto node3 = new BST::Node<double>(3);
+        BST::Node<double> node1_storage{1};
+        auto node1 = &node1_storage;
+        BST::Node<double> node2_storage{2};
+        auto node2 = &node2_storage;
+        BST::Node<double> node3_storage{3};
+        auto node3 = &node3_storage;
         WHEN("node2 is inserted into node1") {
             BST::insert(&node1, node2);
             THEN("the nodes point in the correct directions") {
@@ -123,11 +148,14 @@ SCENARIO("insert node with greater key") {
     }
 }
 
-SCENARIO("insert node with lesser key") {
+SCENARIO("BST: insert node with lesser key") {
     GIVEN("a series of binary search tree nodes") {
-        auto node1 = new BST::Node<double>(3);
-        auto node2 = new BST::Node<double>(2);
-        auto node3 = new BST::Node<double>(1);
+        BST::Node<double> node1_storage{3};
+        auto node1 = &node1_storage;
+        BST::Node<double> node2_storage{2};
+        auto node2 = &node2_storage;
+        BST::Node<double> node3_storage{1};
+        auto node3 = &node3_storage;
         WHEN("node2 is inserted into node1") {
             BST::insert(&node1, node2);
             THEN("the nodes point in the correct directions") {
@@ -161,23 +189,25 @@ SCENARIO("insert node with lesser key") {
     }
 }
 
-//
+// ---------------------------------------------------------------------------
 // MARK: BST::remove
-//
+// ---------------------------------------------------------------------------
 
-SCENARIO(R"(
+/*
 tree shape (single node):
 *
-)") {
+*/
+SCENARIO("BST: remove from a single node") {
     GIVEN("a tree and a single node") {
-        auto node = new BST::Node<double>(3);
+        BST::Node<double> node_storage{3};
+        auto node = &node_storage;
         auto node_copy = node;
         WHEN("the node is removed") {
             BST::remove(&node, node);
             THEN("the node pointers are correct") {
                 REQUIRE(nullptr == node);
             }
-            THEN("the removed node is node deleted") {
+            THEN("the removed node is not deleted") {
                 REQUIRE(nullptr != node_copy);
                 REQUIRE(nullptr == node_copy->parent);
                 REQUIRE(nullptr == node_copy->left);
@@ -187,16 +217,20 @@ tree shape (single node):
     }
 }
 
-SCENARIO(R"(
+/*
 tree shape:
   1
  / \
 0   2
-)") {
+*/
+SCENARIO("BST: remove from a balanced three-node tree") {
     GIVEN("a tree with V shape") {
-        auto node0 = new BST::Node<double>(0);
-        auto node1 = new BST::Node<double>(1);
-        auto node2 = new BST::Node<double>(2);
+        BST::Node<double> node0_storage{0};
+        auto node0 = &node0_storage;
+        BST::Node<double> node1_storage{1};
+        auto node1 = &node1_storage;
+        BST::Node<double> node2_storage{2};
+        auto node2 = &node2_storage;
         // create the tree
         BST::insert(&node1, node0);
         BST::insert(&node1, node2);
@@ -283,18 +317,22 @@ the shape is correct:
     }
 }
 
-SCENARIO(R"(
+/*
 tree shape:
 0
  \
   1
    \
     2
-)") {
+*/
+SCENARIO("BST: remove from a right chain") {
     GIVEN("a tree with right leg shape") {
-        auto node0 = new BST::Node<double>(0);
-        auto node1 = new BST::Node<double>(1);
-        auto node2 = new BST::Node<double>(2);
+        BST::Node<double> node0_storage{0};
+        auto node0 = &node0_storage;
+        BST::Node<double> node1_storage{1};
+        auto node1 = &node1_storage;
+        BST::Node<double> node2_storage{2};
+        auto node2 = &node2_storage;
         // create the tree
         BST::insert(&node0, node1);
         BST::insert(&node0, node2);
@@ -364,18 +402,22 @@ the shape is correct:
     }
 }
 
-SCENARIO(R"(
+/*
 tree shape:
     2
    /
   1
  /
 0
-)") {
+*/
+SCENARIO("BST: remove from a left chain") {
     GIVEN("a tree with left leg shape") {
-        auto node0 = new BST::Node<double>(0);
-        auto node1 = new BST::Node<double>(1);
-        auto node2 = new BST::Node<double>(2);
+        BST::Node<double> node0_storage{0};
+        auto node0 = &node0_storage;
+        BST::Node<double> node1_storage{1};
+        auto node1 = &node1_storage;
+        BST::Node<double> node2_storage{2};
+        auto node2 = &node2_storage;
         // create the tree
         BST::insert(&node2, node1);
         BST::insert(&node2, node0);
@@ -447,7 +489,7 @@ the shape is correct:
     }
 }
 
-SCENARIO(R"(
+/*
 tree shape:
 0
  \
@@ -456,12 +498,17 @@ tree shape:
 1
  \
   2
-)") {
+*/
+SCENARIO("BST: remove from a right-left-right chain") {
     GIVEN("a tree with right zigzag--shaped limit tree (buy)") {
-        auto node0 = new BST::Node<double>(0);
-        auto node1 = new BST::Node<double>(1);
-        auto node2 = new BST::Node<double>(2);
-        auto node3 = new BST::Node<double>(3);
+        BST::Node<double> node0_storage{0};
+        auto node0 = &node0_storage;
+        BST::Node<double> node1_storage{1};
+        auto node1 = &node1_storage;
+        BST::Node<double> node2_storage{2};
+        auto node2 = &node2_storage;
+        BST::Node<double> node3_storage{3};
+        auto node3 = &node3_storage;
         // create the tree
         BST::insert(&node0, node3);
         BST::insert(&node0, node1);
@@ -556,7 +603,7 @@ the shape is correct:
     }
 }
 
-SCENARIO(R"(
+/*
 tree shape:
   3
  /
@@ -565,12 +612,17 @@ tree shape:
   2
  /
 1
-)") {
+*/
+SCENARIO("BST: remove from a left-right-left chain") {
     GIVEN("a tree with left zigzag--shape") {
-        auto node0 = new BST::Node<double>(0);
-        auto node1 = new BST::Node<double>(1);
-        auto node2 = new BST::Node<double>(2);
-        auto node3 = new BST::Node<double>(3);
+        BST::Node<double> node0_storage{0};
+        auto node0 = &node0_storage;
+        BST::Node<double> node1_storage{1};
+        auto node1 = &node1_storage;
+        BST::Node<double> node2_storage{2};
+        auto node2 = &node2_storage;
+        BST::Node<double> node3_storage{3};
+        auto node3 = &node3_storage;
         // create the tree
         BST::insert(&node3, node0);
         BST::insert(&node3, node2);
@@ -665,19 +717,24 @@ the shape is correct:
     }
 }
 
-SCENARIO(R"(
+/*
 tree shape:
   1
  / \
 0   2
      \
       3
-)") {
+*/
+SCENARIO("BST: remove from a right child with a right leaf") {
     GIVEN("nodes") {
-        auto node0 = new BST::Node<double>(0);
-        auto node1 = new BST::Node<double>(1);
-        auto node2 = new BST::Node<double>(2);
-        auto node3 = new BST::Node<double>(3);
+        BST::Node<double> node0_storage{0};
+        auto node0 = &node0_storage;
+        BST::Node<double> node1_storage{1};
+        auto node1 = &node1_storage;
+        BST::Node<double> node2_storage{2};
+        auto node2 = &node2_storage;
+        BST::Node<double> node3_storage{3};
+        auto node3 = &node3_storage;
         // create the tree
         BST::insert(&node1, node0);
         BST::insert(&node1, node2);
@@ -724,7 +781,7 @@ the shape is correct:
     }
 }
 
-SCENARIO(R"(
+/*
 tree shape:
   1
  / \
@@ -733,13 +790,19 @@ tree shape:
   3
  /
 2
-)") {
+*/
+SCENARIO("BST: remove from a deep left successor") {
     GIVEN("nodes") {
-        auto node0 = new BST::Node<double>(0);
-        auto node1 = new BST::Node<double>(1);
-        auto node2 = new BST::Node<double>(2);
-        auto node3 = new BST::Node<double>(3);
-        auto node4 = new BST::Node<double>(4);
+        BST::Node<double> node0_storage{0};
+        auto node0 = &node0_storage;
+        BST::Node<double> node1_storage{1};
+        auto node1 = &node1_storage;
+        BST::Node<double> node2_storage{2};
+        auto node2 = &node2_storage;
+        BST::Node<double> node3_storage{3};
+        auto node3 = &node3_storage;
+        BST::Node<double> node4_storage{4};
+        auto node4 = &node4_storage;
         // create the tree
         BST::insert(&node1, node0);
         BST::insert(&node1, node4);
@@ -797,7 +860,7 @@ the shape is correct:
     }
 }
 
-SCENARIO(R"(
+/*
 tree shape:
   1
  / \
@@ -808,14 +871,21 @@ tree shape:
 2
  \
   3
-)") {
+*/
+SCENARIO("BST: remove from a deep successor with a right child") {
     GIVEN("nodes") {
-        auto node0 = new BST::Node<double>(0);
-        auto node1 = new BST::Node<double>(1);
-        auto node2 = new BST::Node<double>(2);
-        auto node3 = new BST::Node<double>(3);
-        auto node4 = new BST::Node<double>(4);
-        auto node5 = new BST::Node<double>(5);
+        BST::Node<double> node0_storage{0};
+        auto node0 = &node0_storage;
+        BST::Node<double> node1_storage{1};
+        auto node1 = &node1_storage;
+        BST::Node<double> node2_storage{2};
+        auto node2 = &node2_storage;
+        BST::Node<double> node3_storage{3};
+        auto node3 = &node3_storage;
+        BST::Node<double> node4_storage{4};
+        auto node4 = &node4_storage;
+        BST::Node<double> node5_storage{5};
+        auto node5 = &node5_storage;
         // create the tree
         BST::insert(&node1, node0);
         BST::insert(&node1, node5);
@@ -884,19 +954,24 @@ the shape is correct:
     }
 }
 
-SCENARIO(R"(
+/*
 tree shape:
   1
  / \
 0   3
    /
   2
-)") {
+*/
+SCENARIO("BST: remove from an immediate left successor") {
     GIVEN("nodes") {
-        auto node0 = new BST::Node<double>(0);
-        auto node1 = new BST::Node<double>(1);
-        auto node2 = new BST::Node<double>(2);
-        auto node3 = new BST::Node<double>(3);
+        BST::Node<double> node0_storage{0};
+        auto node0 = &node0_storage;
+        BST::Node<double> node1_storage{1};
+        auto node1 = &node1_storage;
+        BST::Node<double> node2_storage{2};
+        auto node2 = &node2_storage;
+        BST::Node<double> node3_storage{3};
+        auto node3 = &node3_storage;
         // create the tree
         BST::insert(&node1, node0);
         BST::insert(&node1, node3);
@@ -941,7 +1016,7 @@ the shape is correct:
     }
 }
 
-SCENARIO(R"(
+/*
 tree shape:
   1
  / \
@@ -950,13 +1025,19 @@ tree shape:
   2
    \
     3
-)") {
+*/
+SCENARIO("BST: remove from a successor with a right child") {
     GIVEN("nodes") {
-        auto node0 = new BST::Node<double>(0);
-        auto node1 = new BST::Node<double>(1);
-        auto node2 = new BST::Node<double>(2);
-        auto node3 = new BST::Node<double>(3);
-        auto node4 = new BST::Node<double>(4);
+        BST::Node<double> node0_storage{0};
+        auto node0 = &node0_storage;
+        BST::Node<double> node1_storage{1};
+        auto node1 = &node1_storage;
+        BST::Node<double> node2_storage{2};
+        auto node2 = &node2_storage;
+        BST::Node<double> node3_storage{3};
+        auto node3 = &node3_storage;
+        BST::Node<double> node4_storage{4};
+        auto node4 = &node4_storage;
         // create the tree
         BST::insert(&node1, node0);
         BST::insert(&node1, node4);
@@ -1012,7 +1093,7 @@ the shape is correct:
     }
 }
 
-SCENARIO(R"(
+/*
 tree shape:
   1
  / \
@@ -1021,14 +1102,21 @@ tree shape:
   3
  / \
 2   4
-)") {
+*/
+SCENARIO("BST: remove from a successor with a sibling") {
     GIVEN("nodes") {
-        auto node0 = new BST::Node<double>(0);
-        auto node1 = new BST::Node<double>(1);
-        auto node2 = new BST::Node<double>(2);
-        auto node3 = new BST::Node<double>(3);
-        auto node4 = new BST::Node<double>(4);
-        auto node5 = new BST::Node<double>(5);
+        BST::Node<double> node0_storage{0};
+        auto node0 = &node0_storage;
+        BST::Node<double> node1_storage{1};
+        auto node1 = &node1_storage;
+        BST::Node<double> node2_storage{2};
+        auto node2 = &node2_storage;
+        BST::Node<double> node3_storage{3};
+        auto node3 = &node3_storage;
+        BST::Node<double> node4_storage{4};
+        auto node4 = &node4_storage;
+        BST::Node<double> node5_storage{5};
+        auto node5 = &node5_storage;
         // create the tree
         BST::insert(&node1, node0);
         BST::insert(&node1, node5);
@@ -1095,7 +1183,7 @@ the shape is correct:
     }
 }
 
-SCENARIO(R"(
+/*
 tree shape:
   1
  / \
@@ -1104,14 +1192,21 @@ tree shape:
       4
      / \
     3   5
-)") {
+*/
+SCENARIO("BST: remove from a right subtree with two leaves") {
     GIVEN("nodes") {
-        auto node0 = new BST::Node<double>(0);
-        auto node1 = new BST::Node<double>(1);
-        auto node2 = new BST::Node<double>(2);
-        auto node3 = new BST::Node<double>(3);
-        auto node4 = new BST::Node<double>(4);
-        auto node5 = new BST::Node<double>(5);
+        BST::Node<double> node0_storage{0};
+        auto node0 = &node0_storage;
+        BST::Node<double> node1_storage{1};
+        auto node1 = &node1_storage;
+        BST::Node<double> node2_storage{2};
+        auto node2 = &node2_storage;
+        BST::Node<double> node3_storage{3};
+        auto node3 = &node3_storage;
+        BST::Node<double> node4_storage{4};
+        auto node4 = &node4_storage;
+        BST::Node<double> node5_storage{5};
+        auto node5 = &node5_storage;
         // create the tree
         BST::insert(&node1, node0);
         BST::insert(&node1, node2);
@@ -1178,7 +1273,7 @@ the shape is correct:
     }
 }
 
-SCENARIO(R"(
+/*
 tree shape:
   1
  / \
@@ -1189,15 +1284,23 @@ tree shape:
 2   5
    /
   4
-)") {
+*/
+SCENARIO("BST: remove from a nested successor") {
     GIVEN("nodes") {
-        auto node0 = new BST::Node<double>(0);
-        auto node1 = new BST::Node<double>(1);
-        auto node2 = new BST::Node<double>(2);
-        auto node3 = new BST::Node<double>(3);
-        auto node4 = new BST::Node<double>(4);
-        auto node5 = new BST::Node<double>(5);
-        auto node6 = new BST::Node<double>(6);
+        BST::Node<double> node0_storage{0};
+        auto node0 = &node0_storage;
+        BST::Node<double> node1_storage{1};
+        auto node1 = &node1_storage;
+        BST::Node<double> node2_storage{2};
+        auto node2 = &node2_storage;
+        BST::Node<double> node3_storage{3};
+        auto node3 = &node3_storage;
+        BST::Node<double> node4_storage{4};
+        auto node4 = &node4_storage;
+        BST::Node<double> node5_storage{5};
+        auto node5 = &node5_storage;
+        BST::Node<double> node6_storage{6};
+        auto node6 = &node6_storage;
         // create the tree
         BST::insert(&node1, node0);
         BST::insert(&node1, node6);
@@ -1273,7 +1376,7 @@ the shape is correct:
     }
 }
 
-SCENARIO(R"(
+/*
 tree shape:
   1
  / \
@@ -1284,15 +1387,23 @@ tree shape:
     3   6
        /
       5
-)") {
+*/
+SCENARIO("BST: remove from a nested right subtree") {
     GIVEN("nodes") {
-        auto node0 = new BST::Node<double>(0);
-        auto node1 = new BST::Node<double>(1);
-        auto node2 = new BST::Node<double>(2);
-        auto node3 = new BST::Node<double>(3);
-        auto node4 = new BST::Node<double>(4);
-        auto node5 = new BST::Node<double>(5);
-        auto node6 = new BST::Node<double>(6);
+        BST::Node<double> node0_storage{0};
+        auto node0 = &node0_storage;
+        BST::Node<double> node1_storage{1};
+        auto node1 = &node1_storage;
+        BST::Node<double> node2_storage{2};
+        auto node2 = &node2_storage;
+        BST::Node<double> node3_storage{3};
+        auto node3 = &node3_storage;
+        BST::Node<double> node4_storage{4};
+        auto node4 = &node4_storage;
+        BST::Node<double> node5_storage{5};
+        auto node5 = &node5_storage;
+        BST::Node<double> node6_storage{6};
+        auto node6 = &node6_storage;
         // create the tree
         BST::insert(&node1, node0);
         BST::insert(&node1, node2);
@@ -1368,7 +1479,7 @@ the shape is correct:
     }
 }
 
-SCENARIO(R"(
+/*
 tree shape:
   1
  / \
@@ -1381,16 +1492,25 @@ tree shape:
   5
  /
 4
-)") {
+*/
+SCENARIO("BST: remove from a twice-nested successor") {
     GIVEN("nodes") {
-        auto node0 = new BST::Node<double>(0);
-        auto node1 = new BST::Node<double>(1);
-        auto node2 = new BST::Node<double>(2);
-        auto node3 = new BST::Node<double>(3);
-        auto node4 = new BST::Node<double>(4);
-        auto node5 = new BST::Node<double>(5);
-        auto node6 = new BST::Node<double>(6);
-        auto node7 = new BST::Node<double>(7);
+        BST::Node<double> node0_storage{0};
+        auto node0 = &node0_storage;
+        BST::Node<double> node1_storage{1};
+        auto node1 = &node1_storage;
+        BST::Node<double> node2_storage{2};
+        auto node2 = &node2_storage;
+        BST::Node<double> node3_storage{3};
+        auto node3 = &node3_storage;
+        BST::Node<double> node4_storage{4};
+        auto node4 = &node4_storage;
+        BST::Node<double> node5_storage{5};
+        auto node5 = &node5_storage;
+        BST::Node<double> node6_storage{6};
+        auto node6 = &node6_storage;
+        BST::Node<double> node7_storage{7};
+        auto node7 = &node7_storage;
         // create the tree
         BST::insert(&node1, node0);
         BST::insert(&node1, node7);
@@ -1477,7 +1597,7 @@ the shape is correct:
     }
 }
 
-SCENARIO(R"(
+/*
 tree shape:
   1
  / \
@@ -1490,16 +1610,25 @@ tree shape:
       6
      /
     5
-)") {
+*/
+SCENARIO("BST: remove from a twice-nested right subtree") {
     GIVEN("nodes") {
-        auto node0 = new BST::Node<double>(0);
-        auto node1 = new BST::Node<double>(1);
-        auto node2 = new BST::Node<double>(2);
-        auto node3 = new BST::Node<double>(3);
-        auto node4 = new BST::Node<double>(4);
-        auto node5 = new BST::Node<double>(5);
-        auto node6 = new BST::Node<double>(6);
-        auto node7 = new BST::Node<double>(7);
+        BST::Node<double> node0_storage{0};
+        auto node0 = &node0_storage;
+        BST::Node<double> node1_storage{1};
+        auto node1 = &node1_storage;
+        BST::Node<double> node2_storage{2};
+        auto node2 = &node2_storage;
+        BST::Node<double> node3_storage{3};
+        auto node3 = &node3_storage;
+        BST::Node<double> node4_storage{4};
+        auto node4 = &node4_storage;
+        BST::Node<double> node5_storage{5};
+        auto node5 = &node5_storage;
+        BST::Node<double> node6_storage{6};
+        auto node6 = &node6_storage;
+        BST::Node<double> node7_storage{7};
+        auto node7 = &node7_storage;
         // create the tree
         BST::insert(&node1, node0);
         BST::insert(&node1, node2);
@@ -1586,11 +1715,11 @@ the shape is correct:
     }
 }
 
-//
+// ---------------------------------------------------------------------------
 // MARK: polymorphism
-//
+// ---------------------------------------------------------------------------
 
-TEST_CASE("should subclass BST::Node (c style") {
+TEST_CASE("BST: should subclass BST::Node (C-style casts)") {
     struct ArbNode : BST::Node<int> { };
     ArbNode* root = nullptr;
     ArbNode node;
@@ -1598,7 +1727,7 @@ TEST_CASE("should subclass BST::Node (c style") {
     REQUIRE(root == &node);
 }
 
-TEST_CASE("should subclass BST::Node (c++ style") {
+TEST_CASE("BST: should subclass BST::Node (C++ casts)") {
     struct ArbNode : BST::Node<int> { };
     ArbNode* root = nullptr;
     ArbNode node;

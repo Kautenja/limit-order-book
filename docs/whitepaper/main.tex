@@ -29,7 +29,7 @@
 \definecolor{accent}{HTML}{B85C38}
 \definecolor{pale}{HTML}{F3F5F7}
 \usepackage[colorlinks=true,linkcolor=ink,citecolor=ink,urlcolor=ink]{hyperref}
-\hypersetup{pdftitle={Limit Order Book: A Price-Time Priority Matching Engine for C++, C, and Python},pdfauthor={Christian Kauten},pdfsubject={Project technical report; revision October 18, 2026},pdfkeywords={limit order book, price-time priority, matching, C++, C, Python, reproducible evaluation}}
+\hypersetup{pdftitle={Limit Order Book: A Price-Time Priority Matching Engine for C++, C, and Python},pdfauthor={Christian Kauten},pdfsubject={Project technical report; revision October 19, 2026},pdfkeywords={limit order book, price-time priority, matching, C++, C, Python, reproducible evaluation}}
 \setlength{\columnsep}{0.25in}
 \setlength{\headheight}{14pt}
 \setlength{\emergencystretch}{1.5em}
@@ -50,7 +50,7 @@
 \input{evidence/results.tex}
 \title{\textbf{Limit Order Book: A Price-Time Priority\\Matching Engine for C++, C, and Python}}
 \author{Christian Kauten}
-\date{Technical report revision: October 18, 2026}
+\date{Technical report revision: October 19, 2026}
 
 \begin{document}
 \twocolumn[\maketitle
@@ -135,9 +135,10 @@ implementation does not enforce. Section~\ref{sec:complexity} derives costs
 from the source rather than adopting the background article's operation table
 as a guarantee.
 
-The project uses Christian Kauten's separately maintained
-\emph{binary-search-tree} and \emph{doubly-linked-list} libraries for intrusive
-nodes and pointer manipulation~\cite{bst,dll}. The price index uses Tessil's
+The project owns Christian Kauten's \emph{binary-search-tree} and
+\emph{doubly-linked-list} components for intrusive nodes and pointer
+manipulation~\cite{bst,dll}. Both now live in \path{include/}; the archived
+study identifies their earlier vendored copies. The price index uses Tessil's
 \emph{robin-map}, an open-addressed hash map with Robin Hood probing and
 backward-shift deletion~\cite{robin}. The order index uses
 \code{std::unordered\_map}. These are reused building blocks; this report
@@ -397,7 +398,8 @@ different structural work. Section~\ref{sec:results} measures this distinction.
 \section{Language and Distribution Boundaries}
 The C++ library is header-only and requires C++14. Its CMake target is
 \path{limit_order_book::limit_order_book}. Installed headers include the
-three required vendored libraries. A default subproject does not build the
+tree and list components and the vendored \emph{robin-map} library.
+A default subproject does not build the
 study, tests, or language bindings. Packaging is part of the reproducibility
 surface, but successful installation alone is not evidence of matching
 correctness or speed.

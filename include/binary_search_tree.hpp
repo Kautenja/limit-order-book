@@ -1,5 +1,24 @@
 // A binary search tree data structure.
-// Copyright 2019 Christian Kauten
+//
+// Copyright (c) 2019 Christian Kauten
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 //
 
 #ifndef BINARY_SEARCH_TREE_HPP
@@ -7,26 +26,30 @@
 
 namespace BST {
 
-/// A generic type key binary search tree node
+/// @brief An intrusive binary search tree node with a comparable key.
+///
+/// @tparam Key the comparable key type
+/// @details Links borrow caller-owned nodes. The tree does not balance itself.
+///
 template<typename Key>
 struct Node {
-    /// the comparable key for the node
+    /// @brief The comparable key for the node.
     Key key;
-    /// the parent node (nullptr indicates root node)
+    /// @brief The parent node (nullptr indicates the root node).
     Node* parent;
-    /// the left child
+    /// @brief The left child, or nullptr.
     Node* left;
-    /// the right child
+    /// @brief The right child, or nullptr.
     Node* right;
 
-    /// Create a new binary search tree node with 0 key.
+    /// @brief Create a detached node with a value-initialized key.
     Node() :
         key(),
         parent(nullptr),
         left(nullptr),
         right(nullptr) { }
 
-    /// Create a new binary search tree node with given key.
+    /// @brief Create a detached node with the given key.
     ///
     /// @param key_ the key to create the node with
     ///
@@ -37,11 +60,13 @@ struct Node {
         right(nullptr) { }
 };
 
-/// Insert a node into a tree.
+/// @brief Insert a detached caller-owned node in O(H) tree height.
 ///
+/// @tparam Key the comparable key type
 /// @param root the root node of the tree to add the node to
 /// @param node the node to add to the tree
-/// @undefined root is non-root node, i.e., root.parent != nullptr
+/// @pre root points to an empty tree or its root; node is non-null and detached
+/// @details Equal keys follow the right branch. No nodes are allocated.
 ///
 template<typename Key>
 void insert(Node<Key>** root, Node<Key>* node) {
@@ -71,11 +96,13 @@ void insert(Node<Key>** root, Node<Key>* node) {
     }
 }
 
-/// Remove a node from a tree.
+/// @brief Unlink a caller-owned node in O(H) tree height without deleting it.
 ///
+/// @tparam Key the comparable key type
 /// @param root a pointer to the root node of the tree to remove the node from
 /// @param node the node to remove from the tree
-/// @undefined root is non-root node, i.e., root.parent != nullptr
+/// @pre root points to the tree's root and node belongs to that tree
+/// @details The removed node's own links are not reset.
 ///
 template<typename Key>
 void remove(Node<Key>** root, Node<Key>* node) {
@@ -142,10 +169,12 @@ void remove(Node<Key>** root, Node<Key>* node) {
     }
 }
 
-/// Return the maximum node of a binary search tree.
+/// @brief Return the maximum node of a nonempty subtree in O(H) tree height.
 ///
+/// @tparam Key the comparable key type
 /// @param root the root node of the tree to search
-/// @undefined root is non-root node, i.e., root.parent != nullptr
+/// @returns a borrowed pointer to the node with the largest key
+/// @pre root is non-null
 ///
 template<typename Key>
 inline Node<Key>* max(Node<Key>* root) {
@@ -154,10 +183,12 @@ inline Node<Key>* max(Node<Key>* root) {
     return root;
 }
 
-/// Return the minimum node of a binary search tree.
+/// @brief Return the minimum node of a nonempty subtree in O(H) tree height.
 ///
+/// @tparam Key the comparable key type
 /// @param root the root node of the tree to search
-/// @undefined root is non-root node, i.e., root.parent != nullptr
+/// @returns a borrowed pointer to the node with the smallest key
+/// @pre root is non-null
 ///
 template<typename Key>
 inline Node<Key>* min(Node<Key>* root) {

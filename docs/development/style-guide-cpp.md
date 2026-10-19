@@ -88,7 +88,10 @@ strongest signals are:
     outside `include/`; everything in `include/` is installed. A new vendored
     dependency needs its include directory in `LOB_VENDOR_INCLUDE_DIRS` and
     its license in the install rules.
--   Use the `LOB` namespace for everything in `include/` except the C API.
+-   Use the `LOB` namespace for new code in `include/` except the C API.
+    The adopted data structures retain their existing `BST` and `DLL`
+    namespaces and include guards for source compatibility; see
+    [Data structures](data-structures.md).
 -   Use include guards named after the file, such as `LOB_LIMIT_TREE_HPP_`,
     matching the existing headers. Do not mix in `#pragma once`.
 -   Use `.hpp` for headers and `.cpp` for translation units. The C API

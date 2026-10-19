@@ -1,7 +1,7 @@
 # Limit Order Book Technical Report
 
 **Limit Order Book: A Price-Time Priority Matching Engine for C++, C, and
-Python**, by Christian Kauten. Technical report revision: October 18, 2026.
+Python**, by Christian Kauten. Technical report revision: October 19, 2026.
 The report and software share the project's [2019 citation](../../CITATION.bib).
 The revision date identifies this document, not a separate cited work. This
 is a repository manuscript, without an assigned DOI, peer-review claim, or
@@ -48,9 +48,10 @@ manuscript. Numerical macros and plot data are generated from the raw CSV.
 ## Reproduce The Study
 
 The independent study needs Python 3, a C++14 Clang or GCC compiler, and the
-vendored headers already in this repository. The driver supports macOS and
-Linux; only macOS was evaluated. It does not need Cython, Catch2, a market-data
-subscription, network access, or third-party Python packages.
+first-party and vendored headers already in this repository. The driver
+supports macOS and Linux; only macOS was evaluated. It does not need Cython,
+Catch2, a market-data subscription, network access, or third-party Python
+packages.
 
 From the repository root, choose a **new** capture directory outside the
 checkout and run:

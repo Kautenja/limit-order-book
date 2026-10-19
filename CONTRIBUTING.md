@@ -144,9 +144,10 @@ flags to `CMakeLists.txt`. Keep `limit_order_book::limit_order_book`, the
 `LOB_*` options, and the install layout stable; downstream projects depend on
 them.
 
-Do not edit `vendor/`. Fixes to the owner-authored `binary-search-tree`
-and `doubly-linked-list` libraries belong in their upstream
-repositories.
+Do not edit `vendor/`. The binary search tree and doubly linked list are
+maintained here in `include/`, with tests in `test/`. See
+[Data structures](docs/development/data-structures.md) for ownership and
+compatibility rules.
 
 ## Development And Testing
 
