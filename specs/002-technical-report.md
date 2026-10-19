@@ -159,8 +159,12 @@ Validation:
 
 -   `make -C docs/whitepaper clean` followed by `make -C docs/whitepaper`
     built eight pages with no final LaTeX or BibTeX warnings. BibTeX's log
-    confirms it reads `../../CITATION.bib` and `references.bib` directly.
-    The Makefile keeps BibTeX in the source directory to resolve that path.
+    confirms it reads the root `CITATION.bib` and `references.bib` directly.
+    The Makefile supplies the repository root through `BIBINPUTS`, allowing
+    BibTeX to run inside `.build/` with restricted output settings.
+-   `env openout_any=p make -C docs/whitepaper` passed from a clean report
+    build, reproducing Ubuntu's output restriction locally. This corrected
+    the initial Actions failure when BibTeX ran outside the hidden directory.
 -   The desktop LaTeX compiler also succeeded with the repository root as
     the project and `docs/whitepaper/main.tex` as its main document.
 -   All eight rendered pages were reviewed. The canonical BibTeX is unchanged,

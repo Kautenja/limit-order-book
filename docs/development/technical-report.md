@@ -17,8 +17,9 @@ The output is `docs/whitepaper/.build/limit-order-book.pdf`. The Makefile is
 the shared build entry point for local development and GitHub Actions. It
 uses `latexmk`, `pdflatex`, and `bibtex`, disables shell escape, and reads
 checked-in evidence without rerunning benchmarks or downloading research.
-The `-bibtexfudge-` option keeps BibTeX in the source directory so that
-`../../CITATION.bib` resolves correctly while outputs stay in `.build/`.
+The Makefile adds the repository root to `BIBINPUTS` so BibTeX finds the
+canonical `CITATION.bib` while running inside `.build/`. This also works with
+TeX's restricted output settings on Ubuntu, without changing those settings.
 
 On Ubuntu 24.04, the workflow installs these packages:
 
