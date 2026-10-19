@@ -7,10 +7,19 @@ The revision date identifies this document, not a separate cited work. This
 is a repository manuscript, without an assigned DOI, peer-review claim, or
 publication acceptance.
 
-The report explains the inherited design, matching semantics, data ownership,
-actual complexity, language interfaces, and a reproducible study. It does not
-claim a new matching algorithm, production readiness, or superiority over
-other matching engines.
+The report explains how the book was built and why its representation is
+useful: occupied-price trees, intrusive FIFO queues, separate order and price
+indices, and cached best prices and aggregates. It places those choices beside
+the 2011 How to HFT design and the QuantCup and Island sources already present
+in the project's first commit in December 2019. The comparison connects each
+benefit to its cost, including allocation, pointer lifetime, and tree height.
+
+The construction account covers the now-owned `LOB::BST` and `LOB::DLL`
+helpers, the vendored price index, and the shared C++ core behind C and Python.
+Detailed evaluation methods and the complete timing table are in appendices.
+The report distinguishes the original design, later maintenance, and the
+archived measured snapshot; it claims neither a new matching algorithm nor
+superiority over the historical engines.
 
 ## Read And Build
 
@@ -135,23 +144,27 @@ inputs are identified by the metadata's SHA-256 hashes. The Python architecture
 account describes the accompanying native binding; no Python performance
 result is included in this report.
 
-For an exact source replay after the checkout has advanced, use a separate
-checkout of that base revision and overlay the study and report additions
-from this artifact. For example, with both `/tmp` destinations unused:
+The October 19 helper integration and robin-map v1.3.0 update postdate that
+study. The archive retains the old vendor paths and hash-map bytes. Its
+numbers are not measurements of the updated dependency, and the ordinary
+evaluation command above measures the current checkout instead.
+
+For an exact source replay, use the original report commit
+`336b2168811290b8d67a2c367ff19f946a183cdc`. All 22 inputs in the study,
+architecture, and historical-reference manifests match that commit, including
+the original evaluation driver. Do not overlay the current driver: its include
+paths now expect the first-party helpers. With both `/tmp` destinations unused:
 
 ```shell
-git worktree add --detach /tmp/lob-report-replay 3a4d254e9bda40d4347b71dbac2cd72c97aeb3b5
-mkdir -p /tmp/lob-report-replay/benchmark/report
-cp benchmark/report/study.cpp /tmp/lob-report-replay/benchmark/report/
-cp -R docs/whitepaper /tmp/lob-report-replay/docs/
+git worktree add --detach /tmp/lob-report-replay 336b2168811290b8d67a2c367ff19f946a183cdc
 cd /tmp/lob-report-replay
 python3 docs/whitepaper/evaluate.py --output /tmp/lob-report-replay-results
 ```
 
 Compare the new `source_hashes` in `metadata.json` with the archived manifest
-before comparing results. The ordinary evaluation command runs the current
-sources; it does not restore the historical snapshot. Different host state
-can change timings even when all source hashes match.
+before comparing results. The new run records the report commit as its Git
+revision; the matching input hashes establish equivalence to the archived
+study. Different host state can change timings even when all sources match.
 
 ## Attribution And Citation
 

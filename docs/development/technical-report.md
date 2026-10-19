@@ -51,6 +51,21 @@ date identifies the document's state and does not replace the project citation
 year. Preserve the evaluated source revision and evidence manifests when
 updating presentation or citation metadata.
 
+## Design Context And Historical Evidence
+
+Keep the report centered on implementation choices and their consequences.
+Historical comparisons need dated primary sources or an identified Git
+artifact; distinguish source observations from measured comparisons. Do not
+assign later bindings, packaging, or dependency versions to the original
+design.
+
+When components move or vendored dependencies change, update the construction
+account and source map without rewriting archived paths, hashes, or timings.
+Identify the inspected current revision separately from the measured one.
+Verify replay instructions against every archived input, including the study
+driver: copying a current driver onto old sources can silently change its
+inputs or break its include paths. Record new measurements as a new study.
+
 ## Release Workflow
 
 [report.yml](../../.github/workflows/report.yml) builds the checked-out report
