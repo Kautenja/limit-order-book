@@ -17,7 +17,7 @@
 cmake_minimum_required(VERSION 3.21...4.2)
 
 project(limit_order_book
-    VERSION 2.0.0
+    VERSION 3.0.0
     DESCRIPTION "A limit order book with a price-time priority matching policy"
     HOMEPAGE_URL "https://github.com/Kautenja/limit-order-book"
     LANGUAGES CXX

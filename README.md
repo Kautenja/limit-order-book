@@ -94,7 +94,7 @@ package in `share/cmake/limit_order_book/`, the pkg-config file in
 use the package from CMake:
 
 ```cmake
-find_package(limit_order_book 2 CONFIG REQUIRED)
+find_package(limit_order_book 3 CONFIG REQUIRED)
 target_link_libraries(my_app PRIVATE limit_order_book::limit_order_book)
 ```
 
@@ -130,7 +130,7 @@ package now holds a compiled library, the CMake package moves to
 `lib/cmake/limit_order_book/`. Link the `limit_order_book::c` target:
 
 ```cmake
-find_package(limit_order_book 2 CONFIG REQUIRED COMPONENTS c)
+find_package(limit_order_book 3 CONFIG REQUIRED COMPONENTS c)
 target_link_libraries(my_app PRIVATE limit_order_book::c)
 ```
 
