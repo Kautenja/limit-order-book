@@ -117,6 +117,25 @@ manually against the release tag:
 gh workflow run publish.yml --ref <tag>
 ```
 
+## Citation
+
+Please cite `limit-order-book` if you use it in your research.
+
+Download [CITATION.bib](CITATION.bib) or copy the BibTeX entry below.
+[CITATION.cff](CITATION.cff) provides the same preferred citation for GitHub's
+**Cite this repository** feature. Please also identify the software version or
+commit used in your research.
+
+```bibtex
+@misc{limit-order-book,
+  author = {Christian Kauten},
+  howpublished = {GitHub},
+  title = {{L}imit {O}rder {B}ook: A Price-Time Priority Matching Engine for {C++}, {C}, and {P}ython},
+  URL = {https://github.com/Kautenja/limit-order-book},
+  year = {2019},
+}
+```
+
 ## Licensing
 
 The repository declares the [MIT License](LICENSE). See
