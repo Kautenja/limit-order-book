@@ -342,3 +342,29 @@ class ShouldClearBuyLimitOrders(TestCase):
         self.assertEqual(0, book.count_sell())
         self.assertEqual(0, book.count_buy())
         self.assertEqual(0, book.count())
+
+#
+# MARK: volume
+#
+
+class ShouldReportVolumeAboveUInt32Max(TestCase):
+    def test(self):
+        book = limit_order_book.LimitOrderBook()
+        # the largest quantity that fits in a 32-bit Quantity
+        quantity = 2**32 - 1
+        book.limit_sell(1, quantity, 100)
+        book.limit_sell(2, quantity, 100)
+        book.limit_sell(3, quantity, 101)
+        book.limit_buy(4, quantity, 50)
+        book.limit_buy(5, quantity, 50)
+        self.assertEqual(2 * quantity, book.volume_sell(100))
+        self.assertEqual(3 * quantity, book.volume_sell())
+        self.assertEqual(2 * quantity, book.volume_buy(50))
+        self.assertEqual(2 * quantity, book.volume_buy())
+        self.assertEqual(2 * quantity, book.volume(100))
+        self.assertEqual(2 * quantity, book.volume(50))
+        self.assertEqual(5 * quantity, book.volume())
+        self.assertEqual(2, book.count_at(100))
+        self.assertEqual(3, book.count_sell())
+        self.assertEqual(2, book.count_buy())
+        self.assertEqual(5, book.count())

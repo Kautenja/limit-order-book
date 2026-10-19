@@ -30,7 +30,7 @@ def load_library():
     # a type for the price of an order
     Price = ctypes.c_uint64
     # a type for the volume measures in the book
-    Volume = ctypes.c_uint32
+    Volume = ctypes.c_uint64
     # a type for counting orders (accumulator)
     Count = ctypes.c_uint32
 
