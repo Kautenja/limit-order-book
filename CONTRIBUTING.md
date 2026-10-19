@@ -143,8 +143,7 @@ them.
 
 Do not edit `vendor/`. Fixes to the owner-authored `binary-search-tree`,
 `doubly-linked-list`, and `cpptqdm` libraries belong in their upstream
-repositories. Do not regenerate `docs/` in a pull request; it is the published
-Doxygen site.
+repositories.
 
 ## Development And Testing
 

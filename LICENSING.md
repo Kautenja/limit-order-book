@@ -23,12 +23,8 @@ file in the repository.
 Copyright (c) 2019 Christian Kauten. The MIT License applies to the original
 C++ headers in `include/`, the C API in `src/`, the Python package in
 `limit_order_book/`, the tests, benchmarks, executables in `main/`, build and
-workflow configuration, the Doxygen theme in `doxygen/`, and the
-documentation. The C++ sources carry the MIT notice in their headers; preserve
+workflow configuration, and the documentation. The C++ sources carry the MIT notice in their headers; preserve
 those notices when copying `include/` into another project.
-
-The generated Doxygen site in `docs/` documents the same code and is covered
-by the same terms.
 
 ## Vendored Dependencies
 
@@ -77,7 +73,7 @@ code, and is not licensed under MIT by this project:
 
 These files carry no license grant from their authors in this repository.
 Their presence does not grant permission to copy, modify, or redistribute them.
-They are excluded from the Python distributions and the Doxygen site. Do not
+They are excluded from the Python distributions. Do not
 copy their code into `include/`, `src/`, or `limit_order_book/`; describe and
 link ideas from them instead.
 

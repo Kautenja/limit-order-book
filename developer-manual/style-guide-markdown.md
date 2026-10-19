@@ -14,9 +14,9 @@ rules to new and edited sections, and avoid unrelated style churn.
 
 Place Markdown by audience and lifetime:
 
--   **`README.md`:** Public orientation, rendered on GitHub, on PyPI through
-    `pyproject.toml`, and as the Doxygen main page. It covers what the project
-    is, installation, usage, and development commands.
+-   **`README.md`:** Public orientation, rendered on GitHub and on PyPI
+    through `pyproject.toml`. It covers what the project is, installation,
+    usage, and development commands.
 -   **`AGENTS.md`:** The entry point for agents: workflow, architecture,
     contracts, and validation.
 -   **`developer-manual/`:** Durable rules for agents and maintainers, such as
@@ -25,12 +25,6 @@ Place Markdown by audience and lifetime:
     following [AGENTS.md](../AGENTS.md#planning-and-completion).
 -   **`notes/`:** Imported research and quoted source material. Preserve its
     original formatting and punctuation; do not restyle it.
--   **`docs/`:** Generated Doxygen HTML for GitHub Pages. Never add Markdown
-    there.
-
-`Doxyfile` scans `*.md` files recursively. When adding a Markdown directory
-that should not appear in the API reference, add it to `EXCLUDE` in
-`Doxyfile`.
 
 ## Structure And Prose
 
@@ -143,8 +137,8 @@ Numeric columns:
 -   Keep heading text stable in `AGENTS.md` and the developer manual, because
     other documents link to their anchors. Update incoming links when a
     heading changes.
--   Give images useful alt text and prefer checked-in assets under
-    `doxygen/img/`. Use HTML only when Markdown cannot express the layout.
+-   Give images useful alt text and prefer checked-in assets over remote
+    images. Use HTML only when Markdown cannot express the layout.
 
 ## Evidence And Release Notes
 

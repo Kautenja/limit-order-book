@@ -19,9 +19,7 @@
 /vendor/** linguist-vendored
 /notes/** linguist-vendored
 
-# Exclude the generated Doxygen site, its theme, documentation, and citations.
-/docs/** linguist-generated linguist-documentation
-/doxygen/** linguist-documentation
+# Exclude documentation and citations.
 *.md linguist-documentation
 /CITATION.bib linguist-documentation
 /CITATION.cff linguist-documentation

@@ -173,8 +173,8 @@ Names describe the market concept, not the implementation detail.
 
 ## Documentation
 
-`Doxyfile` builds the API reference from the headers into `docs/`, so the
-header comments are the published documentation. Write them for a reader who
+The header comments are the API reference; there is no separate generated
+site. Write them for a reader who
 will never open the function body.
 
 -   Use `///` comments. Start with `@brief`, leave a blank `///` line before
@@ -288,4 +288,4 @@ Before finishing a C++ change, check:
     before and after benchmark results.
 -   `./main.sh test-package` passes when the change touches `CMakeLists.txt`,
     `cmake/`, or the set of public headers.
--   No edits were made under `vendor/` or `docs/`.
+-   No edits were made under `vendor/`.

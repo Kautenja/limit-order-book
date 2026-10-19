@@ -51,9 +51,6 @@ material, not dependencies.
 -   **`vendor/`:** Third-party and owner-authored dependencies, committed
     in-tree. Treat them as read-only.
 -   **`developer-manual/`:** Durable rules for agents and maintainers.
--   **`doxygen/`:** Doxygen header, footer, stylesheet, and images.
--   **`docs/`:** Generated Doxygen HTML served by GitHub Pages from `master`.
-    Never hand-edit it or put Markdown there.
 -   **`notes/`:** Imported research notes and example engines.
 
 ## Working In This Repository
@@ -66,8 +63,6 @@ material, not dependencies.
 -   Do not edit `vendor/`. Fixes to the owner-authored `binary-search-tree`,
     `doubly-linked-list`, and `cpptqdm` libraries belong in their upstream
     repositories; ask before changing a vendored copy here.
--   Do not regenerate `docs/` unless asked. A regenerated `docs/` changes the
-    public site once it reaches `master`.
 -   Reserve `.build/` for build outputs. Put scratch files, experiments, and
     benchmark captures outside the repository, and remove them when the task
     is finished. Do not add new top-level build or output directories.

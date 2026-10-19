@@ -32,7 +32,6 @@ classifiers = [
 [project.urls]
 Homepage = "https://github.com/Kautenja/limit-order-book"
 Repository = "https://github.com/Kautenja/limit-order-book"
-Documentation = "https://kautenja.github.io/limit-order-book/"
 
 # CMakeLists.txt builds the C API shared library that the package loads
 # through ctypes and installs it into limit_order_book/. The C++ library is
@@ -49,11 +48,8 @@ sdist.exclude = [
     ".gitignore",
     "AGENTS.md",
     "CONTRIBUTING.md",
-    "Doxyfile",
     "benchmark/**",
     "developer-manual/**",
-    "docs/**",
-    "doxygen/**",
     "limit_order_book/test/**",
     "main.sh",
     "main/**",

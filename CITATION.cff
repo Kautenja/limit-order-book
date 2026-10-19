@@ -13,7 +13,6 @@ authors:
   - family-names: Kauten
     given-names: Christian
 repository-code: "https://github.com/Kautenja/limit-order-book"
-url: "https://kautenja.github.io/limit-order-book/"
 license: MIT
 license-url: "https://github.com/Kautenja/limit-order-book/blob/master/LICENSING.md"
 keywords:
