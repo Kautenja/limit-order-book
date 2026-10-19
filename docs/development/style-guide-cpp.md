@@ -1,8 +1,8 @@
 # C++ Style Guide
 
 This guide is for agents and humans writing or refactoring the C++ library in
-`include/`, the C API, the Catch2 tests, the benchmarks, and the executables
-in `main/`. [AGENTS.md](../../AGENTS.md) owns workflow, architecture, and
+`include/`, the C API, the Catch2 tests, and the benchmarks.
+[AGENTS.md](../../AGENTS.md) owns workflow, architecture, and
 validation; this file owns C++ code shape.
 
 The existing headers in `include/` are the style authority. The rules below
@@ -43,9 +43,6 @@ notice, followed by a blank line before the include guard or includes:
 
 -   New files use the year they are created. Do not bump the year on existing
     files as incidental cleanup.
--   `main/dummy_matching.cpp` carries a short
-    `// Copyright 2019 Christian Kauten` line. Replace it with the full header,
-    keeping the original year, when a requested edit touches the file.
 -   Never add this header to `vendor/` or `docs/references/`.
 
 ## Style Fingerprint
@@ -80,9 +77,11 @@ strongest signals are:
     marked `inline` or templated. `src/limit_order_book_c.cpp` defines the
     C API.
 -   The headers require C++14, and `CMakeLists.txt` builds every first-party
-    target, including tests, benchmarks, and `main/`, as C++14. Avoid C++17
+    target, including tests and benchmarks, as C++14. Avoid C++17
     features such as `if constexpr`, structured bindings, `std::optional`,
     and inline variables.
+-   `LOB_BUILD_EXAMPLES` is a deprecated no-op with a default of `OFF`.
+    Preserve it for existing CMake configurations; do not add targets under it.
 -   Code must compile without warnings under `-Wall -pedantic` with GCC and
     Clang, and under `/W3` with MSVC.
 -   A new public header must be added to the install rules only if it lives
@@ -169,7 +168,7 @@ Names describe the market concept, not the implementation detail.
 -   In tests, include `<catch2/catch_test_macros.hpp>` before the project
     header. Catch2 v3 provides `main` through `Catch2::Catch2WithMain`, so do
     not define `CATCH_CONFIG_MAIN`.
--   `using namespace LOB;` is acceptable in tests, benchmarks, and `main/`.
+-   `using namespace LOB;` is acceptable in tests and benchmarks.
     Never put `using namespace` in a header.
 
 ## Documentation

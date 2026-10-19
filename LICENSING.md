@@ -22,9 +22,9 @@ file in the repository.
 
 Copyright (c) 2019 Christian Kauten. The MIT License applies to the original
 C++ headers in `include/`, the C API in `src/`, the Python package in
-`limit_order_book/`, the tests, benchmarks, executables in `main/`, build and
-workflow configuration, and the documentation. The C++ sources carry the MIT notice in their headers; preserve
-those notices when copying `include/` into another project.
+`limit_order_book/`, the tests, benchmarks, build and workflow configuration,
+and the documentation. The C++ sources carry the MIT notice in their headers;
+preserve those notices when copying `include/` into another project.
 
 ## Vendored Dependencies
 

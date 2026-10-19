@@ -41,6 +41,9 @@ dates, or the tag date for releases that were not uploaded.
 
 **Build and packaging:**
 
+-   Removed the dummy matching executable and its build wiring. The
+    `LOB_BUILD_EXAMPLES` option remains accepted as a deprecated no-op,
+    with its default unchanged at `OFF`.
 -   Replaced Travis CI with GitHub Actions workflows that run the Catch2
     suites on Linux and the Python suite and distribution builds on Linux,
     macOS, and Windows, and publish to PyPI through a trusted publisher.

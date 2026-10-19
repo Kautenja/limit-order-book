@@ -48,7 +48,7 @@ endif()
 
 option(LOB_BUILD_TESTS "Build the Catch2 test suite" ${LOB_IS_DEVELOPER_BUILD})
 option(LOB_BUILD_BENCHMARKS "Build the Catch2 benchmarks" OFF)
-option(LOB_BUILD_EXAMPLES "Build the executables in main/" OFF)
+option(LOB_BUILD_EXAMPLES "Deprecated compatibility option; has no effect" OFF)
 option(
     LOB_BUILD_PYTHON_LIBRARY
     "Build the C API shared library that the Python package loads"
@@ -196,17 +196,6 @@ if(LOB_BUILD_BENCHMARKS)
     add_executable(limit_order_book_benchmarks ${LOB_BENCHMARK_SOURCES})
     lob_configure_target(limit_order_book_benchmarks)
     target_link_libraries(limit_order_book_benchmarks PRIVATE Catch2::Catch2WithMain)
-endif()
-
-# MARK: Examples
-
-if(LOB_BUILD_EXAMPLES)
-    file(GLOB LOB_EXAMPLE_SOURCES CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/main/*.cpp")
-    foreach(source ${LOB_EXAMPLE_SOURCES})
-        get_filename_component(example_name "${source}" NAME_WE)
-        add_executable(${example_name} "${source}")
-        lob_configure_target(${example_name})
-    endforeach()
 endif()
 
 # MARK: Install

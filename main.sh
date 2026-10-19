@@ -10,7 +10,7 @@
 #     python              Print the Python interpreter used by this project
 #     install             Create/use .venv and install development tools
 #     configure           Configure the CMake build in .build/cmake
-#     build               Build the C++ tests, benchmarks, examples, and the
+#     build               Build the C++ tests, benchmarks, and the
 #                         C API library (copied into limit_order_book/)
 #     test                Run the C++ and Python test suites
 #     unittest            Alias for test
@@ -123,7 +123,6 @@ run_configure() {
     -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
     -DLOB_BUILD_TESTS=ON \
     -DLOB_BUILD_BENCHMARKS=ON \
-    -DLOB_BUILD_EXAMPLES=ON \
     "$@"
 }
 

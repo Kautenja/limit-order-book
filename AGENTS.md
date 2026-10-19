@@ -14,7 +14,7 @@ Read this file and the sources relevant to the requested change:
 -   [README.md](README.md): public overview, installation, and the official
     test and benchmark commands.
 -   [C++ Style Guide](docs/development/style-guide-cpp.md): required for
-    headers, the C API, tests, benchmarks, and executables.
+    headers, the C API, tests, and benchmarks.
 -   [Markdown Style Guide](docs/development/style-guide-markdown.md): required
     for `README.md`, this file, and first-party documentation under `docs/`.
 -   [LICENSE](LICENSE): MIT terms for first-party code.
@@ -39,8 +39,6 @@ material, not dependencies.
     `ctypes` signatures; `limit_order_book.py` wraps them in a class.
 -   **`test/` and `limit_order_book/test/`:** Catch2 and `unittest` suites.
 -   **`benchmark/`:** Catch2 benchmarks for the C++ book.
--   **`main/`:** Small executables that drive the book, built with
-    `LOB_BUILD_EXAMPLES=ON`.
 -   **`CMakeLists.txt` and `cmake/`:** The C++ build, install rules, and the
     CMake package and pkg-config templates. The `project()` version is the
     version of both the C++ and Python packages.
@@ -131,8 +129,8 @@ common commands; run them from the repository root:
 ```
 
 That command configures `.build/cmake/`, builds the Catch2 tests, benchmarks,
-examples, and the C API library (copied into `limit_order_book/`), runs the
-Catch2 suite through `ctest`, and runs the Python suite. Other commands:
+and the C API library (copied into `limit_order_book/`), runs the Catch2 suite
+through `ctest`, and runs the Python suite. Other commands:
 
 -   **`./main.sh test-cpp`:** Build and run the Catch2 suite. Extra arguments
     go to `ctest`, such as `-R "send single order"`.

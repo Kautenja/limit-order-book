@@ -65,6 +65,9 @@ target_link_libraries(my_app PRIVATE limit_order_book::limit_order_book)
 As a subproject, the library builds no tests, benchmarks, or shared library.
 `add_subdirectory` on a copy of this repository works the same way.
 
+`LOB_BUILD_EXAMPLES` is deprecated and has no effect. It remains accepted
+with a default of `OFF` for compatibility with existing CMake configurations.
+
 #### System Installation
 
 Install the headers, a CMake package, and a pkg-config file. This requires

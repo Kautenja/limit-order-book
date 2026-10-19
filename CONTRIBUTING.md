@@ -24,7 +24,7 @@ changes in an issue first.
 
 Read the [README](README.md), the [changelog](CHANGELOG.md), and the
 [licensing guide](LICENSING.md). Follow the [C++ Style Guide][cpp-style] for
-headers, the C API, tests, benchmarks, and executables, and the
+headers, the C API, tests, and benchmarks, and the
 [Markdown Style Guide][markdown-style] for documentation. Match the
 surrounding Python conventions in `limit_order_book/`. Keep formatting changes
 focused on the code being changed, and preserve the MIT notice at the top of
@@ -103,8 +103,8 @@ changing C++ sources.
     [limit_order_book/limit_order_book.py](limit_order_book/limit_order_book.py):**
     The `ctypes` declarations and the Python class that wraps them.
 -   **[test](test), [limit_order_book/test](limit_order_book/test),
-    [benchmark](benchmark), and [main](main):** Catch2 suites, the Python
-    suite, Catch2 benchmarks, and small executables.
+    and [benchmark](benchmark):** Catch2 suites, the Python suite, and Catch2
+    benchmarks.
 -   **[CMakeLists.txt](CMakeLists.txt) and [cmake](cmake):** The C++ build,
     install rules, and the CMake package and pkg-config templates. The
     `project()` version is the version of both packages.
@@ -157,9 +157,8 @@ Run every suite with:
 ./main.sh test
 ```
 
-That command configures `.build/cmake/`, builds the tests, benchmarks,
-examples, and C API library, runs the Catch2 suite with `ctest`, and runs the
-Python suite.
+That command configures `.build/cmake/`, builds the tests, benchmarks, and C
+API library, runs the Catch2 suite with `ctest`, and runs the Python suite.
 
 ### C++ Tests
 

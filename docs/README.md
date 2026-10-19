@@ -11,7 +11,7 @@ for installation, usage, and development commands.
 -   [Agent instructions](../AGENTS.md): Repository layout, matching and API
     contracts, and validation requirements.
 -   [C++ Style Guide](development/style-guide-cpp.md): Conventions for the
-    library, C API, tests, benchmarks, and executables.
+    library, C API, tests, and benchmarks.
 -   [Markdown Style Guide](development/style-guide-markdown.md): Document
     organization, prose, formatting, links, and review checks.
 -   [Changelog](../CHANGELOG.md): Release history and compatibility changes.
