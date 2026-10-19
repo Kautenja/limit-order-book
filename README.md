@@ -1,6 +1,6 @@
 # Limit Order Book
 
-[![CI workflow][build-badge]][build-server]
+[![CI status][build-badge]][build-server]
 [![C++14][cpp-version]][build-config]
 [![CMake 3.21+][cmake-version]][build-config]
 [![PyPI version][pypi-version]][pypi-home]
@@ -8,8 +8,8 @@
 [![Development status: beta][project-status]][python-config]
 [![License: MIT][license-badge]][license]
 
-[build-badge]: https://img.shields.io/badge/CI-GitHub%20Actions-blue
-[build-server]: https://github.com/Kautenja/limit-order-book/actions?query=workflow%3ACI
+[build-badge]: https://github.com/Kautenja/limit-order-book/actions/workflows/ci.yml/badge.svg
+[build-server]: https://github.com/Kautenja/limit-order-book/actions/workflows/ci.yml
 [cpp-version]: https://img.shields.io/badge/C%2B%2B-14-blue
 [cmake-version]: https://img.shields.io/badge/CMake-3.21%2B-blue
 [build-config]: CMakeLists.txt
