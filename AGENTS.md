@@ -30,10 +30,11 @@ material, not dependencies.
 
 -   **`include/`:** The C++ library. `structures.hpp` defines `Order`, `Limit`,
     and the domain types; `limit_tree.hpp` defines one side of the book;
-    `limit_order_book.hpp` combines both sides; `lib_lob.h` is the C API.
--   **`src/lib_lob.cpp`:** The definitions of the C API, compiled into the
-    shared library that C programs (`LOB_BUILD_C_LIBRARY=ON`) and the Python
-    package load.
+    `limit_order_book.hpp` combines both sides; `limit_order_book_c.h` is
+    the C API.
+-   **`src/limit_order_book_c.cpp`:** The definitions of the C API, compiled
+    into the shared library that C programs (`LOB_BUILD_C_LIBRARY=ON`) and
+    the Python package load.
 -   **`limit_order_book/`:** The Python package. `library.py` declares the
     `ctypes` signatures; `limit_order_book.py` wraps them in a class.
 -   **`test/` and `limit_order_book/test/`:** Catch2 and `unittest` suites.
@@ -84,8 +85,8 @@ below it:
 3.  `limit_order_book.hpp`: `LimitOrderBook` owns both trees and the
     order-ID-to-order map, and crosses incoming limit orders against the
     opposite side.
-4.  `lib_lob.h` and `src/lib_lob.cpp`: C functions on an opaque handle that
-    mirror `LimitOrderBook`.
+4.  `limit_order_book_c.h` and `src/limit_order_book_c.cpp`: C functions on
+    an opaque handle that mirror `LimitOrderBook`.
 5.  `limit_order_book/`: `ctypes` declarations and the Python class.
 
 Preserve these matching invariants:
@@ -105,10 +106,10 @@ Preserve these matching invariants:
 Preserve the public interface. Renaming or removing a C++ method, C function,
 or Python method is a breaking change for users who copy `include/` or
 install from PyPI; call it out and get agreement first. When the C API
-changes, update `lib_lob.h`, `src/lib_lob.cpp`, the `argtypes` and `restype`
-declarations in `library.py`, the Python wrapper, the Python suite, and the C
-consumer in `test/package/` in the same change. `ctypes` types must match the
-C++ type widths exactly.
+changes, update `limit_order_book_c.h`, `src/limit_order_book_c.cpp`, the
+`argtypes` and `restype` declarations in `library.py`, the Python wrapper,
+the Python suite, and the C consumer in `test/package/` in the same change.
+`ctypes` types must match the C++ type widths exactly.
 
 Downstream C++ projects depend on the CMake interface, so treat it as public:
 the `limit_order_book::limit_order_book` and `limit_order_book::c` targets,

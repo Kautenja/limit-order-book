@@ -1,4 +1,4 @@
-// The definitions of the C API declared in lib_lob.h.
+// The definitions of the C API declared in limit_order_book_c.h.
 //
 // Copyright (c) 2020 Christian Kauten
 //
@@ -21,7 +21,7 @@
 // SOFTWARE.
 //
 
-#include "lib_lob.h"
+#include "limit_order_book_c.h"
 #include "limit_order_book.hpp"
 #include <type_traits>
 

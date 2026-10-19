@@ -13,12 +13,15 @@ dates, or the tag date for releases that were not uploaded.
     CPython 3.13 and 3.14 on Linux x64 and arm64, macOS x64 and arm64, and
     Windows x64.
 -   Replaced the C++-only `include/lib_lob.hpp` with the C99 header
-    `include/lib_lob.h`, which declares the C API on an opaque
+    `include/limit_order_book_c.h`, which declares the C API on an opaque
     `LOB_LimitOrderBook` handle and `LOB_` fixed-width aliases.
-    `src/lib_lob.cpp` now holds the definitions, so the header can be
-    included from any number of C or C++ translation units. The function
+    `src/limit_order_book_c.cpp` now holds the definitions, so the header
+    can be included from any number of C or C++ translation units. The function
     names and ABI are unchanged, but C++ code that called them with a
     `LOB::LimitOrderBook*` must use the handle from `new_`.
+-   Renamed the C API files from `lib_lob.h` and `lib_lob.cpp` to
+    `limit_order_book_c.h` and `limit_order_book_c.cpp`. C and C++ consumers
+    must update their includes to `#include "limit_order_book_c.h"`.
 
 **Features:**
 

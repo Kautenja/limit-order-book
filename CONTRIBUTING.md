@@ -95,10 +95,10 @@ changing C++ sources.
 -   **[include/limit_order_book.hpp](include/limit_order_book.hpp):**
     `LimitOrderBook`, which owns both trees and the order map and crosses
     incoming orders against the opposite side.
--   **[include/lib_lob.h](include/lib_lob.h) and
-    [src/lib_lob.cpp](src/lib_lob.cpp):** The C API header, with
-    declarations only, and the translation unit that defines it in the shared
-    library.
+-   **[include/limit_order_book_c.h](include/limit_order_book_c.h) and
+    [src/limit_order_book_c.cpp](src/limit_order_book_c.cpp):** The C API
+    header, with declarations only, and the translation unit that defines it
+    in the shared library.
 -   **[limit_order_book/library.py](limit_order_book/library.py) and
     [limit_order_book/limit_order_book.py](limit_order_book/limit_order_book.py):**
     The `ctypes` declarations and the Python class that wraps them.
@@ -116,8 +116,9 @@ changing C++ sources.
 ### Compatibility And Invariants
 
 The C++, C, and Python interfaces mirror each other. When the C API changes,
-update `lib_lob.h` and `src/lib_lob.cpp`, the `argtypes` and `restype` declarations in
-`library.py`, the Python wrapper, and both test suites in the same change.
+update `limit_order_book_c.h` and `src/limit_order_book_c.cpp`, the `argtypes`
+and `restype` declarations in `library.py`, the Python wrapper, and both test
+suites in the same change.
 `ctypes` types must match the C++ type widths exactly. Renaming or removing a
 C++ method, C function, or Python method is a breaking change for users who
 copy `include/` or install from PyPI; discuss it in an issue first.

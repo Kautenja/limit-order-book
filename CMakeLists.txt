@@ -7,7 +7,7 @@
 # -   find_package(limit_order_book CONFIG) after `cmake --install`
 # -   pkg-config with limit_order_book.pc after `cmake --install`
 #
-# With LOB_BUILD_C_LIBRARY=ON, the C API in include/lib_lob.h is also built
+# With LOB_BUILD_C_LIBRARY=ON, the C API in include/limit_order_book_c.h is built
 # as a shared library, exported as limit_order_book::c, and described by
 # limit_order_book_c.pc.
 #
@@ -114,14 +114,16 @@ endfunction()
 # one shared library serves both C consumers and the Python package, which
 # loads it through ctypes under the name lib_limit_order_book
 if(LOB_BUILD_C_LIBRARY OR LOB_BUILD_PYTHON_LIBRARY)
-    add_library(limit_order_book_c SHARED "${PROJECT_SOURCE_DIR}/src/lib_lob.cpp")
+    add_library(limit_order_book_c SHARED
+        "${PROJECT_SOURCE_DIR}/src/limit_order_book_c.cpp"
+    )
     add_library(limit_order_book::c ALIAS limit_order_book_c)
     lob_configure_target(limit_order_book_c)
     target_include_directories(limit_order_book_c PUBLIC
         "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>"
         "$<INSTALL_INTERFACE:${LOB_INSTALL_INCLUDEDIR}>"
     )
-    # lib_lob.h exports the C functions; hide every other symbol
+    # limit_order_book_c.h exports the C functions; hide every other symbol
     target_compile_definitions(limit_order_book_c PRIVATE LOB_C_BUILDING_LIBRARY)
     set_target_properties(limit_order_book_c PROPERTIES
         EXPORT_NAME c
@@ -255,7 +257,7 @@ if(LOB_INSTALL)
     # export the C API library as limit_order_book::c, with its C header
     if(LOB_BUILD_C_LIBRARY)
         install(TARGETS limit_order_book_c EXPORT limit_order_book_targets)
-        install(FILES "${PROJECT_SOURCE_DIR}/include/lib_lob.h"
+        install(FILES "${PROJECT_SOURCE_DIR}/include/limit_order_book_c.h"
             DESTINATION "${LOB_INSTALL_INCLUDEDIR}"
         )
     endif()

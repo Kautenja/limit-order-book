@@ -21,12 +21,12 @@
 // SOFTWARE.
 //
 
-#ifndef LOB_LIB_LOB_H_
-#define LOB_LIB_LOB_H_
+#ifndef LOB_LIMIT_ORDER_BOOK_C_H_
+#define LOB_LIMIT_ORDER_BOOK_C_H_
 
 // This header is valid C99 and C++14. It declares the functions of the
 // limit_order_book shared library (the limit_order_book::c CMake target);
-// src/lib_lob.cpp defines them.
+// src/limit_order_book_c.cpp defines them.
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -309,4 +309,4 @@ LOB_C_API LOB_Count count(LOB_LimitOrderBook* book);
 // un-define the export macro
 #undef LOB_C_API
 
-#endif  // LOB_LIB_LOB_H_
+#endif  // LOB_LIMIT_ORDER_BOOK_C_H_

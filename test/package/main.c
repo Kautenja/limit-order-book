@@ -21,7 +21,7 @@
 // SOFTWARE.
 //
 
-#include "lib_lob.h"
+#include "limit_order_book_c.h"
 #include <stddef.h>
 
 int main(void) {
