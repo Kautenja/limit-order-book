@@ -1,3 +1,5 @@
 graft include
 graft src
 graft vendor
+prune vendor/Catch2
+prune vendor/*/vendor

@@ -80,8 +80,8 @@ strongest signals are:
     add it as a submodule, so new library code lives in headers and is marked
     `inline` or templated. `src/lib_lob.cpp` only compiles the C API.
 -   SCons builds with `-std=c++17`; `setup.py` builds the PyPI extension with
-    `-std=c++1y`. Library code must compile under both until `setup.py` is
-    updated, so avoid C++17-only features in `include/` such as
+    `-std=c++1y`, or `/std:c++14` under MSVC for Windows wheels. Library code
+    must compile under all three until `setup.py` is updated, so avoid C++17-only features in `include/` such as
     `if constexpr`, structured bindings, `std::optional`, and inline
     variables. Tests, benchmarks, and `main/` may use C++17.
 -   Code must compile without warnings under `-pedantic -Wall` with both

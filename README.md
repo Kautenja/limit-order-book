@@ -7,8 +7,8 @@
 [![Format][pypi-format]][pypi-home]
 [![License][pypi-license]][license]
 
-[build-status]: https://travis-ci.org/Kautenja/limit-order-book.svg
-[build-server]: https://travis-ci.org/Kautenja/limit-order-book
+[build-status]: https://github.com/Kautenja/limit-order-book/actions/workflows/ci.yml/badge.svg
+[build-server]: https://github.com/Kautenja/limit-order-book/actions/workflows/ci.yml
 [pypi-version]: https://badge.fury.io/py/limit-order-book.svg
 [pypi-license]: https://img.shields.io/pypi/l/limit-order-book.svg
 [pypi-status]: https://img.shields.io/pypi/status/limit-order-book.svg
@@ -40,6 +40,10 @@ The preferred Python installation of `limit-order-book` is from `pip`:
 ```shell
 pip install limit-order-book
 ```
+
+Wheels are published for CPython 3.13 and 3.14 on Linux (x64, arm64), macOS
+(x64, arm64), and Windows (x64). Other platforms build from the source
+distribution and need a C++14 compiler.
 
 ## Usage Caveats
 
@@ -83,4 +87,24 @@ To run the C++ benchmark code, run:
 
 ```shell
 scons benchmark
+```
+
+### Releasing
+
+The [CI workflow](.github/workflows/ci.yml) runs the C++ suites on Linux x64
+and the Python suite and distribution builds for CPython 3.13 and 3.14 on
+Linux, macOS, and Windows. It runs on pull requests, pushes to `master`, and
+tag pushes.
+
+To release, update `version` in [pyproject.toml](pyproject.toml), then push a
+tag that matches it, optionally prefixed with `v`. Tag CI creates or updates a
+GitHub release with the built distributions. Publish that release to start the
+[Publish to PyPI](.github/workflows/publish.yml) workflow, which builds the
+sdist and wheels and uploads them through the `pypi` environment's trusted
+publisher. A release created by the CI workflow's token does not trigger
+another workflow, so if publishing does not start, dispatch the workflow
+manually against the release tag:
+
+```shell
+gh workflow run publish.yml --ref <tag>
 ```

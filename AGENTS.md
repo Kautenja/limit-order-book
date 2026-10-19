@@ -100,8 +100,9 @@ changes, update `lib_lob.hpp`, the `argtypes` and `restype` declarations in
 
 ## Development And Validation
 
-The C++ build uses SCons with the system `g++`, and the Python extension uses
-`setup.py`. From the repository root:
+The C++ build uses SCons with the system `g++`. The Python package uses
+`pyproject.toml` for metadata and `setup.py` for the extension. From the
+repository root:
 
 ```shell
 make test
@@ -120,8 +121,10 @@ Run one Catch2 suite with its alias, such as `scons test/test_limit_tree.cpp`,
 and the benchmarks with `scons benchmark`.
 
 **Important:** SCons compiles with `-std=c++17`, but `setup.py` compiles the
-PyPI extension with `-std=c++1y`. Code in `include/` and `src/` must compile
-under both until `setup.py` is updated.
+PyPI extension with `-std=c++1y`, or `/std:c++14` under MSVC. Code in
+`include/` and `src/` must compile under all three until `setup.py` is
+updated. Wheels must stay portable, so never add `-march=native` or other
+host-tuned flags to `setup.py`.
 
 **Note:** The vendored Catch2 2.9 header uses an x86-only debugger trap, so
 the Catch2 suites and benchmarks fail to compile on Apple Silicon. On arm64
@@ -136,8 +139,9 @@ Validate changes by type:
     and after the change when the hot path is touched.
 -   **C API or Python bindings:** `make test`, and confirm every C function has
     matching `ctypes` declarations.
--   **Build or packaging:** `make test` and `python3 setup.py sdist`. Do not
-    run `make ship` or upload to PyPI unless asked.
+-   **Build or packaging:** `make test` and `python3 -m build`. Do not run
+    `make ship`, dispatch the publish workflow, or upload to PyPI unless
+    asked.
 -   **Documentation only:** Link, path, and command checks, `git diff --check`,
     and a review of the rendered Markdown. A C++ build is not required.
 

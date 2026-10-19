@@ -1,0 +1,115 @@
+name: CI
+
+'on':
+  pull_request:
+  push:
+    branches:
+      - master
+    tags:
+      - '*'
+
+permissions:
+  contents: read
+
+jobs:
+  native-test:
+    name: C++ tests / Linux x64
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+
+      - name: Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y g++ scons
+          g++ --version
+
+      - name: Run Catch2 suites
+        run: scons -j2 test
+
+  build-test:
+    name: ${{ matrix.platform.name }} / Python ${{ matrix.python-version }}
+    runs-on: ${{ matrix.platform.runner }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version:
+          - '3.13'
+          - '3.14'
+        platform:
+          - name: Linux x64
+            runner: ubuntu-24.04
+            artifact: linux-x64
+          - name: Linux arm64
+            runner: ubuntu-24.04-arm
+            artifact: linux-arm64
+          - name: Windows x64
+            runner: windows-2022
+            artifact: windows-x64
+          - name: macOS x64
+            runner: macos-15-intel
+            artifact: macos-x64
+          - name: macOS arm64
+            runner: macos-15
+            artifact: macos-arm64
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          python -m pip install --editable .
+
+      - name: Run tests
+        run: python -m unittest discover .
+
+      - name: Clean test build artifacts
+        run: git clean -fdX
+
+      - name: Build distributions
+        run: python -m build
+
+      - name: Upload distributions
+        uses: actions/upload-artifact@v7
+        with:
+          name: limit-order-book-${{ matrix.platform.artifact }}-py${{ matrix.python-version }}-dist
+          path: dist/*
+          if-no-files-found: error
+
+  release:
+    name: Attach tag release artifacts
+    needs:
+      - native-test
+      - build-test
+    runs-on: ubuntu-24.04
+    if: startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download distributions
+        uses: actions/download-artifact@v8
+        with:
+          pattern: limit-order-book-*-dist
+          path: release-dist
+          merge-multiple: true
+
+      - name: Create or update GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG_NAME: ${{ github.ref_name }}
+        run: |
+          gh release view "$TAG_NAME" || gh release create "$TAG_NAME" --title "$TAG_NAME" --notes "Automated release for $TAG_NAME"
+          gh release upload "$TAG_NAME" release-dist/* --clobber

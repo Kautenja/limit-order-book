@@ -15,7 +15,7 @@ rules to new and edited sections, and avoid unrelated style churn.
 Place Markdown by audience and lifetime:
 
 -   **`README.md`:** Public orientation, rendered on GitHub, on PyPI through
-    `setup.py`, and as the Doxygen main page. It covers what the project is,
+    `pyproject.toml`, and as the Doxygen main page. It covers what the project is,
     installation, usage, and development commands.
 -   **`AGENTS.md`:** The entry point for agents: workflow, architecture,
     contracts, and validation.
@@ -127,8 +127,9 @@ Numeric columns:
 -   Omit `$` prompt markers from copyable commands.
 -   State the working directory and prerequisites when they are not the
     repository root and the tools in `README.md`.
--   Check commands against `makefile`, `SConstruct`, and `setup.py` before
-    documenting them. Do not import commands from other projects.
+-   Check commands against `makefile`, `SConstruct`, `pyproject.toml`,
+    `setup.py`, and `.github/workflows/` before documenting them. Do not
+    import commands from other projects.
 -   Put the command before its results in evidence sections.
 
 ## Links And Media
@@ -163,7 +164,8 @@ Before finishing a Markdown change, check:
 -   The document is in the right directory for its audience.
 -   The first paragraph says what the document is for.
 -   Headings, lists, fences, and tables follow this guide in the source view.
--   Commands match the current `makefile`, `SConstruct`, and `setup.py`.
+-   Commands match the current `makefile`, `SConstruct`, `pyproject.toml`,
+    `setup.py`, and `.github/workflows/`.
 -   Relative links and heading anchors resolve.
 -   The rendered Markdown looks right on GitHub.
 -   `git diff --check` passes. It checks whitespace only, not table alignment
