@@ -1,0 +1,4 @@
+# Development-only tools. Runtime and release dependencies live in
+# pyproject.toml.
+build>=1.2.1
+Cython>=3.1,<4

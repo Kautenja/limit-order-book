@@ -1,20 +1,34 @@
 // Benchmark the Limit Order Book (LOB).
-// Copyright 2019 Christian Kauten
+//
+// Copyright (c) 2019 Christian Kauten
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 //
 
-#define CATCH_CONFIG_MAIN
-#define CATCH_CONFIG_ENABLE_BENCHMARKING
 #include <random>
-#include <vector>
-#include <unordered_set>
-#include <string>
-#include <sstream>
-#include <iostream>
-#include "catch.hpp"
-#include "limit_order_book.hpp"
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/benchmark/catch_benchmark.hpp>
+#include "fresh_books.hpp"
 
 using namespace LOB;
 using Catch::Benchmark::Chronometer;
+using LOB::Benchmark::measure_fresh_books;
 
 //
 // MARK: new limits
@@ -26,26 +40,22 @@ inline void spam_limits(LimitOrderBook& book, int count) {
 
 TEST_CASE("Spam new Limits") {
     BENCHMARK_ADVANCED("send 1 new limits")(Chronometer cron) {
-        auto book = LimitOrderBook();
-        cron.measure([&]() {
+        measure_fresh_books(cron, [&](LimitOrderBook& book) {
             spam_limits(book, 1);
         });
     };
     BENCHMARK_ADVANCED("send 10 new limits")(Chronometer cron) {
-        auto book = LimitOrderBook();
-        cron.measure([&]() {
+        measure_fresh_books(cron, [&](LimitOrderBook& book) {
             spam_limits(book, 10);
         });
     };
     BENCHMARK_ADVANCED("send 100 new limits")(Chronometer cron) {
-        auto book = LimitOrderBook();
-        cron.measure([&]() {
+        measure_fresh_books(cron, [&](LimitOrderBook& book) {
             spam_limits(book, 100);
         });
     };
     BENCHMARK_ADVANCED("send 1000 new limits")(Chronometer cron) {
-        auto book = LimitOrderBook();
-        cron.measure([&]() {
+        measure_fresh_books(cron, [&](LimitOrderBook& book) {
             spam_limits(book, 1000);
         });
     };
@@ -62,26 +72,22 @@ inline void spam_orders(LimitOrderBook& book, int count, int variance = 5) {
 
 TEST_CASE("Spam new Orders") {
     BENCHMARK_ADVANCED("send 1 orders")(Chronometer cron) {
-        auto book = LimitOrderBook();
-        cron.measure([&]() {
+        measure_fresh_books(cron, [&](LimitOrderBook& book) {
             spam_orders(book, 1);
         });
     };
     BENCHMARK_ADVANCED("send 10 orders")(Chronometer cron) {
-        auto book = LimitOrderBook();
-        cron.measure([&]() {
+        measure_fresh_books(cron, [&](LimitOrderBook& book) {
             spam_orders(book, 10);
         });
     };
     BENCHMARK_ADVANCED("send 100 orders")(Chronometer cron) {
-        auto book = LimitOrderBook();
-        cron.measure([&]() {
+        measure_fresh_books(cron, [&](LimitOrderBook& book) {
             spam_orders(book, 100);
         });
     };
     BENCHMARK_ADVANCED("send 1000 orders")(Chronometer cron) {
-        auto book = LimitOrderBook();
-        cron.measure([&]() {
+        measure_fresh_books(cron, [&](LimitOrderBook& book) {
             spam_orders(book, 1000);
         });
     };
@@ -110,26 +116,22 @@ inline void spam_orders_random_cancels(
 
 TEST_CASE("Spam orders and randomly cancel orders") {
     BENCHMARK_ADVANCED("send and cancel 10 orders")(Chronometer cron) {
-        auto book = LimitOrderBook();
-        cron.measure([&]() {
+        measure_fresh_books(cron, [&](LimitOrderBook& book) {
             spam_orders_random_cancels(book, 10);
         });
     };
     BENCHMARK_ADVANCED("send and cancel 100 orders")(Chronometer cron) {
-        auto book = LimitOrderBook();
-        cron.measure([&]() {
+        measure_fresh_books(cron, [&](LimitOrderBook& book) {
             spam_orders_random_cancels(book, 100);
         });
     };
     BENCHMARK_ADVANCED("send and cancel 1000 orders")(Chronometer cron) {
-        auto book = LimitOrderBook();
-        cron.measure([&]() {
+        measure_fresh_books(cron, [&](LimitOrderBook& book) {
             spam_orders_random_cancels(book, 1000);
         });
     };
     BENCHMARK_ADVANCED("send and cancel 10000 orders")(Chronometer cron) {
-        auto book = LimitOrderBook();
-        cron.measure([&]() {
+        measure_fresh_books(cron, [&](LimitOrderBook& book) {
             spam_orders_random_cancels(book, 10000);
         });
     };
@@ -161,17 +163,20 @@ inline void spam_limit_random_orders(
 }
 
 TEST_CASE("Spam limit orders and occasional market orders") {
-    BENCHMARK("1000 limit orders") {
-        auto book = LimitOrderBook();
-        spam_limit_random_orders(book, 1000);
+    BENCHMARK_ADVANCED("1000 limit orders")(Chronometer cron) {
+        measure_fresh_books(cron, [&](LimitOrderBook& book) {
+            spam_limit_random_orders(book, 1000);
+        });
     };
-    BENCHMARK("10000 limit orders") {
-        auto book = LimitOrderBook();
-        spam_limit_random_orders(book, 10000);
+    BENCHMARK_ADVANCED("10000 limit orders")(Chronometer cron) {
+        measure_fresh_books(cron, [&](LimitOrderBook& book) {
+            spam_limit_random_orders(book, 10000);
+        });
     };
-    BENCHMARK("100000 limit orders") {
-        auto book = LimitOrderBook();
-        spam_limit_random_orders(book, 100000);
+    BENCHMARK_ADVANCED("100000 limit orders")(Chronometer cron) {
+        measure_fresh_books(cron, [&](LimitOrderBook& book) {
+            spam_limit_random_orders(book, 100000);
+        });
     };
 }
 
@@ -195,20 +200,24 @@ inline void spam_limit_many_market_orders(
 }
 
 TEST_CASE("Spam limit orders and constant market orders") {
-    BENCHMARK("10 limit orders") {
-        auto book = LimitOrderBook();
-        spam_limit_many_market_orders(book, 10);
+    BENCHMARK_ADVANCED("10 limit orders")(Chronometer cron) {
+        measure_fresh_books(cron, [&](LimitOrderBook& book) {
+            spam_limit_many_market_orders(book, 10);
+        });
     };
-    BENCHMARK("100 limit orders") {
-        auto book = LimitOrderBook();
-        spam_limit_many_market_orders(book, 100);
+    BENCHMARK_ADVANCED("100 limit orders")(Chronometer cron) {
+        measure_fresh_books(cron, [&](LimitOrderBook& book) {
+            spam_limit_many_market_orders(book, 100);
+        });
     };
-    BENCHMARK("1000 limit orders") {
-        auto book = LimitOrderBook();
-        spam_limit_many_market_orders(book, 1000);
+    BENCHMARK_ADVANCED("1000 limit orders")(Chronometer cron) {
+        measure_fresh_books(cron, [&](LimitOrderBook& book) {
+            spam_limit_many_market_orders(book, 1000);
+        });
     };
-    BENCHMARK("10000 limit orders") {
-        auto book = LimitOrderBook();
-        spam_limit_many_market_orders(book, 10000);
+    BENCHMARK_ADVANCED("10000 limit orders")(Chronometer cron) {
+        measure_fresh_books(cron, [&](LimitOrderBook& book) {
+            spam_limit_many_market_orders(book, 10000);
+        });
     };
 }

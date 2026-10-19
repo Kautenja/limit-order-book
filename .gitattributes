@@ -1,2 +1,35 @@
-notes/* linguist-vendored
-vendor/* linguist-vendored
+# Normalize text files to LF in the repository and leave binaries untouched.
+* text=auto
+*.png binary
+*.pdf binary
+
+# Keep LF in shell scripts, which CI also runs through Git Bash on Windows.
+*.sh text eol=lf
+
+# Preserve the original CRLF line endings of the imported Island ECN source.
+/docs/references/engines/island.prg -text
+
+# Keep the C++ library and Python package classified consistently, including
+# tests and benchmarks.
+*.cpp linguist-language=C++
+*.hpp linguist-language=C++
+*.py linguist-language=Python
+
+# Exclude in-tree dependencies and imported reference material.
+/vendor/** linguist-vendored
+/docs/references/** linguist-vendored
+
+# Exclude documentation and citations.
+*.md linguist-documentation
+/CITATION.bib linguist-documentation
+/CITATION.cff linguist-documentation
+/LICENSE linguist-documentation
+
+# Exclude build tooling, package metadata, and GitHub configuration.
+/.github/** -linguist-detectable
+/cmake/** -linguist-detectable
+/CMakeLists.txt -linguist-detectable
+/test/package/CMakeLists.txt -linguist-detectable
+/main.sh -linguist-detectable
+/pyproject.toml -linguist-detectable
+/requirements.txt -linguist-detectable

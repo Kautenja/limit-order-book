@@ -1,5 +1,6 @@
 # MARK: Project Files
-build*/
+# C++, Python, and report outputs, including docs/whitepaper/.build/
+.build/
 
 # MARK: Python gitignore
 # https://github.com/github/gitignore/blob/master/Python.gitignore
@@ -10,8 +11,9 @@ __pycache__/
 *$py.class
 
 # C extensions
-# TODO: this might not need ignored for this package
+# native Python extensions
 *.so
+*.pyd
 
 # Distribution / packaging
 MANIFEST
@@ -144,15 +146,6 @@ ENV/
 *.exe
 *.out
 *.app
-
-
-
-# MARK: scons Files
-# https://github.com/github/gitignore/blob/master/SCons.gitignore
-
-.sconsign.dblite
-.scon*
-config.log
 
 
 

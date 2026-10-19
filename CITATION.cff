@@ -1,0 +1,35 @@
+cff-version: 1.2.0
+message: >-
+  Cite the software and its technical report using the same preferred
+  citation below. Identify the software version or commit used, and the
+  report revision and evidence manifest when referring to measurements.
+type: software
+title: "Limit Order Book: A Price-Time Priority Matching Engine for C++, C, and Python"
+abstract: >-
+  limit-order-book is a header-only C++ limit order book with a price-time
+  priority matching policy for reception of market data streams, a C API
+  compiled into a shared library, and a Python package that binds C++ directly
+  through Cython.
+authors:
+  - family-names: Kauten
+    given-names: Christian
+repository-code: "https://github.com/Kautenja/limit-order-book"
+license: MIT
+license-url: "https://github.com/Kautenja/limit-order-book/blob/master/LICENSING.md"
+keywords:
+  - limit order book
+  - matching engine
+  - market microstructure
+  - price-time priority
+  - C++
+  - Python
+preferred-citation:
+  type: software
+  title: "Limit Order Book: A Price-Time Priority Matching Engine for C++, C, and Python"
+  authors:
+    - family-names: Kauten
+      given-names: Christian
+  publisher:
+    name: GitHub
+  year: 2019
+  url: "https://github.com/Kautenja/limit-order-book"

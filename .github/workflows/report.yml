@@ -1,0 +1,77 @@
+name: Technical report
+
+'on':
+  workflow_call:
+  workflow_dispatch:
+  push:
+    # Master, PRs, and tags use this workflow through ci.yml.
+    branches-ignore:
+      - master
+    paths:
+      - 'CITATION.bib'
+      - 'docs/whitepaper/**'
+      - '.github/workflows/report.yml'
+      - '.github/workflows/ci.yml'
+  release:
+    types:
+      - published
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build report PDF
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event_name == 'release' && github.event.release.tag_name || github.sha }}
+          persist-credentials: false
+
+      - name: Install LaTeX
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            latexmk texlive-latex-extra texlive-fonts-extra texlive-pictures \
+            texlive-plain-generic
+
+      - name: Build report from archived evidence
+        run: |
+          make -C docs/whitepaper
+          test -s docs/whitepaper/.build/limit-order-book.pdf
+
+      - name: Upload report PDF
+        uses: actions/upload-artifact@v7
+        with:
+          name: limit-order-book-report
+          path: docs/whitepaper/.build/limit-order-book.pdf
+          include-hidden-files: true
+          if-no-files-found: error
+
+  attach-release:
+    name: Attach PDF to published release
+    if: github.event_name == 'release'
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download report PDF
+        uses: actions/download-artifact@v8
+        with:
+          name: limit-order-book-report
+          path: .build/release-report
+
+      - name: Upload release asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG_NAME: ${{ github.event.release.tag_name }}
+        run: gh release upload "$TAG_NAME" .build/release-report/limit-order-book.pdf --clobber

@@ -1,0 +1,161 @@
+name: Publish to PyPI
+
+'on':
+  release:
+    types:
+      - published
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-pypi-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  check-version:
+    name: Check release version
+    runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Validate tag matches package version
+        id: version
+        env:
+          REF_NAME: ${{ github.ref_name }}
+          REF_TYPE: ${{ github.ref_type }}
+        run: |
+          python - <<'PY'
+          import os
+          import pathlib
+          import re
+
+          ref_name = os.environ["REF_NAME"]
+          ref_type = os.environ["REF_TYPE"]
+          if ref_type != "tag":
+              raise SystemExit("PyPI publishing must run from a release tag.")
+
+          # the C++ project version in CMakeLists.txt is the package version
+          cmake = pathlib.Path("CMakeLists.txt").read_text()
+          version = re.search(r"project\([^)]*VERSION\s+([0-9][0-9.]*)", cmake).group(1)
+          tag_version = ref_name[1:] if ref_name.startswith("v") else ref_name
+          if tag_version != version:
+              raise SystemExit(
+                  f"Release tag {ref_name!r} does not match CMakeLists.txt version {version!r}."
+              )
+
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+              print(f"version={version}", file=output)
+          PY
+
+  build-sdist:
+    name: Build source distribution
+    needs: check-version
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Build sdist
+        run: |
+          python -m pip install --upgrade pip build
+          python -m build --sdist --outdir .build/dist
+
+      - name: Upload sdist
+        uses: actions/upload-artifact@v7
+        with:
+          name: limit-order-book-sdist
+          path: .build/dist/*.tar.gz
+          include-hidden-files: true
+          if-no-files-found: error
+
+  build-wheels:
+    name: Build wheel (${{ matrix.name }})
+    needs: check-version
+    runs-on: ${{ matrix.runner }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux x64
+            runner: ubuntu-24.04
+            cibw-arch: x86_64
+            artifact: linux-x64
+          - name: Linux arm64
+            runner: ubuntu-24.04-arm
+            cibw-arch: aarch64
+            artifact: linux-arm64
+          - name: Windows x64
+            runner: windows-2022
+            cibw-arch: AMD64
+            artifact: windows-x64
+          - name: macOS x64
+            runner: macos-15-intel
+            cibw-arch: x86_64
+            artifact: macos-x64
+          - name: macOS arm64
+            runner: macos-15
+            cibw-arch: arm64
+            artifact: macos-arm64
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v3.4.1
+        with:
+          output-dir: .build/wheelhouse
+        env:
+          CIBW_ARCHS: ${{ matrix.cibw-arch }}
+
+      - name: Upload wheels
+        uses: actions/upload-artifact@v7
+        with:
+          name: limit-order-book-${{ matrix.artifact }}-wheel
+          path: .build/wheelhouse/*.whl
+          include-hidden-files: true
+          if-no-files-found: error
+
+  publish:
+    name: Publish to PyPI
+    needs:
+      - check-version
+      - build-sdist
+      - build-wheels
+    runs-on: ubuntu-24.04
+    environment:
+      name: pypi
+      url: https://pypi.org/project/limit-order-book/${{ needs.check-version.outputs.version }}/
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Download distributions
+        uses: actions/download-artifact@v8
+        with:
+          pattern: limit-order-book-*
+          path: dist
+          merge-multiple: true
+
+      - name: Publish distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1

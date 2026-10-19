@@ -1,0 +1,72 @@
+[build-system]
+requires = ["scikit-build-core>=0.11", "Cython>=3.1,<4"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "limit_order_book"
+dynamic = ["version"]
+description = "A Limit Order Book (LOB) implementation"
+readme = "README.md"
+requires-python = ">=3.13"
+license = "MIT"
+license-files = ["LICENSE", "LICENSING.md", "vendor/*/LICENSE"]
+authors = [
+    {name = "Christian Kauten", email = "kautencreations@gmail.com"},
+]
+keywords = ["Limit Order Book", "Matching Engine"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Intended Audience :: Science/Research",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: C++",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Office/Business :: Financial",
+    "Topic :: Office/Business :: Financial :: Investment",
+]
+
+[project.urls]
+Homepage = "https://github.com/Kautenja/limit-order-book"
+Repository = "https://github.com/Kautenja/limit-order-book"
+
+# CMakeLists.txt builds the Cython extension and installs it into
+# limit_order_book/. The C++ library is the primary product, so its project
+# version is the package version.
+[tool.scikit-build]
+minimum-version = "build-system.requires"
+build-dir = ".build/python/{wheel_tag}"
+wheel.packages = ["limit_order_book"]
+wheel.exclude = ["limit_order_book/test/**", "limit_order_book/lib_limit_order_book*"]
+sdist.exclude = [
+    ".gitattributes",
+    ".github/**",
+    ".gitignore",
+    "AGENTS.md",
+    "CONTRIBUTING.md",
+    "benchmark/**",
+    "docs/**",
+    "limit_order_book/test/**",
+    "main.sh",
+    "requirements.txt",
+    "specs/**",
+    "test/**",
+    "vendor/*/benchmark/**",
+    "vendor/*/test/**",
+    "vendor/*/tests/**",
+    "vendor/*/vendor/**",
+]
+
+[tool.scikit-build.metadata.version]
+provider = "scikit_build_core.metadata.regex"
+input = "CMakeLists.txt"
+regex = 'project\([^)]*VERSION\s+(?P<value>[0-9][0-9.]*)'
+
+[tool.cibuildwheel]
+build = "cp313-* cp314-*"
+skip = "*-musllinux_*"
+test-command = 'python -c "from limit_order_book import LimitOrderBook; book = LimitOrderBook(); book.limit_sell(1, 100, 50); assert book.best_sell() == 50"'
+build-verbosity = 1
