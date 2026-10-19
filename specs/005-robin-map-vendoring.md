@@ -258,3 +258,31 @@ On 2026-10-19, the user requested committing and pushing the robin-map work
 on `2026-10-19-updates`. The version bump was already a separate commit,
 `29888a3`. The pre-commit snapshot integrity check and `git diff --check`
 passed; the validation results and limitations above still apply.
+
+## Windows CI Fixture Cleanup
+
+On 2026-10-19, [PR #6's first CI run][windows-failure] failed in both Windows
+Python jobs after the library's 28 Python tests passed. The offline integrity
+test used `shutil.rmtree` to remove its upstream fixture; Windows rejected
+deletion of read-only Git object files with `PermissionError`.
+
+The fixture now owns a separate `TemporaryDirectory` and calls its public
+`cleanup()` method, which handles read-only files. An assertion confirms the
+clone is absent before running `--check`. Cleanup remains registered for
+every test, including failures. The importer and vendored files are unchanged.
+
+Local validation on macOS arm64 with CPython 3.14.2:
+
+```shell
+.venv/bin/python -m unittest discover -s scripts -p 'test_*.py'
+.venv/bin/python scripts/update_robin_map.py --check
+git diff --check
+```
+
+All six importer tests passed, the five pinned files verified, and the diff
+passed its whitespace check. The PR's Windows CPython 3.13 and 3.14 jobs
+exercise the actual Windows filesystem behavior; local macOS validation alone
+does not establish that result. Native and packaging checks are unchanged and
+run in the existing PR matrix.
+
+[windows-failure]: https://github.com/Kautenja/limit-order-book/actions/runs/39201824821

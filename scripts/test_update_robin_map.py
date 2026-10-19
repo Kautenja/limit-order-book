@@ -20,8 +20,9 @@ class UpdateRobinMapTests(unittest.TestCase):
         (self.root / 'scripts').mkdir()
         shutil.copyfile(Path(__file__).with_name('update_robin_map.py'),
                         self.root / 'scripts/update_robin_map.py')
-        self.source = self.root / 'upstream'
-        self.source.mkdir()
+        self.upstream = tempfile.TemporaryDirectory(prefix='upstream-', dir=self.root)
+        self.addCleanup(self.upstream.cleanup)
+        self.source = Path(self.upstream.name)
         subprocess.run(['git', 'init', '--quiet', str(self.source)], check=True)
         subprocess.run(['git', '-C', str(self.source), 'config', 'core.autocrlf', 'false'],
                        check=True)
@@ -103,7 +104,9 @@ class UpdateRobinMapTests(unittest.TestCase):
             self.assertEqual(self.snapshot_bytes(), before)
 
     def test_integrity_check_does_not_require_the_upstream_clone(self):
-        shutil.rmtree(self.source)
+        # TemporaryDirectory handles read-only Git object files on Windows.
+        self.upstream.cleanup()
+        self.assertFalse(self.source.exists())
         self.run_tool('--check')
 
     def test_autocrlf_checkout_preserves_vendored_bytes(self):
