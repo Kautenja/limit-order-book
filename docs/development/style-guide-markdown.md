@@ -1,8 +1,8 @@
 # Markdown Style Guide
 
 This guide is for agents and humans writing or editing Markdown in this
-repository: `README.md`, `AGENTS.md`, the developer manual, and specs.
-[AGENTS.md](../AGENTS.md) owns workflow and completion requirements; this file
+repository: `README.md`, `AGENTS.md`, first-party content in `docs/`, and specs.
+[AGENTS.md](../../AGENTS.md) owns workflow and completion requirements; this file
 owns Markdown presentation.
 
 The style follows Christian Kauten's public repositories, including this
@@ -19,12 +19,15 @@ Place Markdown by audience and lifetime:
     usage, and development commands.
 -   **`AGENTS.md`:** The entry point for agents: workflow, architecture,
     contracts, and validation.
--   **`developer-manual/`:** Durable rules for agents and maintainers, such as
+-   **`docs/README.md`:** The documentation index, linking to contributor
+    guidance, development rules, and imported reference material.
+-   **`docs/development/`:** Durable rules for agents and maintainers, such as
     style guides, testing methodology, and architecture notes.
 -   **`specs/`:** Dated, testable work definitions with completion evidence,
-    following [AGENTS.md](../AGENTS.md#planning-and-completion).
--   **`notes/`:** Imported research and quoted source material. Preserve its
-    original formatting and punctuation; do not restyle it.
+    following [AGENTS.md](../../AGENTS.md#planning-and-completion).
+-   **`docs/references/`:** Imported research, quoted source material, and
+    example engines. Preserve their original formatting and punctuation;
+    do not restyle them.
 
 ## Structure And Prose
 
@@ -40,8 +43,9 @@ Place Markdown by audience and lifetime:
     Avoid slogans, inflated claims, and implementation diaries.
 -   Default to ASCII punctuation in new prose: straight quotes, `-` instead
     of en or em dashes, and `...` instead of the ellipsis character.
--   Use `$O(1)$` style inline math for complexity, as `notes/lob.md` does.
--   Link to [LICENSE](../LICENSE) instead of duplicating license text.
+-   Use `$O(1)$` style inline math for complexity, as
+    `docs/references/lob.md` does.
+-   Link to [LICENSE](../../LICENSE) instead of duplicating license text.
     Markdown files do not get the source-code copyright header.
 -   Do not use emoji.
 
@@ -134,7 +138,7 @@ Numeric columns:
     sets. Keep badge definitions directly below the badge row, as `README.md`
     does.
 -   Use descriptive link text, never a bare "here".
--   Keep heading text stable in `AGENTS.md` and the developer manual, because
+-   Keep heading text stable in `AGENTS.md` and `docs/development/`, because
     other documents link to their anchors. Update incoming links when a
     heading changes.
 -   Give images useful alt text and prefer checked-in assets over remote

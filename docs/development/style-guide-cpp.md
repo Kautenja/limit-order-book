@@ -2,7 +2,7 @@
 
 This guide is for agents and humans writing or refactoring the C++ library in
 `include/`, the C API, the Catch2 tests, the benchmarks, and the executables
-in `main/`. [AGENTS.md](../AGENTS.md) owns workflow, architecture, and
+in `main/`. [AGENTS.md](../../AGENTS.md) owns workflow, architecture, and
 validation; this file owns C++ code shape.
 
 The existing headers in `include/` are the style authority. The rules below
@@ -46,7 +46,7 @@ notice, followed by a blank line before the include guard or includes:
 -   `main/dummy_matching.cpp` carries a short
     `// Copyright 2019 Christian Kauten` line. Replace it with the full header,
     keeping the original year, when a requested edit touches the file.
--   Never add this header to `vendor/` or `notes/`.
+-   Never add this header to `vendor/` or `docs/references/`.
 
 ## Style Fingerprint
 
@@ -292,7 +292,7 @@ Before finishing a C++ change, check:
 -   Signatures use the domain aliases and include units or meaning in names.
 -   Every new or changed declaration has `///` documentation, including side,
     complexity, failure behavior, and ownership where they apply.
--   The matching invariants in [AGENTS.md](../AGENTS.md) still hold.
+-   The matching invariants in [AGENTS.md](../../AGENTS.md) still hold.
 -   C API changes have matching `ctypes` declarations, Python methods, and
     tests in both languages.
 -   Catch2 scenarios cover the changed behavior, and hot-path changes have

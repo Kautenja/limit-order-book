@@ -61,14 +61,14 @@ part of any distribution or installation.
 
 ## Notes And Example Engines
 
-The material in `notes/` is imported reference material, not original project
-code, and is not licensed under MIT by this project:
+The material in `docs/references/` is imported reference material, not
+original project code, and is not licensed under MIT by this project:
 
--   **`notes/lob.md`:** Quoted posts from the archived "How to HFT" blog, with
-    a link to the source. Copyright remains with the original author.
--   **`notes/engines/engine.c`:** A QuantCup 1 price-time matching engine
-    submission credited to its author, "voyager".
--   **`notes/engines/island.prg`:** Source attributed to the Island ECN
+-   **`docs/references/lob.md`:** Quoted posts from the archived "How to HFT"
+    blog, with a link to the source. Copyright remains with the original author.
+-   **`docs/references/engines/engine.c`:** A QuantCup 1 price-time matching
+    engine submission credited to its author, "voyager".
+-   **`docs/references/engines/island.prg`:** Source attributed to the Island ECN
     matching engine.
 
 These files carry no license grant from their authors in this repository.

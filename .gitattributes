@@ -7,7 +7,7 @@
 *.sh text eol=lf
 
 # Preserve the original CRLF line endings of the imported Island ECN source.
-/notes/engines/island.prg -text
+/docs/references/engines/island.prg -text
 
 # Keep the C++ library and Python package classified consistently, including
 # tests and benchmarks.
@@ -17,7 +17,7 @@
 
 # Exclude in-tree dependencies and imported reference material.
 /vendor/** linguist-vendored
-/notes/** linguist-vendored
+/docs/references/** linguist-vendored
 
 # Exclude documentation and citations.
 *.md linguist-documentation

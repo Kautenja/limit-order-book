@@ -155,6 +155,9 @@ package provides these tools for free.
 
 ## Development
 
+See the [documentation index](docs/README.md) for contributor guidance,
+style guides, and reference material.
+
 [main.sh](main.sh) wraps the CMake and Python commands; run `./main.sh -h` for
 the full list. Development needs CMake 3.21 or later, a C++14 compiler, Git
 (CMake fetches Catch2 for the tests), and Python 3.13 or later. Set up a
@@ -248,4 +251,5 @@ commit used in your research.
 
 The repository declares the [MIT License](LICENSE). See
 [LICENSING.md](LICENSING.md) for the scope of that grant, the licenses of the
-vendored dependencies, and the third-party reference material in `notes/`.
+vendored dependencies, and the third-party reference material in
+`docs/references/`.

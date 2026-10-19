@@ -283,5 +283,5 @@ before announcing the release.
     checks and unresolved failures explicitly.
 
 [issues]: https://github.com/Kautenja/limit-order-book/issues
-[cpp-style]: developer-manual/style-guide-cpp.md
-[markdown-style]: developer-manual/style-guide-markdown.md
+[cpp-style]: docs/development/style-guide-cpp.md
+[markdown-style]: docs/development/style-guide-markdown.md

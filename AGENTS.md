@@ -13,13 +13,14 @@ Read this file and the sources relevant to the requested change:
 
 -   [README.md](README.md): public overview, installation, and the official
     test and benchmark commands.
--   [C++ Style Guide](developer-manual/style-guide-cpp.md): required for
+-   [C++ Style Guide](docs/development/style-guide-cpp.md): required for
     headers, the C API, tests, benchmarks, and executables.
--   [Markdown Style Guide](developer-manual/style-guide-markdown.md): required
-    for `README.md`, this file, the developer manual, and notes.
+-   [Markdown Style Guide](docs/development/style-guide-markdown.md): required
+    for `README.md`, this file, and first-party documentation under `docs/`.
 -   [LICENSE](LICENSE): MIT terms for first-party code.
--   [notes/lob.md](notes/lob.md): imported background on fast limit order book
-    design. It is quoted reference material, not project guidance.
+-   [Limit order book research](docs/references/lob.md): imported background
+    on fast limit order book design. It is quoted reference material, not
+    project guidance.
 
 The style guides adapt the conventions from Christian Kauten's other projects
 to this repository. They are self-contained; the other projects are reference
@@ -51,8 +52,9 @@ material, not dependencies.
     `.build/dist/`. `./main.sh clean` removes it.
 -   **`vendor/`:** Third-party and owner-authored dependencies, committed
     in-tree. Treat them as read-only.
--   **`developer-manual/`:** Durable rules for agents and maintainers.
--   **`notes/`:** Imported research notes and example engines.
+-   **`docs/`:** Documentation, indexed in [docs/README.md](docs/README.md).
+    `docs/development/` holds durable rules for agents and maintainers;
+    `docs/references/` holds imported research notes and example engines.
 
 ## Working In This Repository
 
@@ -177,7 +179,7 @@ in the owning spec: date, decisions, commands and results, and limitations.
 Mark verified work `Status: COMPLETE`. Do not create separate history logs.
 
 When a change creates a durable rule for future work, record it in the
-owning guide under `developer-manual/` rather than in a spec or this file.
+owning guide under `docs/development/` rather than in a spec or this file.
 
 Finish with a concise summary of the changes, the validation actually run,
 and any failures or skipped checks. Include the commit and push result when
