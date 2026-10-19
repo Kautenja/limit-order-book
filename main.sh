@@ -11,15 +11,16 @@
 #     install             Create/use .venv and install development tools
 #     configure           Configure the CMake build in .build/cmake
 #     build               Build the C++ tests, benchmarks, and the
-#                         C API library (copied into limit_order_book/)
+#                         Cython extension (copied into limit_order_book/)
 #     test                Run the C++ and Python test suites
 #     unittest            Alias for test
 #     test-cpp            Build and run the Catch2 test suite with ctest
-#     test-python         Build the C API library and run the Python suite
+#     test-python         Build the Cython extension and run the Python suite
 #     test-package        Install the headers and C API library into
 #                         .build/prefix and build the C++ and C consumers
 #                         with find_package and with FetchContent
 #     benchmark           Build and run the Catch2 benchmarks
+#     benchmark-python    Build and benchmark the public Python interface
 #     install-cpp         Install the headers and CMake package; pass extra
 #                         args to `cmake --install`, e.g., --prefix /opt/lob
 #     clean               Remove build artifacts and Python bytecode
@@ -123,22 +124,31 @@ run_configure() {
     -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
     -DLOB_BUILD_TESTS=ON \
     -DLOB_BUILD_BENCHMARKS=ON \
+    -DLOB_BUILD_PYTHON_LIBRARY=OFF \
     "$@"
 }
 
 run_build() {
-  run_configure
+  run_configure -DLOB_BUILD_PYTHON_LIBRARY=ON \
+    -DPython_EXECUTABLE="$("${PYTHON}" -c 'import sys; print(sys.executable)')"
   cmake --build "${BUILD_DIR}" --config "${BUILD_TYPE}" --parallel "$@"
 }
 
 run_test_cpp() {
-  run_build
+  run_configure
+  cmake --build "${BUILD_DIR}" --config "${BUILD_TYPE}" --parallel
   ctest --test-dir "${BUILD_DIR}" --build-config "${BUILD_TYPE}" --output-on-failure "$@"
 }
 
+run_build_python() {
+  run_configure -DLOB_BUILD_TESTS=OFF -DLOB_BUILD_BENCHMARKS=OFF \
+    -DLOB_BUILD_PYTHON_LIBRARY=ON \
+    -DPython_EXECUTABLE="$("${PYTHON}" -c 'import sys; print(sys.executable)')"
+  cmake --build "${BUILD_DIR}" --config "${BUILD_TYPE}" --target limit_order_book_native
+}
+
 run_test_python() {
-  run_configure
-  cmake --build "${BUILD_DIR}" --config "${BUILD_TYPE}" --target limit_order_book_c
+  run_build_python
   "${PYTHON}" -m unittest discover . "$@"
 }
 
@@ -177,7 +187,8 @@ run_package_consumer() {
 }
 
 run_benchmark() {
-  run_build --target limit_order_book_benchmarks
+  run_configure
+  cmake --build "${BUILD_DIR}" --config "${BUILD_TYPE}" --target limit_order_book_benchmarks
   # multi-config generators (Visual Studio, Xcode) nest binaries by config,
   # and Windows binaries end in .exe
   local binary
@@ -204,11 +215,14 @@ run_clean() {
   rm -rf "${BUILD_ROOT}"
   find limit_order_book -type f -name "*.pyc" -exec rm -f {} +
   find limit_order_book -type d -name "__pycache__" -prune -exec rm -rf {} +
-  find limit_order_book -maxdepth 1 -type f -name "lib_limit_order_book*" -exec rm -f {} +
+  find limit_order_book -maxdepth 1 -type f \
+    \( -name "lib_limit_order_book*" -o -name "_native*.so" -o -name "_native*.pyd" \) \
+    -exec rm -f {} +
 }
 
 run_test() {
-  run_test_cpp
+  run_build
+  ctest --test-dir "${BUILD_DIR}" --build-config "${BUILD_TYPE}" --output-on-failure
   "${PYTHON}" -m unittest discover . "$@"
 }
 
@@ -277,6 +291,12 @@ case "${COMMAND}" in
 
 "benchmark")
   run_benchmark "$@"
+  exit 0
+  ;;
+
+"benchmark-python")
+  run_build_python
+  "${PYTHON}" benchmark/benchmark_python.py "$@"
   exit 0
   ;;
 

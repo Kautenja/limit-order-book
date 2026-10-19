@@ -1,5 +1,5 @@
 [build-system]
-requires = ["scikit-build-core>=0.11"]
+requires = ["scikit-build-core>=0.11", "Cython>=3.1,<4"]
 build-backend = "scikit_build_core.build"
 
 [project]
@@ -33,14 +33,14 @@ classifiers = [
 Homepage = "https://github.com/Kautenja/limit-order-book"
 Repository = "https://github.com/Kautenja/limit-order-book"
 
-# CMakeLists.txt builds the C API shared library that the package loads
-# through ctypes and installs it into limit_order_book/. The C++ library is
-# the primary product, so its project version is the package version.
+# CMakeLists.txt builds the Cython extension and installs it into
+# limit_order_book/. The C++ library is the primary product, so its project
+# version is the package version.
 [tool.scikit-build]
 minimum-version = "build-system.requires"
 build-dir = ".build/python/{wheel_tag}"
 wheel.packages = ["limit_order_book"]
-wheel.exclude = ["limit_order_book/test/**"]
+wheel.exclude = ["limit_order_book/test/**", "limit_order_book/lib_limit_order_book*"]
 sdist.exclude = [
     ".gitattributes",
     ".github/**",
@@ -52,6 +52,7 @@ sdist.exclude = [
     "limit_order_book/test/**",
     "main.sh",
     "requirements.txt",
+    "specs/**",
     "test/**",
     "vendor/*/benchmark/**",
     "vendor/*/test/**",

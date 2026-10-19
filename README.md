@@ -20,8 +20,8 @@
 
 This is a header-only C++ implementation of the limit order book with a
 price-time priority matching policy for reception of market data streams. The
-C++ library is the primary product; a C API and a Python package built on it
-are also provided.
+C++ library is the primary product; a C API and a Python package with Cython
+bindings to the C++ book are also provided.
 
 ## Usage
 
@@ -76,7 +76,7 @@ CMake 3.21 or later and a C++14 compiler:
 ```shell
 git clone https://github.com/Kautenja/limit-order-book.git
 cd limit-order-book
-cmake -S . -B .build/cmake -DLOB_BUILD_TESTS=OFF
+cmake -S . -B .build/cmake -DLOB_BUILD_TESTS=OFF -DLOB_BUILD_PYTHON_LIBRARY=OFF
 cmake --install .build/cmake --prefix /usr/local
 ```
 
@@ -106,11 +106,12 @@ dependencies into your project, and add all four to the include path.
 
 The C API in [include/limit_order_book_c.h](include/limit_order_book_c.h) is
 a C99 header that wraps the book in an opaque `LOB_LimitOrderBook` handle.
-The same shared library backs the Python package. Build and install it with
-`LOB_BUILD_C_LIBRARY=ON`:
+Build and install it with `LOB_BUILD_C_LIBRARY=ON`. C consumers do not need
+Python or Cython:
 
 ```shell
-cmake -S . -B .build/cmake -DLOB_BUILD_TESTS=OFF -DLOB_BUILD_C_LIBRARY=ON
+cmake -S . -B .build/cmake -DLOB_BUILD_TESTS=OFF \
+    -DLOB_BUILD_PYTHON_LIBRARY=OFF -DLOB_BUILD_C_LIBRARY=ON
 cmake --build .build/cmake
 cmake --install .build/cmake --prefix /usr/local
 ```
@@ -146,7 +147,22 @@ pip install limit-order-book
 
 Wheels are published for CPython 3.13 and 3.14 on Linux (x64, arm64), macOS
 (x64, arm64), and Windows (x64). Other platforms build from the source
-distribution and need a C++14 compiler.
+distribution and need a C++14 compiler and Python development headers. The
+source build installs Cython as an isolated build dependency; installed wheels
+do not need Cython or a separate C API shared library.
+
+The public `LimitOrderBook` class calls C++ through the compiled
+`limit_order_book._native` extension. Existing imports and methods are
+preserved:
+
+```python
+from limit_order_book import LimitOrderBook
+
+book = LimitOrderBook()
+book.limit_sell(order_id=1, quantity=100, price=50)
+book.market_buy(order_id=2, quantity=40)
+assert book.volume_sell(50) == 60
+```
 
 ## Usage Caveats
 
@@ -179,8 +195,9 @@ To run the C++ and Python test suites, run:
 ```
 
 To run them separately, run `./main.sh test-cpp` or `./main.sh test-python`.
-The C++ suite runs through `ctest`; the Python suite runs against the C API
-library that the CMake build copies into `limit_order_book/`. To check that
+The C++ suite runs through `ctest`; the Python suite runs against the Cython
+extension that the CMake build copies into `limit_order_book/`. The C++-only
+commands do not require Python or Cython. To check that
 the installed CMake package and FetchContent both work for a consumer
 project, run:
 
@@ -197,6 +214,18 @@ To run the C++ benchmarks, run:
 ```
 
 Arguments after `benchmark` go to the Catch2 runner, such as a test name.
+To benchmark Python queries, order entry/cancellation, and matching:
+
+```shell
+./main.sh benchmark-python --loops 100000 --repeats 9 --output /tmp/lob-before.json
+# Rebuild after changing the bindings, then compare on the same machine.
+./main.sh benchmark-python --loops 100000 --repeats 9 --compare /tmp/lob-before.json
+```
+
+The runner reports median and minimum/maximum nanoseconds per Python method
+call, checks final book state outside the timed region, and compares matched
+runs. See [Python bindings](docs/development/python-bindings.md) for the build
+contract and measurement procedure.
 
 Each measured iteration uses an independent empty book, with book construction
 and cleanup outside the timed workload. Results from the earlier benchmarks

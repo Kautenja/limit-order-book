@@ -12,6 +12,8 @@ for installation, usage, and development commands.
     contracts, and validation requirements.
 -   [C++ Style Guide](development/style-guide-cpp.md): Conventions for the
     library, C API, tests, and benchmarks.
+-   [Python bindings](development/python-bindings.md): Cython ownership,
+    conversions, builds, and repeatable performance measurements.
 -   [Markdown Style Guide](development/style-guide-markdown.md): Document
     organization, prose, formatting, links, and review checks.
 -   [Changelog](../CHANGELOG.md): Release history and compatibility changes.
