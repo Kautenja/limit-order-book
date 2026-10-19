@@ -9,7 +9,7 @@ description = "A Limit Order Book (LOB) implementation"
 readme = "README.md"
 requires-python = ">=3.13"
 license = "MIT"
-license-files = ["LICENSE"]
+license-files = ["LICENSE", "LICENSING.md"]
 authors = [
     {name = "Christian Kauten", email = "kautencreations@gmail.com"},
 ]

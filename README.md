@@ -116,3 +116,9 @@ manually against the release tag:
 ```shell
 gh workflow run publish.yml --ref <tag>
 ```
+
+## Licensing
+
+The repository declares the [MIT License](LICENSE). See
+[LICENSING.md](LICENSING.md) for the scope of that grant, the licenses of the
+vendored dependencies, and the third-party reference material in `notes/`.
