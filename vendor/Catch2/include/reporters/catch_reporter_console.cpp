@@ -9,7 +9,7 @@
 #include "catch_reporter_console.h"
 
 #include "../internal/catch_reporter_registrars.hpp"
-#include "internal/catch_console_colour.h"
+#include "../internal/catch_console_colour.h"
 #include "../internal/catch_version.h"
 #include "../internal/catch_text.h"
 #include "../internal/catch_stringref.h"
@@ -210,15 +210,11 @@ class Duration {
     static const uint64_t s_nanosecondsInASecond = 1000 * s_nanosecondsInAMillisecond;
     static const uint64_t s_nanosecondsInAMinute = 60 * s_nanosecondsInASecond;
 
-    uint64_t m_inNanoseconds;
+    double m_inNanoseconds;
     Unit m_units;
 
 public:
-	explicit Duration(double inNanoseconds, Unit units = Unit::Auto)
-        : Duration(static_cast<uint64_t>(inNanoseconds), units) {
-    }
-
-    explicit Duration(uint64_t inNanoseconds, Unit units = Unit::Auto)
+    explicit Duration(double inNanoseconds, Unit units = Unit::Auto)
         : m_inNanoseconds(inNanoseconds),
         m_units(units) {
         if (m_units == Unit::Auto) {
@@ -247,7 +243,7 @@ public:
         case Unit::Minutes:
             return m_inNanoseconds / static_cast<double>(s_nanosecondsInAMinute);
         default:
-            return static_cast<double>(m_inNanoseconds);
+            return m_inNanoseconds;
         }
     }
     auto unitsAsString() const -> std::string {
@@ -268,7 +264,7 @@ public:
 
     }
     friend auto operator << (std::ostream& os, Duration const& duration) -> std::ostream& {
-        return os << duration.value() << " " << duration.unitsAsString();
+        return os << duration.value() << ' ' << duration.unitsAsString();
     }
 };
 } // end anon namespace
@@ -300,9 +296,9 @@ public:
 				headerCols += Column(info.name).width(static_cast<std::size_t>(info.width - 2));
 				headerCols += spacer;
 			}
-			m_os << headerCols << "\n";
+			m_os << headerCols << '\n';
 
-            m_os << Catch::getLineOfChars<'-'>() << "\n";
+            m_os << Catch::getLineOfChars<'-'>() << '\n';
         }
     }
     void close() {
@@ -321,30 +317,29 @@ public:
 
     friend TablePrinter& operator << (TablePrinter& tp, ColumnBreak) {
         auto colStr = tp.m_oss.str();
-        // This takes account of utf8 encodings
-        auto strSize = Catch::StringRef(colStr).numberOfCharacters();
+        const auto strSize = colStr.size();
         tp.m_oss.str("");
         tp.open();
         if (tp.m_currentColumn == static_cast<int>(tp.m_columnInfos.size() - 1)) {
             tp.m_currentColumn = -1;
-            tp.m_os << "\n";
+            tp.m_os << '\n';
         }
         tp.m_currentColumn++;
 
         auto colInfo = tp.m_columnInfos[tp.m_currentColumn];
-        auto padding = (strSize + 2 < static_cast<std::size_t>(colInfo.width))
-            ? std::string(colInfo.width - (strSize + 2), ' ')
+        auto padding = (strSize + 1 < static_cast<std::size_t>(colInfo.width))
+            ? std::string(colInfo.width - (strSize + 1), ' ')
             : std::string();
         if (colInfo.justification == ColumnInfo::Left)
-            tp.m_os << colStr << padding << " ";
+            tp.m_os << colStr << padding << ' ';
         else
-            tp.m_os << padding << colStr << " ";
+            tp.m_os << padding << colStr << ' ';
         return tp;
     }
 
     friend TablePrinter& operator << (TablePrinter& tp, RowBreak) {
         if (tp.m_currentColumn > 0) {
-            tp.m_os << "\n";
+            tp.m_os << '\n';
             tp.m_currentColumn = -1;
         }
         return tp;
@@ -354,12 +349,26 @@ public:
 ConsoleReporter::ConsoleReporter(ReporterConfig const& config)
     : StreamingReporterBase(config),
     m_tablePrinter(new TablePrinter(config.stream(),
-    {
-        { "benchmark name", CATCH_CONFIG_CONSOLE_WIDTH - 32, ColumnInfo::Left },
-        { "samples      mean       std dev", 14, ColumnInfo::Right },
-        { "iterations   low mean   low std dev", 14, ColumnInfo::Right },
-        { "estimated    high mean  high std dev", 14, ColumnInfo::Right }
-    })) {}
+        [&config]() -> std::vector<ColumnInfo> {
+        if (config.fullConfig()->benchmarkNoAnalysis())
+        {
+            return{
+                { "benchmark name", CATCH_CONFIG_CONSOLE_WIDTH - 43, ColumnInfo::Left },
+                { "     samples", 14, ColumnInfo::Right },
+                { "  iterations", 14, ColumnInfo::Right },
+                { "        mean", 14, ColumnInfo::Right }
+            };
+        }
+        else
+        {
+            return{
+                { "benchmark name", CATCH_CONFIG_CONSOLE_WIDTH - 43, ColumnInfo::Left },
+                { "samples      mean       std dev", 14, ColumnInfo::Right },
+                { "iterations   low mean   low std dev", 14, ColumnInfo::Right },
+                { "estimated    high mean  high std dev", 14, ColumnInfo::Right }
+            };
+        }
+    }())) {}
 ConsoleReporter::~ConsoleReporter() = default;
 
 std::string ConsoleReporter::getDescription() {
@@ -368,6 +377,10 @@ std::string ConsoleReporter::getDescription() {
 
 void ConsoleReporter::noMatchingTestCases(std::string const& spec) {
     stream << "No test cases matched '" << spec << '\'' << std::endl;
+}
+
+void ConsoleReporter::reportInvalidArguments(std::string const&arg){
+    stream << "Invalid Filter: " << arg << std::endl;
 }
 
 void ConsoleReporter::assertionStarting(AssertionInfo const&) {}
@@ -405,8 +418,9 @@ void ConsoleReporter::sectionEnded(SectionStats const& _sectionStats) {
             stream << "\nNo assertions in test case";
         stream << " '" << _sectionStats.sectionInfo.name << "'\n" << std::endl;
     }
-    if (m_config->showDurations() == ShowDurations::Always) {
-        stream << getFormattedDuration(_sectionStats.durationInSeconds) << " s: " << _sectionStats.sectionInfo.name << std::endl;
+    double dur = _sectionStats.durationInSeconds;
+    if (shouldShowDuration(*m_config, dur)) {
+        stream << getFormattedDuration(dur) << " s: " << _sectionStats.sectionInfo.name << std::endl;
     }
     if (m_headerPrinted) {
         m_headerPrinted = false;
@@ -432,24 +446,32 @@ void ConsoleReporter::benchmarkPreparing(std::string const& name) {
 }
 
 void ConsoleReporter::benchmarkStarting(BenchmarkInfo const& info) {
-	(*m_tablePrinter) << info.samples << ColumnBreak()
-		<< info.iterations << ColumnBreak()
-		<< Duration(info.estimatedDuration) << ColumnBreak();
+    (*m_tablePrinter) << info.samples << ColumnBreak()
+        << info.iterations << ColumnBreak();
+    if (!m_config->benchmarkNoAnalysis())
+        (*m_tablePrinter) << Duration(info.estimatedDuration) << ColumnBreak();
 }
 void ConsoleReporter::benchmarkEnded(BenchmarkStats<> const& stats) {
-	(*m_tablePrinter) << ColumnBreak()
-		<< Duration(stats.mean.point.count()) << ColumnBreak()
-		<< Duration(stats.mean.lower_bound.count()) << ColumnBreak()
-		<< Duration(stats.mean.upper_bound.count()) << ColumnBreak() << ColumnBreak()
-		<< Duration(stats.standardDeviation.point.count()) << ColumnBreak()
-		<< Duration(stats.standardDeviation.lower_bound.count()) << ColumnBreak()
-		<< Duration(stats.standardDeviation.upper_bound.count()) << ColumnBreak() << ColumnBreak() << ColumnBreak() << ColumnBreak() << ColumnBreak();
+    if (m_config->benchmarkNoAnalysis())
+    {
+        (*m_tablePrinter) << Duration(stats.mean.point.count()) << ColumnBreak();
+    }
+    else
+    {
+        (*m_tablePrinter) << ColumnBreak()
+            << Duration(stats.mean.point.count()) << ColumnBreak()
+            << Duration(stats.mean.lower_bound.count()) << ColumnBreak()
+            << Duration(stats.mean.upper_bound.count()) << ColumnBreak() << ColumnBreak()
+            << Duration(stats.standardDeviation.point.count()) << ColumnBreak()
+            << Duration(stats.standardDeviation.lower_bound.count()) << ColumnBreak()
+            << Duration(stats.standardDeviation.upper_bound.count()) << ColumnBreak() << ColumnBreak() << ColumnBreak() << ColumnBreak() << ColumnBreak();
+    }
 }
 
 void ConsoleReporter::benchmarkFailed(std::string const& error) {
 	Colour colour(Colour::Red);
     (*m_tablePrinter)
-        << "Benchmark failed (" << error << ")"
+        << "Benchmark failed (" << error << ')'
         << ColumnBreak() << RowBreak();
 }
 #endif // CATCH_CONFIG_ENABLE_BENCHMARKING
@@ -531,11 +553,10 @@ void ConsoleReporter::printTestCaseAndSectionHeader() {
 
     SourceLineInfo lineInfo = m_sectionStack.back().lineInfo;
 
-    if (!lineInfo.empty()) {
-        stream << getLineOfChars<'-'>() << '\n';
-        Colour colourGuard(Colour::FileName);
-        stream << lineInfo << '\n';
-    }
+
+    stream << getLineOfChars<'-'>() << '\n';
+    Colour colourGuard(Colour::FileName);
+    stream << lineInfo << '\n';
     stream << getLineOfChars<'.'>() << '\n' << std::endl;
 }
 
@@ -660,8 +681,10 @@ void ConsoleReporter::printSummaryDivider() {
 }
 
 void ConsoleReporter::printTestFilters() {
-    if (m_config->testSpec().hasFilters())
-        stream << Colour(Colour::BrightYellow) << "Filters: " << serializeFilters( m_config->getTestsOrTags() ) << '\n';
+    if (m_config->testSpec().hasFilters()) {
+        Colour guard(Colour::BrightYellow);
+        stream << "Filters: " << serializeFilters(m_config->getTestsOrTags()) << '\n';
+    }
 }
 
 CATCH_REGISTER_REPORTER("console", ConsoleReporter)

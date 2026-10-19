@@ -520,12 +520,12 @@ Matchers.tests.cpp:<line number>
 ...............................................................................
 
 Matchers.tests.cpp:<line number>: FAILED:
-  CHECK_THROWS_MATCHES( throws(3), SpecialException, ExceptionMatcher{1} )
+  CHECK_THROWS_MATCHES( throwsSpecialException(3), SpecialException, ExceptionMatcher{1} )
 with expansion:
   SpecialException::what special exception has value of 1
 
 Matchers.tests.cpp:<line number>: FAILED:
-  REQUIRE_THROWS_MATCHES( throws(4), SpecialException, ExceptionMatcher{1} )
+  REQUIRE_THROWS_MATCHES( throwsSpecialException(4), SpecialException, ExceptionMatcher{1} )
 with expansion:
   SpecialException::what special exception has value of 1
 
@@ -693,6 +693,46 @@ Matchers.tests.cpp:<line number>: FAILED:
   CHECK_THAT( testStringForMatching(), !Contains("substring") )
 with expansion:
   "this string contains 'abc' as a substring" not contains: "substring"
+
+-------------------------------------------------------------------------------
+Mayfail test case with nested sections
+  A
+  1
+-------------------------------------------------------------------------------
+Condition.tests.cpp:<line number>
+...............................................................................
+
+Condition.tests.cpp:<line number>: FAILED:
+
+-------------------------------------------------------------------------------
+Mayfail test case with nested sections
+  A
+  2
+-------------------------------------------------------------------------------
+Condition.tests.cpp:<line number>
+...............................................................................
+
+Condition.tests.cpp:<line number>: FAILED:
+
+-------------------------------------------------------------------------------
+Mayfail test case with nested sections
+  B
+  1
+-------------------------------------------------------------------------------
+Condition.tests.cpp:<line number>
+...............................................................................
+
+Condition.tests.cpp:<line number>: FAILED:
+
+-------------------------------------------------------------------------------
+Mayfail test case with nested sections
+  B
+  2
+-------------------------------------------------------------------------------
+Condition.tests.cpp:<line number>
+...............................................................................
+
+Condition.tests.cpp:<line number>: FAILED:
 
 -------------------------------------------------------------------------------
 Mismatching exception messages failing the test
@@ -1380,6 +1420,6 @@ due to unexpected exception with message:
   Why would you throw a std::string?
 
 ===============================================================================
-test cases:  295 |  221 passed |  70 failed |  4 failed as expected
-assertions: 1547 | 1395 passed | 131 failed | 21 failed as expected
+test cases:  323 |  248 passed |  70 failed |  5 failed as expected
+assertions: 1764 | 1608 passed | 131 failed | 25 failed as expected
 

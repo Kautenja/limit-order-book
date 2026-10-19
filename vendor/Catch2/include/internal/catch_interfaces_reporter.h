@@ -21,6 +21,8 @@
 #if defined(CATCH_CONFIG_ENABLE_BENCHMARKING)
 #include "benchmark/catch_estimate.hpp"
 #include "benchmark/catch_outlier_classification.hpp"
+
+#include <iterator>
 #endif // CATCH_CONFIG_ENABLE_BENCHMARKING
 
 
@@ -214,6 +216,8 @@ namespace Catch {
 
         virtual void noMatchingTestCases( std::string const& spec ) = 0;
 
+        virtual void reportInvalidArguments(std::string const&) {}
+        
         virtual void testRunStarting( TestRunInfo const& testRunInfo ) = 0;
         virtual void testGroupStarting( GroupInfo const& groupInfo ) = 0;
 

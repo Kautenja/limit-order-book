@@ -193,9 +193,9 @@ namespace Catch {
             e.writeAttribute( "durationInSeconds", m_testCaseTimer.getElapsedSeconds() );
 
         if( !testCaseStats.stdOut.empty() )
-            m_xml.scopedElement( "StdOut" ).writeText( trim( testCaseStats.stdOut ), false );
+            m_xml.scopedElement( "StdOut" ).writeText( trim( testCaseStats.stdOut ), XmlFormatting::Newline );
         if( !testCaseStats.stdErr.empty() )
-            m_xml.scopedElement( "StdErr" ).writeText( trim( testCaseStats.stdErr ), false );
+            m_xml.scopedElement( "StdErr" ).writeText( trim( testCaseStats.stdErr ), XmlFormatting::Newline );
 
         m_xml.endElement();
     }
@@ -207,6 +207,10 @@ namespace Catch {
             .writeAttribute( "successes", testGroupStats.totals.assertions.passed )
             .writeAttribute( "failures", testGroupStats.totals.assertions.failed )
             .writeAttribute( "expectedFailures", testGroupStats.totals.assertions.failedButOk );
+        m_xml.scopedElement( "OverallResultsCases")
+            .writeAttribute( "successes", testGroupStats.totals.testCases.passed )
+            .writeAttribute( "failures", testGroupStats.totals.testCases.failed )
+            .writeAttribute( "expectedFailures", testGroupStats.totals.testCases.failedButOk );
         m_xml.endElement();
     }
 
@@ -216,26 +220,33 @@ namespace Catch {
             .writeAttribute( "successes", testRunStats.totals.assertions.passed )
             .writeAttribute( "failures", testRunStats.totals.assertions.failed )
             .writeAttribute( "expectedFailures", testRunStats.totals.assertions.failedButOk );
+        m_xml.scopedElement( "OverallResultsCases")
+            .writeAttribute( "successes", testRunStats.totals.testCases.passed )
+            .writeAttribute( "failures", testRunStats.totals.testCases.failed )
+            .writeAttribute( "expectedFailures", testRunStats.totals.testCases.failedButOk );
         m_xml.endElement();
     }
 
 #if defined(CATCH_CONFIG_ENABLE_BENCHMARKING)
-    void XmlReporter::benchmarkStarting(BenchmarkInfo const &info) {
+    void XmlReporter::benchmarkPreparing(std::string const& name) {
         m_xml.startElement("BenchmarkResults")
-            .writeAttribute("name", info.name)
-            .writeAttribute("samples", info.samples)
+            .writeAttribute("name", name);
+    }
+
+    void XmlReporter::benchmarkStarting(BenchmarkInfo const &info) {
+        m_xml.writeAttribute("samples", info.samples)
             .writeAttribute("resamples", info.resamples)
             .writeAttribute("iterations", info.iterations)
-            .writeAttribute("clockResolution", static_cast<uint64_t>(info.clockResolution))
-            .writeAttribute("estimatedDuration", static_cast<uint64_t>(info.estimatedDuration))
+            .writeAttribute("clockResolution", info.clockResolution)
+            .writeAttribute("estimatedDuration", info.estimatedDuration)
             .writeComment("All values in nano seconds");
     }
 
     void XmlReporter::benchmarkEnded(BenchmarkStats<> const& benchmarkStats) {
         m_xml.startElement("mean")
-            .writeAttribute("value", static_cast<uint64_t>(benchmarkStats.mean.point.count()))
-            .writeAttribute("lowerBound", static_cast<uint64_t>(benchmarkStats.mean.lower_bound.count()))
-            .writeAttribute("upperBound", static_cast<uint64_t>(benchmarkStats.mean.upper_bound.count()))
+            .writeAttribute("value", benchmarkStats.mean.point.count())
+            .writeAttribute("lowerBound", benchmarkStats.mean.lower_bound.count())
+            .writeAttribute("upperBound", benchmarkStats.mean.upper_bound.count())
             .writeAttribute("ci", benchmarkStats.mean.confidence_interval);
         m_xml.endElement();
         m_xml.startElement("standardDeviation")
