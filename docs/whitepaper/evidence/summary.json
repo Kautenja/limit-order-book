@@ -1,0 +1,202 @@
+[
+  {
+    "workload": "ascending",
+    "size": 16,
+    "repeats": 9,
+    "median_ns": 71.33758544921875,
+    "min_ns": 69.02226257324219,
+    "max_ns": 74.41766357421875
+  },
+  {
+    "workload": "ascending",
+    "size": 128,
+    "repeats": 9,
+    "median_ns": 119.2177734375,
+    "min_ns": 118.39996337890625,
+    "max_ns": 122.8345947265625
+  },
+  {
+    "workload": "ascending",
+    "size": 1024,
+    "repeats": 9,
+    "median_ns": 588.1881713867188,
+    "min_ns": 583.2742614746094,
+    "max_ns": 613.7117004394531
+  },
+  {
+    "workload": "ascending",
+    "size": 4096,
+    "repeats": 9,
+    "median_ns": 4359.647750854492,
+    "min_ns": 4054.3257598876953,
+    "max_ns": 4710.521713256836
+  },
+  {
+    "workload": "clock",
+    "size": 1,
+    "repeats": 9,
+    "median_ns": 15.64251708984375,
+    "min_ns": 15.129135131835938,
+    "max_ns": 19.420074462890625
+  },
+  {
+    "workload": "descending",
+    "size": 16,
+    "repeats": 9,
+    "median_ns": 71.28254699707031,
+    "min_ns": 68.79660034179688,
+    "max_ns": 96.79995727539062
+  },
+  {
+    "workload": "descending",
+    "size": 128,
+    "repeats": 9,
+    "median_ns": 118.68223571777344,
+    "min_ns": 117.91372680664062,
+    "max_ns": 120.54512023925781
+  },
+  {
+    "workload": "descending",
+    "size": 1024,
+    "repeats": 9,
+    "median_ns": 592.4669799804688,
+    "min_ns": 583.7548217773438,
+    "max_ns": 1308.97265625
+  },
+  {
+    "workload": "descending",
+    "size": 4096,
+    "repeats": 9,
+    "median_ns": 4491.112396240234,
+    "min_ns": 3717.4701538085938,
+    "max_ns": 4990.337356567383
+  },
+  {
+    "workload": "existing_c",
+    "size": 16,
+    "repeats": 9,
+    "median_ns": 44.802337646484375,
+    "min_ns": 44.71397399902344,
+    "max_ns": 47.82295227050781
+  },
+  {
+    "workload": "existing_c",
+    "size": 256,
+    "repeats": 9,
+    "median_ns": 45.86601257324219,
+    "min_ns": 44.5709228515625,
+    "max_ns": 49.74810791015625
+  },
+  {
+    "workload": "existing_c",
+    "size": 4096,
+    "repeats": 9,
+    "median_ns": 45.250579833984375,
+    "min_ns": 43.76792907714844,
+    "max_ns": 46.74848937988281
+  },
+  {
+    "workload": "existing_cpp",
+    "size": 16,
+    "repeats": 9,
+    "median_ns": 43.576568603515625,
+    "min_ns": 42.93060302734375,
+    "max_ns": 47.6773681640625
+  },
+  {
+    "workload": "existing_cpp",
+    "size": 256,
+    "repeats": 9,
+    "median_ns": 43.552398681640625,
+    "min_ns": 43.357208251953125,
+    "max_ns": 44.76484680175781
+  },
+  {
+    "workload": "existing_cpp",
+    "size": 4096,
+    "repeats": 9,
+    "median_ns": 44.437408447265625,
+    "min_ns": 42.708709716796875,
+    "max_ns": 47.29461669921875
+  },
+  {
+    "workload": "fifo_sweep",
+    "size": 1,
+    "repeats": 9,
+    "median_ns": 49.440460205078125,
+    "min_ns": 45.04631042480469,
+    "max_ns": 51.031829833984375
+  },
+  {
+    "workload": "fifo_sweep",
+    "size": 16,
+    "repeats": 9,
+    "median_ns": 317.648681640625,
+    "min_ns": 310.70166015625,
+    "max_ns": 346.8291015625
+  },
+  {
+    "workload": "fifo_sweep",
+    "size": 256,
+    "repeats": 9,
+    "median_ns": 4333.875,
+    "min_ns": 4204.41015625,
+    "max_ns": 4543.4375
+  },
+  {
+    "workload": "level_sweep",
+    "size": 1,
+    "repeats": 9,
+    "median_ns": 50.57835388183594,
+    "min_ns": 49.52693176269531,
+    "max_ns": 54.37687683105469
+  },
+  {
+    "workload": "level_sweep",
+    "size": 16,
+    "repeats": 9,
+    "median_ns": 578.34423828125,
+    "min_ns": 556.604736328125,
+    "max_ns": 617.591064453125
+  },
+  {
+    "workload": "level_sweep",
+    "size": 256,
+    "repeats": 9,
+    "median_ns": 9455.390625,
+    "min_ns": 9139.48828125,
+    "max_ns": 10003.98828125
+  },
+  {
+    "workload": "shuffled",
+    "size": 16,
+    "repeats": 9,
+    "median_ns": 65.32276916503906,
+    "min_ns": 63.20513916015625,
+    "max_ns": 68.10284423828125
+  },
+  {
+    "workload": "shuffled",
+    "size": 128,
+    "repeats": 9,
+    "median_ns": 64.96086120605469,
+    "min_ns": 63.7940673828125,
+    "max_ns": 66.18453979492188
+  },
+  {
+    "workload": "shuffled",
+    "size": 1024,
+    "repeats": 9,
+    "median_ns": 79.41244506835938,
+    "min_ns": 78.39840698242188,
+    "max_ns": 86.78697204589844
+  },
+  {
+    "workload": "shuffled",
+    "size": 4096,
+    "repeats": 9,
+    "median_ns": 105.68934631347656,
+    "min_ns": 102.74954223632812,
+    "max_ns": 130.8829345703125
+  }
+]

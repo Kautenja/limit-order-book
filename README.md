@@ -23,6 +23,10 @@ price-time priority matching policy for reception of market data streams. The
 C++ library is the primary product; a C API and a Python package with Cython
 bindings to the C++ book are also provided.
 
+The [technical report](docs/whitepaper/README.md) explains the design's prior
+work, matching semantics, implementation limits, and reproducible evaluation.
+Its [LaTeX source](docs/whitepaper/main.tex) and raw measurements are included.
+
 ## Usage
 
 ### C++
@@ -267,6 +271,10 @@ gh workflow run publish.yml --ref <tag>
 ## Citation
 
 Please cite `limit-order-book` if you use it in your research.
+
+For the implementation analysis and measurements, use the
+[technical report citation](docs/whitepaper/CITATION.bib). The software citation
+below identifies the library itself.
 
 Download [CITATION.bib](CITATION.bib) or copy the BibTeX entry below.
 [CITATION.cff](CITATION.cff) provides the same preferred citation for GitHub's

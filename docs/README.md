@@ -4,6 +4,12 @@ This directory brings together development guidance and imported reference
 material for `limit-order-book`. Start with the project [README](../README.md)
 for installation, usage, and development commands.
 
+## Technical Report
+
+-   [Design and evaluation](whitepaper/README.md): LaTeX manuscript, attribution,
+    matching semantics, complexity, and reproducible correctness and timing
+    experiments with archived observations.
+
 ## Development
 
 -   [Contributing](../CONTRIBUTING.md): Environment setup, architecture,
