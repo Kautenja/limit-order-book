@@ -5,7 +5,7 @@ Notable changes to `limit-order-book` are collected here. Entries before
 against the tagged sources and commit history. Dates through 2.0.0 are the
 PyPI upload dates, or the tag date for releases that were not uploaded.
 
-## Unreleased
+## 3.1.0 (2026-10-19)
 
 **Breaking changes:**
 
