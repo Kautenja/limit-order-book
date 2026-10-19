@@ -37,7 +37,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --no-install-recommends -y \
-            latexmk texlive-latex-extra texlive-fonts-extra texlive-pictures
+            latexmk texlive-latex-extra texlive-fonts-extra texlive-pictures \
+            texlive-plain-generic
 
       - name: Build report from archived evidence
         run: |

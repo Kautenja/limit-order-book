@@ -76,5 +76,9 @@ Local validation on 2026-10-18, macOS arm64:
 -   All 22 entries in the study, architecture, and historical-reference
     source manifests still match. The manuscript and evaluation are unchanged.
 
+The first Ubuntu Actions run found a missing `binhex.tex` dependency in
+`newtxtext`. The workflow and guide now explicitly include
+`texlive-plain-generic`; `actionlint` passes after this correction.
+
 The release paths were inspected without creating a tag, release, or PyPI
-publication. GitHub-hosted build validation remains to be recorded after push.
+publication. Successful GitHub-hosted validation remains to be recorded.

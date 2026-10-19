@@ -22,10 +22,13 @@ On Ubuntu 24.04, the workflow installs these packages:
 
 ```shell
 sudo apt-get install --no-install-recommends -y \
-    latexmk texlive-latex-extra texlive-fonts-extra texlive-pictures
+    latexmk texlive-latex-extra texlive-fonts-extra texlive-pictures \
+    texlive-plain-generic
 ```
 
-Keep that dependency list consistent with the manuscript's preamble. Do not
+The `texlive-plain-generic` package supplies `binhex.tex`, required by the
+Ubuntu version of `newtxtext`. Keep the dependency list consistent with the
+manuscript's preamble. Do not
 commit PDFs or auxiliary files: `.build/` is ignored at every depth.
 `make -C docs/whitepaper clean` removes report outputs; `./main.sh clean`
 removes the report directory and the root build directory.
