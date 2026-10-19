@@ -1,14 +1,16 @@
 """The compilation script for this project using SCons."""
 import os
 import fnmatch
-import re
 
 
-# create a separate build directory
-VariantDir('build', 'src', duplicate=0)
-VariantDir('build_benchmark', 'benchmark', duplicate=0)
-VariantDir('build_test', 'test', duplicate=0)
-VariantDir('build_main', 'main', duplicate=0)
+# the root directory for all build outputs
+BUILD_DIR = '.build'
+# the source directories that compile into variant directories under BUILD_DIR
+SOURCE_DIRS = ['src', 'test', 'benchmark', 'main']
+for source_dir in SOURCE_DIRS:
+    VariantDir(os.path.join(BUILD_DIR, source_dir), source_dir, duplicate=0)
+# keep the SCons signature database with the other build outputs
+SConsignFile(os.path.join(BUILD_DIR, 'sconsign'))
 
 
 # the compiler and linker flags for the testing C++ environment
@@ -81,27 +83,42 @@ BENCHMARK_ENV = Environment(
 )
 
 
-def find_source_files(src_dir, build_dir):
+def find_source_files(src_dir):
     """
     Find all the source files in the given directory.
 
     Args:
         src_dir: the source directory to search through
-        build_dir: the build directory (to replace src_dir with)
 
     Returns:
-        a list of paths to cpp files where src_dir is replaced by build_dir
+        a sorted list of paths to cpp files in the variant directory of
+        src_dir under BUILD_DIR
+
     """
     files = []
     for root, dirnames, filenames in os.walk(src_dir):
-        root = re.sub(src_dir, build_dir, root)
+        root = os.path.join(BUILD_DIR, root)
         for filename in fnmatch.filter(filenames, '*.cpp'):
             files.append(os.path.join(root, filename))
     return sorted(files)
 
 
+def source_name(build_file):
+    """
+    Return the source path of a file in a variant directory.
+
+    Args:
+        build_file: a path to a file in a variant directory under BUILD_DIR
+
+    Returns:
+        the path to the file relative to BUILD_DIR, e.g., test/test_lob.cpp
+
+    """
+    return os.path.relpath(build_file, BUILD_DIR)
+
+
 # Locate all the C++ source files
-SRC = find_source_files('src', 'build')
+SRC = find_source_files('src')
 # create separate object files for testing and production environments
 TEST_SRC = [TESTING_ENV.Object(f.replace('.cpp', '') + '-test', f) for f in SRC]
 PROD_SRC = [PRODUCTION_ENV.Object(f.replace('.cpp', '') + '-prod', f) for f in SRC]
@@ -113,18 +130,18 @@ BENCHMARK_SRC = [BENCHMARK_ENV.Object(f.replace('.cpp', '') + '-bench', f) for f
 #
 
 
-# locate all the testing source files
-TEST_FILES = find_source_files('test/', 'build_test/')
 # create a list to store all the test target aliases in
 UNIT_TEST_ALIASES = []
-for file in TEST_FILES:  # iterate over all the test source files
-    UNIT_TEST_PROGRAM = TESTING_ENV.Program(file.replace('.cpp', ''), [file] + TEST_SRC)
-    UNIT_TEST_ALIASES.append(Alias('test/' + file.replace('build_test/', ''), [UNIT_TEST_PROGRAM], UNIT_TEST_PROGRAM[0].path))
+for file in find_source_files('test'):  # iterate over the test source files
+    program = TESTING_ENV.Program(file.replace('.cpp', ''), [file] + TEST_SRC)
+    # create an alias that builds and runs the test suite, e.g.,
+    # `scons test/test_limit_tree.cpp`
+    UNIT_TEST_ALIASES.append(Alias(source_name(file), [program], program[0].path))
     AlwaysBuild(UNIT_TEST_ALIASES[-1])
 
 
 # create an alias to run all test suites
-Alias("test", UNIT_TEST_ALIASES)
+Alias('test', UNIT_TEST_ALIASES)
 
 
 #
@@ -132,14 +149,18 @@ Alias("test", UNIT_TEST_ALIASES)
 #
 
 
-for benchmark in find_source_files('benchmark', 'build_benchmark'):
-    # create the binary
-    binary_name = benchmark.replace('.cpp', '')
-    program = BENCHMARK_ENV.Program(binary_name, [benchmark] + BENCHMARK_SRC)
-    # create a scons alias for the binary
-    shell_name = benchmark.replace('build_', '')
-    benchmark_alias = Alias(shell_name, [program], program[0].path)
-    AlwaysBuild(benchmark_alias)
+# create a list to store all the benchmark target aliases in
+BENCHMARK_ALIASES = []
+for file in find_source_files('benchmark'):
+    program = BENCHMARK_ENV.Program(file.replace('.cpp', ''), [file] + BENCHMARK_SRC)
+    # create an alias that builds and runs the benchmark, e.g.,
+    # `scons benchmark/benchmark_lob.cpp`
+    BENCHMARK_ALIASES.append(Alias(source_name(file), [program], program[0].path))
+    AlwaysBuild(BENCHMARK_ALIASES[-1])
+
+
+# create an alias to run all benchmarks
+Alias('benchmark', BENCHMARK_ALIASES)
 
 
 #
@@ -147,18 +168,34 @@ for benchmark in find_source_files('benchmark', 'build_benchmark'):
 #
 
 
-for main in find_source_files('main', 'build_main'):
-    # create the binary
-    binary_name = main.replace('.cpp', '')
-    program = PRODUCTION_ENV.Program(binary_name, [main] + PROD_SRC)
-    # create a scons alias for the binary
-    shell_name = main.replace('build_', '')
-    benchmark_alias = Alias(shell_name, [program], program[0].path)
-    AlwaysBuild(benchmark_alias)
+# create a list to store all the executable programs in
+MAIN_PROGRAMS = []
+for file in find_source_files('main'):
+    program = PRODUCTION_ENV.Program(file.replace('.cpp', ''), [file] + PROD_SRC)
+    MAIN_PROGRAMS.append(program)
+    # create an alias that builds and runs the executable, e.g.,
+    # `scons main/dummy_matching.cpp`
+    AlwaysBuild(Alias(source_name(file), [program], program[0].path))
+
+
+# create an alias to build (but not run) all executables
+Alias('main', MAIN_PROGRAMS)
+
+
+#
+# MARK: Shared Library
+#
 
 
 # Create a shared library (it will add "lib" to the front automatically)
-lib = PRODUCTION_ENV.SharedLibrary('_limit_order_book.so', SRC)
+lib = PRODUCTION_ENV.SharedLibrary(os.path.join(BUILD_DIR, 'lib', '_limit_order_book.so'), SRC)
 AlwaysBuild(lib)
-# copy the so file to the lob package
-Command(target="limit_order_book", source=lib, action=Copy("$TARGET", "$SOURCE"))
+# copy the shared library into the Python package
+package_lib = Command(
+    target='limit_order_book/${SOURCE.file}',
+    source=lib,
+    action=Copy('$TARGET', '$SOURCE'),
+)
+Alias('limit_order_book', package_lib)
+# build the shared library and copy it into the package by default
+Default(package_lib)

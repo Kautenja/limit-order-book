@@ -79,11 +79,11 @@ strongest signals are:
 -   `include/` is a header-only library. Users copy it into their projects or
     add it as a submodule, so new library code lives in headers and is marked
     `inline` or templated. `src/lib_lob.cpp` only compiles the C API.
--   SCons builds with `-std=c++17`; `setup.py` builds the PyPI extension with
-    `-std=c++1y`, or `/std:c++14` under MSVC for Windows wheels. Library code
-    must compile under all three until `setup.py` is updated, so avoid C++17-only features in `include/` such as
-    `if constexpr`, structured bindings, `std::optional`, and inline
-    variables. Tests, benchmarks, and `main/` may use C++17.
+-   SCons builds with `-std=c++17`. The PyPI extension in `pyproject.toml`
+    uses the compiler default, which is C++14 for MSVC. Library code must
+    compile as C++14 for the Windows wheels, so avoid C++17-only features in
+    `include/` such as `if constexpr`, structured bindings, `std::optional`,
+    and inline variables. Tests, benchmarks, and `main/` may use C++17.
 -   Code must compile without warnings under `-pedantic -Wall` with both
     `g++` and Apple Clang.
 -   Use the `LOB` namespace for everything in `include/` except the C API.

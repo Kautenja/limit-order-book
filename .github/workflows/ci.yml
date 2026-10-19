@@ -78,13 +78,14 @@ jobs:
         run: git clean -fdX
 
       - name: Build distributions
-        run: python -m build
+        run: python -m build --outdir .build/dist
 
       - name: Upload distributions
         uses: actions/upload-artifact@v7
         with:
           name: limit-order-book-${{ matrix.platform.artifact }}-py${{ matrix.python-version }}-dist
-          path: dist/*
+          path: .build/dist/*
+          include-hidden-files: true
           if-no-files-found: error
 
   release:

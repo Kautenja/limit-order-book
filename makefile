@@ -1,8 +1,7 @@
 # an alias to the python command
 PYTHON=python3
 
-# build the LaiNES code, test the Python interface, and build
-# the deployment package
+# test the C++ and Python code and build the deployment package
 all: test deployment
 
 #
@@ -13,9 +12,9 @@ all: test deployment
 test_lib_limit_order_book:
 	scons test
 
-# build the CPP code
+# build the shared library into the Python package
 lib_limit_order_book: test_lib_limit_order_book
-	scons
+	scons limit_order_book
 
 # run the Python test suite
 test: lib_limit_order_book
@@ -25,25 +24,24 @@ test: lib_limit_order_book
 # MARK: Deployment
 #
 
-clean_dist:
-	rm -rf build/ dist/ .eggs/ *.egg-info/ || true
+# remove the build directory, which holds all C++ and Python build outputs,
+# and the setuptools metadata that cannot live there
+clean_build:
+	rm -rf .build *.egg-info
 
+# remove Python bytecode and the shared library copied into the package
 clean_python_build:
-	find . -name "*.pyc" -delete
-	find . -name "__pycache__" -delete
+	find limit_order_book -name "*.pyc" -delete
+	find limit_order_book -name "__pycache__" -type d -prune -exec rm -rf {} +
+	rm -f limit_order_book/lib_limit_order_book*
 
-clean_cpp_build:
-	find . -name ".sconsign.dblite" -delete
-	find . -name "build" | rm -rf
-	find . -name "lib_limit_order_book.so" -delete
-
-# clean the build directory
-clean: clean_dist clean_python_build clean_cpp_build
+# clean all build outputs
+clean: clean_build clean_python_build
 
 # build the deployment package
 deployment: clean
-	${PYTHON} -m build
+	${PYTHON} -m build --outdir .build/dist
 
 # ship the deployment package to PyPi
 ship: test deployment
-	twine upload dist/*
+	twine upload .build/dist/*

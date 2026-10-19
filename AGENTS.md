@@ -36,6 +36,10 @@ material, not dependencies.
 -   **`test/` and `limit_order_book/test/`:** Catch2 and `unittest` suites.
 -   **`benchmark/`:** Catch2 benchmarks for the C++ book.
 -   **`main/`:** Small executables that drive the book, built by SCons.
+-   **`.build/`:** Every build output, ignored by Git: SCons objects and
+    binaries in `.build/{src,test,benchmark,main}/`, the shared library in
+    `.build/lib/`, setuptools intermediates in `.build/python/`, and
+    distributions in `.build/dist/`. `make clean` removes it.
 -   **`vendor/`:** Third-party and owner-authored dependencies, committed
     in-tree. Treat them as read-only.
 -   **`developer-manual/`:** Durable rules for agents and maintainers.
@@ -56,9 +60,9 @@ material, not dependencies.
     repositories; ask before changing a vendored copy here.
 -   Do not regenerate `docs/` unless asked. A regenerated `docs/` changes the
     public site once it reaches `master`.
--   Put scratch files, build experiments, and benchmark captures outside the
-    repository or in an ignored `build*/` directory. Remove them when the task
-    is finished.
+-   Reserve `.build/` for build outputs. Put scratch files, experiments, and
+    benchmark captures outside the repository, and remove them when the task
+    is finished. Do not add new top-level build or output directories.
 -   Commit only when requested. Push, tag, and publish to PyPI only when
     requested. Keep credentials and private local paths out of tracked files.
 
@@ -100,31 +104,39 @@ changes, update `lib_lob.hpp`, the `argtypes` and `restype` declarations in
 
 ## Development And Validation
 
-The C++ build uses SCons with the system `g++`. The Python package uses
-`pyproject.toml` for metadata and `setup.py` for the extension. From the
-repository root:
+The C++ build uses SCons with the system `g++`. The Python package and its
+extension are declared entirely in `pyproject.toml` and built by setuptools;
+there is no `setup.py`. From the repository root:
 
 ```shell
 make test
 ```
 
-That target runs the Catch2 suites, builds the shared library into
-`limit_order_book/`, and runs the Python suite. The individual stages are:
+That target runs the Catch2 suites, builds the shared library and copies it
+into `limit_order_book/`, and runs the Python suite. The individual stages
+are:
 
 ```shell
 scons test
-scons
+scons limit_order_book
 python3 -m unittest discover .
 ```
 
-Run one Catch2 suite with its alias, such as `scons test/test_limit_tree.cpp`,
-and the benchmarks with `scons benchmark`.
+Other SCons aliases:
 
-**Important:** SCons compiles with `-std=c++17`, but `setup.py` compiles the
-PyPI extension with `-std=c++1y`, or `/std:c++14` under MSVC. Code in
-`include/` and `src/` must compile under all three until `setup.py` is
-updated. Wheels must stay portable, so never add `-march=native` or other
-host-tuned flags to `setup.py`.
+-   **`scons test/test_limit_tree.cpp`:** Build and run one Catch2 suite.
+-   **`scons benchmark`:** Build and run every benchmark, or one with
+    `scons benchmark/benchmark_lob.cpp`.
+-   **`scons main`:** Build the executables in `main/`, or build and run one
+    with `scons main/dummy_matching.cpp`.
+
+Plain `scons` builds only the shared library into the package.
+
+**Important:** SCons compiles with `-std=c++17`. The PyPI extension sets no
+standard flag, so it uses the compiler default: C++17 for current GCC and
+Clang, but C++14 for MSVC. Code in `include/` and `src/` must compile as
+C++14 for the Windows wheels. Wheels must stay portable, so never add
+`-march=native` or other host-tuned flags to `pyproject.toml`.
 
 Validate changes by type:
 
@@ -132,7 +144,8 @@ Validate changes by type:
     and after the change when the hot path is touched.
 -   **C API or Python bindings:** `make test`, and confirm every C function has
     matching `ctypes` declarations.
--   **Build or packaging:** `make test` and `python3 -m build`. Do not run
+-   **Build or packaging:** `make test` and
+    `python3 -m build --outdir .build/dist`. Do not run
     `make ship`, dispatch the publish workflow, or upload to PyPI unless
     asked.
 -   **Documentation only:** Link, path, and command checks, `git diff --check`,

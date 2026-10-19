@@ -1,5 +1,6 @@
 # MARK: Project Files
-build*/
+# all C++ and Python build outputs, see SConstruct and pyproject.toml
+.build/
 
 # MARK: Python gitignore
 # https://github.com/github/gitignore/blob/master/Python.gitignore

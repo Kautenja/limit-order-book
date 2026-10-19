@@ -72,13 +72,14 @@ jobs:
       - name: Build sdist
         run: |
           python -m pip install --upgrade pip build
-          python -m build --sdist --outdir dist
+          python -m build --sdist --outdir .build/dist
 
       - name: Upload sdist
         uses: actions/upload-artifact@v7
         with:
           name: limit-order-book-sdist
-          path: dist/*.tar.gz
+          path: .build/dist/*.tar.gz
+          include-hidden-files: true
           if-no-files-found: error
 
   build-wheels:
@@ -119,6 +120,8 @@ jobs:
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v3.4.1
+        with:
+          output-dir: .build/wheelhouse
         env:
           CIBW_ARCHS: ${{ matrix.cibw-arch }}
 
@@ -126,7 +129,8 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: limit-order-book-${{ matrix.artifact }}-wheel
-          path: wheelhouse/*.whl
+          path: .build/wheelhouse/*.whl
+          include-hidden-files: true
           if-no-files-found: error
 
   publish:

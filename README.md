@@ -73,10 +73,18 @@ scons test
 
 #### Python
 
-To run the Python unit-test suite, run:
+To run the Python unit-test suite, build the shared library into the package
+with `scons` or `pip install --editable .`, then run:
 
 ```shell
 python -m unittest discover .
+```
+
+All build outputs, including distributions from `python -m build --outdir
+.build/dist`, go to the ignored `.build/` directory. To remove them, run:
+
+```shell
+make clean
 ```
 
 ### Benchmarking

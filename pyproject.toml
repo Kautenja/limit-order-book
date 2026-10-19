@@ -41,6 +41,31 @@ zip-safe = false
 include = ["limit_order_book*"]
 exclude = ["limit_order_book.test*"]
 
+# The shared library that the Python package loads through ctypes. No
+# standard or optimization flags are set, so the compiler defaults apply:
+# C++17 for current GCC and Clang, C++14 for MSVC, and the optimization level
+# Python was built with. Wheels run on other machines, so never add
+# -march=native or other host-tuned flags here.
+[[tool.setuptools.ext-modules]]
+name = "limit_order_book.lib_limit_order_book"
+sources = ["src/lib_lob.cpp"]
+include-dirs = [
+    "include",
+    "vendor/binary-search-tree/include",
+    "vendor/cpptqdm/include",
+    "vendor/doubly-linked-list/include",
+    "vendor/hopscotch_map/include",
+    "vendor/robin-map/include",
+    "vendor/sparse-map/include",
+]
+language = "c++"
+
+# Keep setuptools intermediates under .build/ with the SCons outputs instead
+# of build/ in the repository root. The *.egg-info/ metadata stays in the
+# root, because setuptools requires its base directory to already exist.
+[tool.distutils.build]
+build-base = ".build/python"
+
 [tool.cibuildwheel]
 build = "cp313-* cp314-*"
 skip = "*-musllinux_*"
